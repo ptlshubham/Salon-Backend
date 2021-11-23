@@ -38,7 +38,7 @@ router.get("/GetAllServices", (req, res, next) => {
 });
 
 router.post("/UpdateServicesList", (req, res, next) => {
-    db.executeSql("UPDATE `angrez`.`serviceslist` SET name='" + req.body.name + "',price=" + req.body.price + ",time=" + req.body.time + ",point=" + req.body.point + ",updateddate=CURRENT_TIMESTAMP WHERE id=" + req.body.id + ";", function (data, err) {
+    db.executeSql("UPDATE  `serviceslist` SET name='" + req.body.name + "',price=" + req.body.price + ",time=" + req.body.time + ",point=" + req.body.point + ",updateddate=CURRENT_TIMESTAMP WHERE id=" + req.body.id + ";", function (data, err) {
         if (err) {
             console.log("Error in store.js", err);
         } else {
@@ -107,6 +107,16 @@ router.post("/RemoveEmployeeList", (req, res, next) => {
 
     console.log(req.body);
     db.executeSql("Delete from employee where id=" + req.body.id, function (data, err) {
+        if (err) {
+            console.log("Error in store.js", err);
+        } else {
+            return res.json(data);
+        }
+    });
+})
+
+router.post("/UpdateEmployeeList", (req, res, next) => {
+    db.executeSql("UPDATE `employee` SET fname='" + req.body.fname + "',lname='" + req.body.lname + "',contact='" + req.body.contact + "',whatsapp='" + req.body.whatsapp + "',address='" + req.body.address + "',city='" + req.body.city + "',gender='" + req.body.gender + "',updateddate=CURRENT_TIMESTAMP WHERE id=" + req.body.id + ";", function (data, err) {
         if (err) {
             console.log("Error in store.js", err);
         } else {
@@ -227,7 +237,7 @@ router.get("/GetMonthlyTotal", (req, res, next) => {
 
 
 router.post("/UpdateCustomerList", (req, res, next) => {
-    db.executeSql("UPDATE `angrez`.`customer` SET fname='" + req.body.fname + "',lname='" + req.body.lname + "',email='" + req.body.email + "',contact='" + req.body.contact + "',whatsapp='" + req.body.whatsapp + "',gender='" + req.body.gender + "',updateddate=CURRENT_TIMESTAMP WHERE id=" + req.body.id + ";", function (data, err) {
+    db.executeSql("UPDATE  `customer` SET fname='" + req.body.fname + "',lname='" + req.body.lname + "',email='" + req.body.email + "',contact='" + req.body.contact + "',whatsapp='" + req.body.whatsapp + "',gender='" + req.body.gender + "',updateddate=CURRENT_TIMESTAMP WHERE id=" + req.body.id + ";", function (data, err) {
         if (err) {
             console.log("Error in store.js", err);
         } else {
@@ -235,6 +245,8 @@ router.post("/UpdateCustomerList", (req, res, next) => {
         }
     });
 })
+
+
 
 router.get("/removeCustomerDetails/:id", (req, res, next) => {
 
@@ -334,7 +346,7 @@ router.post("/updatePasswordAccordingRole", (req, res, next) => {
     var repass = salt + '' + req.body.password;
     var encPassword = crypto.createHash('sha1').update(repass).digest('hex');
     if (req.body.role == 'Admin') {
-        db.executeSql("UPDATE `angrez`.`admin` SET password='" + encPassword + "' WHERE id=" + req.body.id + ";", function (data, err) {
+        db.executeSql("UPDATE  `admin` SET password='" + encPassword + "' WHERE id=" + req.body.id + ";", function (data, err) {
             if (err) {
                 console.log("Error in store.js", err);
             } else {
@@ -345,7 +357,7 @@ router.post("/updatePasswordAccordingRole", (req, res, next) => {
 });
 
 router.post("/UpdateActiveStatus", (req, res, next) => {
-    db.executeSql("UPDATE `angrez`.`appointment` SET isactive=" + req.body.isactive + ", updatedate=CURRENT_TIMESTAMP WHERE id=" + req.body.id + ";", function (data, err) {
+    db.executeSql("UPDATE  `appointment` SET isactive=" + req.body.isactive + ", updatedate=CURRENT_TIMESTAMP WHERE id=" + req.body.id + ";", function (data, err) {
         if (err) {
             console.log("Error in store.js", err);
         } else {
@@ -365,7 +377,7 @@ router.post("/GetViewAppointment", (req, res, next) => {
 })
 
 router.post("/UpdateEnquiryStatus", (req, res, next) => {
-    db.executeSql("UPDATE `angrez`.`enquiry` SET isactive=" + req.body.isactive + " WHERE id=" + req.body.id + ";", function (data, err) {
+    db.executeSql("UPDATE  `enquiry` SET isactive=" + req.body.isactive + " WHERE id=" + req.body.id + ";", function (data, err) {
         if (err) {
             console.log("Error in store.js", err);
         } else {
