@@ -11,8 +11,8 @@ const { equal } = require("assert");
 const { Console } = require("console");
 const { json } = require("body-parser");
 const nodemailer = require('nodemailer');
-const today = new Date();
-const utcMonth = today.getUTCMonth();
+// const today = new Date();
+// const utcMonth = today.getUTCMonth();
 
 
 router.post("/SaveServicesList", (req, res, next) => {
@@ -397,6 +397,44 @@ router.post("/GetCustomerTotalPoints", (req, res, next) => {
     });
 })
 
+router.post("/GetAllCustomerDataList", (req, res, next) => {
+
+    db.executeSql("select * from appointment where custid = " + req.body.id + "", function (data, err) {
+        if (err) {
+            console.log("Error in store.js", err);
+        } else {
+            return res.json(data);
+        }
+    });
+})
+
+router.post("/GetUsedServicesByCustomer", (req, res, next) => {
+
+    db.executeSql("select s.servicesid,s.servicesname,s.custid,s.appointmentid,sl.id as slId,sl.price,sl.time,sl.point from custservices s join serviceslist sl on s.servicesid=sl.id where s.appointmentid = " + req.body.id + "", function (data, err) {
+        if (err) {
+            console.log("Error in store.js", err);
+        } else {
+            return res.json(data);
+        }
+    });
+})
+
+var today = new Date();
+var dd = String(today.getDate()).padStart(2, '0');
+var mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
+var yyyy = today.getFullYear();
+
+today = yyyy + '-' + mm + '-' + dd;
+
+router.get("/GetAllCompletedServices", (req, res, next) => {
+    db.executeSql("select a.id,a.custid,a.empname,a.totalprice,a.totalpoint,a.totaltime,a.isactive,a.createddate,a.updatedate,c.id as cId,c.fname,c.lname,c.email,c.contact,c.whatsapp,c.gender from appointment a join customer c on a.custid=c.id where a.isactive=false and a.createddate='" + today + "'", function (data, err) {
+        if (err) {
+            console.log(err);
+        } else {
+            return res.json(data);
+        }
+    })
+});
 
 let secret = 'prnv';
 router.post('/login', function (req, res, next) {
