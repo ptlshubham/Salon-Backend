@@ -216,7 +216,7 @@ router.get("/GetAllEnquiryList", (req, res, next) => {
 var nowDate = new Date();
 date = nowDate.getFullYear() + '-' + (nowDate.getMonth() + 1) + '-' + nowDate.getDate();
 router.get("/GetDailyTotal", (req, res, next) => {
-    db.executeSql("select * from appointment where createddate='" + date + "'", function (data, err) {
+    db.executeSql("select * from appointment where createddate='" + date + "' and isactive=false", function (data, err) {
         if (err) {
             console.log(err);
         } else {
