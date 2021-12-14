@@ -226,7 +226,7 @@ router.get("/GetDailyTotal", (req, res, next) => {
 });
 
 router.get("/GetMonthlyTotal", (req, res, next) => {
-    db.executeSql("select * from appointment where  DATE_FORMAT(createddate, '%m') = DATE_FORMAT(CURRENT_TIMESTAMP, '%m')", function (data, err) {
+    db.executeSql("select * from appointment where  DATE_FORMAT(createddate, '%m') = DATE_FORMAT(CURRENT_TIMESTAMP, '%m') and isactive=false", function (data, err) {
         if (err) {
             console.log(err);
         } else {
