@@ -149,7 +149,7 @@ router.get("/GetAllCustomer", (req, res, next) => {
 
 router.post("/SaveAppointmentList", (req, res, next) => {
     console.log(req.body)
-    db.executeSql("INSERT INTO `appointment`(`custid`, `empname`, `totalprice`, `totalpoint`, `totaltime`, `isactive`, `createddate`)VALUES(" + req.body.custid + ",'" + req.body.emp + "','" + req.body.totalprice + "','" + req.body.totalpoint + "','" + req.body.totaltime + "'," + req.body.isactive + ",CURRENT_TIMESTAMP);", function (data, err) {
+    db.executeSql("INSERT INTO `appointment`(`custid`, `empname`, `totalprice`, `totalpoint`, `totaltime`, `isactive`, `createddate`,`ispayment`)VALUES(" + req.body.custid + ",'" + req.body.emp + "','" + req.body.totalprice + "','" + req.body.totalpoint + "','" + req.body.totaltime + "'," + req.body.isactive + ",CURRENT_TIMESTAMP,false);", function (data, err) {
         if (err) {
             console.log(err)
         } else {
@@ -216,17 +216,18 @@ router.get("/GetAllEnquiryList", (req, res, next) => {
 var nowDate = new Date();
 date = nowDate.getFullYear() + '-' + (nowDate.getMonth() + 1) + '-' + nowDate.getDate();
 router.get("/GetDailyTotal", (req, res, next) => {
-    db.executeSql("select * from appointment where createddate='" + date + "'", function (data, err) {
+    db.executeSql("select * from appointment where createddate='" + date + "' and ispayment=true", function (data, err) {
         if (err) {
             console.log(err);
         } else {
+            
             return res.json(data);
         }
     })
 });
 
 router.get("/GetMonthlyTotal", (req, res, next) => {
-    db.executeSql("select * from appointment where  DATE_FORMAT(createddate, '%m') = DATE_FORMAT(CURRENT_TIMESTAMP, '%m')", function (data, err) {
+    db.executeSql("select * from appointment where  DATE_FORMAT(createddate, '%m') = DATE_FORMAT(CURRENT_TIMESTAMP, '%m') and ispayment=true", function (data, err) {
         if (err) {
             console.log(err);
         } else {
@@ -357,7 +358,7 @@ router.post("/updatePasswordAccordingRole", (req, res, next) => {
 });
 
 router.post("/UpdateActiveStatus", (req, res, next) => {
-    db.executeSql("UPDATE  `appointment` SET isactive=" + req.body.isactive + ", updatedate=CURRENT_TIMESTAMP WHERE id=" + req.body.id + ";", function (data, err) {
+    db.executeSql("UPDATE  `appointment` SET isactive=" + req.body.isactive + ", updatedate=CURRENT_TIMESTAMP,ispayment=true WHERE id=" + req.body.id + ";", function (data, err) {
         if (err) {
             console.log("Error in store.js", err);
         } else {
