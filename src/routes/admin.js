@@ -127,7 +127,7 @@ router.post("/UpdateEmployeeList", (req, res, next) => {
 
 router.post("/SaveCustomerList", (req, res, next) => {
     console.log(req.body)
-    db.executeSql("INSERT INTO `customer`(`fname`,`lname`,`email`,`contact`,`whatsapp`,`gender`,`createddate`)VALUES('" + req.body.fname + "','" + req.body.lname + "','" + req.body.email + "','" + req.body.contact + "','" + req.body.whatsapp + "','" + req.body.gender + "',CURRENT_TIMESTAMP);", function (data, err) {
+    db.executeSql("INSERT INTO `customer`(`fname`,`lname`,`email`,`contact`,`whatsapp`,`gender`,`createddate`,`address`)VALUES('" + req.body.fname + "','" + req.body.lname + "','" + req.body.email + "','" + req.body.contact + "','" + req.body.whatsapp + "','" + req.body.gender + "',CURRENT_TIMESTAMP,'" + req.body.address + "');", function (data, err) {
         if (err) {
             console.log(err)
         } else {
@@ -199,7 +199,35 @@ router.get("/GetAllAppointment", (req, res, next) => {
         }
     })
 });
+router.post("/ChackForPassword", (req, res, next) => {
+    var salt = '7fa73b47df808d36c5fe328546ddef8b9011b2c6';
+    var repass = salt + '' + req.body.pass;
+    var encPassword = crypto.createHash('sha1').update(repass).digest('hex');
+    db.executeSql("select * from admin where id=" + req.body.id + " and password='" + encPassword + "'", function (data, err) {
+        if (err) {
+            console.log(err);
+        }
+        else {
+            return res.json(data)
+        }
+    })
+})
 
+router.post("/updatePasswordAccordingRole", (req, res, next) => {
+    console.log(req.body)
+    var salt = '7fa73b47df808d36c5fe328546ddef8b9011b2c6';
+    var repass = salt + '' + req.body.password;
+    var encPassword = crypto.createHash('sha1').update(repass).digest('hex');
+    if (req.body.role == 'Admin') {
+        db.executeSql("UPDATE  `admin` SET password='" + encPassword + "' WHERE id=" + req.body.id + ";", function (data, err) {
+            if (err) {
+                console.log("Error in store.js", err);
+            } else {
+                return res.json(data);
+            }
+        });
+    }
+});
 
 
 router.get("/GetAllEnquiryList", (req, res, next) => {
@@ -238,7 +266,7 @@ router.get("/GetMonthlyTotal", (req, res, next) => {
 
 
 router.post("/UpdateCustomerList", (req, res, next) => {
-    db.executeSql("UPDATE  `customer` SET fname='" + req.body.fname + "',lname='" + req.body.lname + "',email='" + req.body.email + "',contact='" + req.body.contact + "',whatsapp='" + req.body.whatsapp + "',gender='" + req.body.gender + "',updateddate=CURRENT_TIMESTAMP WHERE id=" + req.body.id + ";", function (data, err) {
+    db.executeSql("UPDATE  `customer` SET fname='" + req.body.fname + "',lname='" + req.body.lname + "',email='" + req.body.email + "',contact='" + req.body.contact + "',whatsapp='" + req.body.whatsapp + "',gender='" + req.body.gender + "',updateddate=CURRENT_TIMESTAMP,address='"+req.body.address+"' WHERE id=" + req.body.id + ";", function (data, err) {
         if (err) {
             console.log("Error in store.js", err);
         } else {
@@ -341,21 +369,7 @@ router.post("/GetOneTimePassword", (req, res, next) => {
     });
 });
 
-router.post("/updatePasswordAccordingRole", (req, res, next) => {
-    console.log(req.body)
-    var salt = '7fa73b47df808d36c5fe328546ddef8b9011b2c6';
-    var repass = salt + '' + req.body.password;
-    var encPassword = crypto.createHash('sha1').update(repass).digest('hex');
-    if (req.body.role == 'Admin') {
-        db.executeSql("UPDATE  `admin` SET password='" + encPassword + "' WHERE id=" + req.body.id + ";", function (data, err) {
-            if (err) {
-                console.log("Error in store.js", err);
-            } else {
-                return res.json(data);
-            }
-        });
-    }
-});
+
 
 router.post("/UpdateActiveStatus", (req, res, next) => {
     db.executeSql("UPDATE  `appointment` SET isactive=" + req.body.isactive + ", updatedate=CURRENT_TIMESTAMP,ispayment=true WHERE id=" + req.body.id + ";", function (data, err) {
