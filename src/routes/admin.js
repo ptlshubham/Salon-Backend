@@ -154,7 +154,7 @@ router.post("/SaveAppointmentList", (req, res, next) => {
             console.log(err)
         } else {
             for (let i = 0; i < req.body.selectedService.length; i++) {
-                db.executeSql("INSERT INTO `custservices`(`servicesid`,`servicesname`,`custid`,`appointmentid`) VALUES(" + req.body.selectedService[i].servicesId + ",'" + req.body.selectedService[i].itemName + "'," + req.body.custid + "," + data.insertId + ");", function (data1, err) {
+                db.executeSql("INSERT INTO `custservices`(`servicesid`,`servicesname`,`custid`,`appointmentid`,`employeename`,`empid`) VALUES(" + req.body.selectedService[i].selectedServid + ",'" + req.body.selectedService[i].selectedServ + "'," + req.body.custid + "," + data.insertId + ",'" + req.body.selectedService[i].selectedEmp + "'," + req.body.selectedService[i].selectedEmpid + ");", function (data1, err) {
                     if (err) {
                         console.log(err);
                     } else {
@@ -248,7 +248,7 @@ router.get("/GetDailyTotal", (req, res, next) => {
         if (err) {
             console.log(err);
         } else {
-            
+
             return res.json(data);
         }
     })
@@ -266,7 +266,7 @@ router.get("/GetMonthlyTotal", (req, res, next) => {
 
 
 router.post("/UpdateCustomerList", (req, res, next) => {
-    db.executeSql("UPDATE  `customer` SET fname='" + req.body.fname + "',lname='" + req.body.lname + "',email='" + req.body.email + "',contact='" + req.body.contact + "',whatsapp='" + req.body.whatsapp + "',gender='" + req.body.gender + "',updateddate=CURRENT_TIMESTAMP,address='"+req.body.address+"' WHERE id=" + req.body.id + ";", function (data, err) {
+    db.executeSql("UPDATE  `customer` SET fname='" + req.body.fname + "',lname='" + req.body.lname + "',email='" + req.body.email + "',contact='" + req.body.contact + "',whatsapp='" + req.body.whatsapp + "',gender='" + req.body.gender + "',updateddate=CURRENT_TIMESTAMP,address='" + req.body.address + "' WHERE id=" + req.body.id + ";", function (data, err) {
         if (err) {
             console.log("Error in store.js", err);
         } else {
@@ -425,7 +425,7 @@ router.post("/GetAllCustomerDataList", (req, res, next) => {
 
 router.post("/GetUsedServicesByCustomer", (req, res, next) => {
 
-    db.executeSql("select s.servicesid,s.servicesname,s.custid,s.appointmentid,sl.id as slId,sl.price,sl.time,sl.point from custservices s join serviceslist sl on s.servicesid=sl.id where s.appointmentid = " + req.body.id + "", function (data, err) {
+    db.executeSql("select s.servicesid,s.servicesname,s.custid,s.appointmentid,s.employeename,s.empid,sl.id as slId,sl.price,sl.time,sl.point from custservices s join serviceslist sl on s.servicesid=sl.id where s.appointmentid = " + req.body.id + "", function (data, err) {
         if (err) {
             console.log("Error in store.js", err);
         } else {
@@ -450,6 +450,28 @@ router.get("/GetAllCompletedServices", (req, res, next) => {
         }
     })
 });
+
+router.post("/SaveModeOfPayment", (req, res, next) => {
+    db.executeSql("INSERT INTO `payment`(`cid`, `appointmentid`, `cname`, `modeofpayment`, `tprice`, `tpoint`, `pdate`,`createddate`) VALUES (" + req.body.cid + "," + req.body.appointmentid + ",'" + req.body.cname + "','" + req.body.modeofpayment + "'," + req.body.tprice + "," + req.body.tpoint + ",CURRENT_TIMESTAMP,CURRENT_TIMESTAMP);", function (data, err) {
+        if (err) {
+            res.json("error");
+        } else {
+
+            return res.json("success");
+        }
+    });
+});
+
+router.get("/GetAllModeOfPayment", (req, res, next) => {
+
+    db.executeSql("select * from payment where pdate ='" + today + "' ", function (data, err) {
+        if (err) {
+            console.log("Error in store.js", err);
+        } else {
+            return res.json(data);
+        }
+    });
+})
 
 let secret = 'prnv';
 router.post('/login', function (req, res, next) {
