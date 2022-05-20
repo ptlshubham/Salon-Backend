@@ -463,8 +463,17 @@ router.post("/SaveModeOfPayment", (req, res, next) => {
 });
 
 router.get("/GetAllModeOfPayment", (req, res, next) => {
-
     db.executeSql("select * from payment where pdate ='" + today + "' ", function (data, err) {
+        if (err) {
+            console.log("Error in store.js", err);
+        } else {
+            return res.json(data);
+        }
+    });
+})
+
+router.get("/GetMonthlyPayment", (req, res, next) => {
+    db.executeSql("select * from payment ", function (data, err) {
         if (err) {
             console.log("Error in store.js", err);
         } else {
