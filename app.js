@@ -7,7 +7,7 @@ var corsoption={
     origin: "*",
     // origin: "http://localhost:4300"
 }
-app.use(cors(corsoption));
+app.use(cors(corsoption)); 
 app.use(express.static('public'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
