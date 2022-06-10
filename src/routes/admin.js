@@ -231,6 +231,45 @@ router.get("/GetAllCustomer", (req, res, next) => {
     })
 });
 
+router.get("/GetAllOffer", (req, res, next) => {
+    db.executeSql("select * from offer", function (data, err) {
+        if (err) {
+            console.log(err);
+        } else {
+            return res.json(data);
+        }
+    })
+});
+router.post("/SaveOfferList", (req, res, next) => {
+    console.log(req.body)
+
+    db.executeSql("INSERT INTO `offer`(`offername`,`totalprice`,`offerprice`,`percentage`)VALUES('" + req.body.offername + "'," + req.body.totalprice + "," + req.body.offerprice + "," + req.body.percentage + ");", function (data, err) {
+        if (err) {
+            console.log(err)
+        } else {
+            for (let i = 0; i < req.body.services.length; i++) {
+                db.executeSql("INSERT INTO `offerservices`(`offerid`,`servicesname`,`totalprice`,`offername`,`offerprice`) VALUES(" + data.insertId + ",'" + req.body.services[i].selectedServ + "'," + req.body.totalprice + ",'" + req.body.offername + "'," + req.body.offerprice + ");", function (data1, err) {
+                    if (err) {
+                        console.log(err);
+                    } else { }
+                });
+            }
+        }
+        return res.json('success');
+    });
+
+});
+router.post("/GetUsedServicesByOffer", (req, res, next) => {
+
+    db.executeSql("select s.offerid,s.servicesname,s.offername,s.,s.offerprice,sl.id as slId,sl.totalprice,sl.time,sl.point from offerservices s join serviceslist sl on s.servicesid=sl.id where s.appointmentid = " + req.body.id + "", function (data, err) {
+        if (err) {
+            console.log("Error in store.js", err);
+        } else {
+            return res.json(data);
+        }
+    });
+})
+
 router.post("/SaveAppointmentList", (req, res, next) => {
     console.log(req.body)
     db.executeSql("INSERT INTO `appointment`(`custid`, `empname`, `totalprice`, `totalpoint`, `totaltime`, `isactive`, `createddate`,`ispayment`)VALUES(" + req.body.custid + ",'" + req.body.emp + "','" + req.body.totalprice + "','" + req.body.totalpoint + "','" + req.body.totaltime + "'," + req.body.isactive + ",CURRENT_TIMESTAMP,false);", function(data, err) {
