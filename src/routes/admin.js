@@ -341,59 +341,56 @@ router.get("/RemoveServicesList/:id", (req, res, next) => {
 router.post("/ForgotPassword", (req, res, next) => {
     let otp = Math.floor(100000 + Math.random() * 900000);
     console.log(req.body);
-    if (req.body.role == 'Admin') {
-        db.executeSql("select * from admin where email='" + req.body.email + "';", function(data, err) {
-            if (err) {
-                console.log("Error in store.js", err);
-                return res.json('err');
-            } else {
-
-                db.executeSql("INSERT INTO `otp`(`userid`, `otp`, `createddate`, `createdtime`,`role`,`isactive`) VALUES (" + data[0].id + "," + otp + ",CURRENT_TIMESTAMP,CURRENT_TIMESTAMP,'" + req.body.role + "',true)", function(data1, err) {
-                    if (err) {
-                        console.log(err);
-                    } else {
-                        const transporter = nodemailer.createTransport({
-                            service: 'gmail',
-                            host: "smtp.gmail.com",
-                            port: 465,
-                            secure: false, // true for 465, false for other ports
-                            auth: {
-                                user: 'keryaritsolutions@gmail.com', // generated ethereal user
-                                pass: 'sHAIL@2210', // generated ethereal password
-                            },
-                        });
-                        const output = `
-                        <h3>One Time Password</h3>
-                        <p>To authenticate, please use the following One Time Password(OTP):<h3>` + otp + `</h3></p>
-                        <p>OTP valid for only 2 Minutes.</P>
-                        <p>Don't share this OTP with anyone.</p>
-                        <a href="http://localhost:4200/password">Change Password</a>
+    db.executeSql("select * from users where email='" + req.body.email + "';", function(data, err) {
+        if (err) {
+            console.log("Error in store.js", err);
+            return res.json('err');
+        } else {
+            console.log(data[0]);
+            db.executeSql("INSERT INTO `otp`(`userid`, `otp`, `createddate`, `createdtime`,`role`,`isactive`) VALUES (" + data[0].userid + "," + otp + ",CURRENT_TIMESTAMP,CURRENT_TIMESTAMP,'" + data[0].role + "',true)", function(data1, err) {
+                if (err) {
+                    console.log(err);
+                } else {
+                    const transporter = nodemailer.createTransport({
+                        service: 'gmail',
+                        host: "smtp.gmail.com",
+                        port: 465,
+                        secure: false, // true for 465, false for other ports
+                        auth: {
+                            user: 'keryaritsolutions@gmail.com', // generated ethereal user
+                            pass: 'sHAIL@2210', // generated ethereal password
+                        },
+                    });
+                    const output = `
+                    <h3>One Time Password</h3>
+                    <p>To authenticate, please use the following One Time Password(OTP):<h3>` + otp + `</h3></p>
+                    <p>OTP valid for only 2 Minutes.</P>
+                    <p>Don't share this OTP with anyone.</p>
+                    <a href="http://localhost:4200/password">Change Password</a>
 `;
-                        const mailOptions = {
-                            from: '"KerYar" <keryaritsolutions@gmail.com>',
-                            subject: "Password resetting",
-                            to: req.body.email,
-                            Name: '',
-                            html: output
+                    const mailOptions = {
+                        from: '"KerYar" <keryaritsolutions@gmail.com>',
+                        subject: "Password resetting",
+                        to: req.body.email,
+                        Name: '',
+                        html: output
 
-                        };
-                        transporter.sendMail(mailOptions, function(error, info) {
-                            console.log('fgfjfj')
-                            if (error) {
-                                console.log(error);
-                                res.json("Errror");
-                            } else {
-                                console.log('Email sent: ' + info.response);
-                                res.json(data);
-                            }
-                        });
-                    }
-                })
-                console.log(req.body)
-            }
-        });
-    }
+                    };
+                    transporter.sendMail(mailOptions, function(error, info) {
+                        console.log('fgfjfj')
+                        if (error) {
+                            console.log(error);
+                            res.json("Errror");
+                        } else {
+                            console.log('Email sent: ' + info.response);
+                            res.json(data);
+                        }
+                    });
+                }
+            })
 
+        }
+    });
 });
 
 router.post("/GetOneTimePassword", (req, res, next) => {
@@ -406,7 +403,33 @@ router.post("/GetOneTimePassword", (req, res, next) => {
         }
     });
 });
+router.post("/ChackForPassword", midway.checkToken, (req, res, next) => {
+    var salt = '7fa73b47df808d36c5fe328546ddef8b9011b2c6';
+    var repass = salt + '' + req.body.pass;
+    var encPassword = crypto.createHash('sha1').update(repass).digest('hex');
+    db.executeSql("select * from users where userid=" + req.body.id + " and password='" + encPassword + "'", function(data, err) {
+        if (err) {
+            console.log(err);
+        } else {
+            return res.json(data)
+        }
+    })
+})
 
+router.post("/updatePasswordAccordingRole", (req, res, next) => {
+    console.log(req.body)
+    var salt = '7fa73b47df808d36c5fe328546ddef8b9011b2c6';
+    var repass = salt + '' + req.body.password;
+    var encPassword = crypto.createHash('sha1').update(repass).digest('hex');
+    db.executeSql("UPDATE users SET password='" + encPassword + "' WHERE userid=" + req.body.id + ";", function(data, err) {
+        if (err) {
+            console.log("Error in store.js", err);
+        } else {
+            console.log("shsyuhgsuygdyusgdyus", data);
+            return res.json(data);
+        }
+    });
+});
 
 
 router.post("/UpdateActiveStatus", (req, res, next) => {
@@ -577,7 +600,7 @@ router.get("/getMonthlyExpensesList", (req, res, next) => {
     })
 });
 
-let secret = 'prnv';
+// let secret = 'prnv';
 router.post('/login', function(req, res, next) {
 
     const body = req.body;
@@ -616,8 +639,185 @@ router.post('/login', function(req, res, next) {
     });
 
 });
+let secret = 'prnv';
+router.post('/GetUsersLogin', function(req, res, next) {
+    // restart1();
+    const body = req.body;
+    console.log(body,'Main Email');
+    var salt = '7fa73b47df808d36c5fe328546ddef8b9011b2c6';
+    var repass = salt + '' + body.password;
+    var encPassword = crypto.createHash('sha1').update(repass).digest('hex');
+    db.executeSql("select * from users where email='" + req.body.email + "';", function(data, err) {
+
+        if (data == null || data == undefined) {
+
+            return res.json(1);
+        } else {
+            // var time = get_time_diff;
+            // console.log(time);
+            db.executeSql("select * from users where email='" + req.body.email + "' and password='" + encPassword + "';", function(data1, err) {
+                console.log(data1);
+                console.log('main');
+                if (data1.length > 0) {
+
+                    module.exports.user1 = {
+                        username: data1[0].email,
+                        password: data1[0].password
+                    }
+                    let token = jwt.sign({ username: data1[0].email, password: data1[0].password },
+                        secret, {
+                            expiresIn: '1h' // expires in 24 hours
+                        }
+                    );
+                    console.log("token=", token);
 
 
+                    res.cookie('auth', token);
+                    if (data1[0].role == 'Admin') {
+                        let resdata = [];
+                        db.executeSql("select * from admin where uid=" + data1[0].userid, function(data2, err) {
+                            if (err) {
+                                console.log(err);
+                            } else {
+                                resdata.push(data2[0]);
+                                resdata[0].token = token;
+                                resdata[0].role = data1[0].role;
+                                resdata[0].last_login = data1[0].out_time;
+                                resdata[0].last_inTime = data1[0].in_time;
+                                db.executeSql("UPDATE  `users` SET status=true,in_time=CURRENT_TIMESTAMP WHERE userid=" + data1[0].userid, function(msg, err) {
+                                    if (err) {
+                                        console.log("Error in store.js", err);
+                                    } else {}
+                                });
+                                return res.json(resdata);
+                            }
+                        })
+
+                    } else if (data1[0].role == 'Customer') {
+                        let resdata1 = [];
+                        db.executeSql("select * from customer where uid=" + data1[0].userid, function(data3, err) {
+                            if (err) {
+                                console.log(err);
+                            } else {
+                                resdata1.push(data3[0]);
+                                resdata1[0].token = token;
+                                resdata1[0].role = data1[0].role;
+                                resdata1[0].last_login = data1[0].out_time;
+                                resdata1[0].last_inTime = data1[0].in_time;
+                                db.executeSql("UPDATE  `users` SET status=true,in_time=CURRENT_TIMESTAMP WHERE userid=" + data1[0].userid, function(msg, err) {
+                                    if (err) {
+                                        console.log("Error in store.js", err);
+                                    } else {}
+                                });
+                                return res.json(resdata1);
+                            }
+                        })
+                    } else if (data1[0].role == 'Student') {
+                        let resdata2 = [];
+                        db.executeSql("select * from studentlist where uid=" + data1[0].userid, function(data4, err) {
+                            if (err) {
+                                console.log(err);
+                            } else {
+                                resdata2.push(data4[0]);
+                                resdata2[0].token = token;
+                                resdata2[0].role = data1[0].role;
+                                resdata2[0].last_login = data1[0].out_time;
+                                resdata2[0].last_inTime = data1[0].in_time;
+                                db.executeSql("UPDATE  `users` SET status=true,in_time=CURRENT_TIMESTAMP WHERE userid=" + data1[0].userid, function(msg, err) {
+                                    if (err) {
+                                        console.log("Error in store.js", err);
+                                    } else {}
+                                });
+                                return res.json(resdata2);
+                            }
+                        })
+                    } else if (data1[0].role == 'Visitor') {
+                        let resdata3 = [];
+                        db.executeSql("select * from visitorreg where uid=" + data1[0].userid, function(data5, err) {
+                            if (err) {
+                                console.log(err);
+                            } else {
+                                resdata3.push(data5[0]);
+                                resdata3[0].token = token;
+                                resdata3[0].role = data1[0].role;
+                                resdata3[0].last_login = data1[0].out_time;
+                                resdata3[0].last_inTime = data1[0].in_time;
+                                db.executeSql("UPDATE  `users` SET status=true,in_time=CURRENT_TIMESTAMP WHERE userid=" + data1[0].userid, function(msg, err) {
+                                    if (err) {
+                                        console.log("Error in store.js", err);
+                                    } else {}
+                                });
+                                return res.json(resdata3);
+                            }
+                        })
+                    } else if (data1[0].role == 'Parents') {
+                        let resdata4 = [];
+                        db.executeSql("select * from parentsinfo where uid=" + data1[0].userid, function(data6, err) {
+                            if (err) {
+                                console.log(err);
+                            } else {
+                                resdata4.push(data6[0]);
+                                resdata4[0].token = token;
+                                resdata4[0].role = data1[0].role;
+                                resdata4[0].last_login = data1[0].out_time;
+                                resdata4[0].last_inTime = data1[0].in_time;
+                                db.executeSql("UPDATE  `users` SET status=true,in_time=CURRENT_TIMESTAMP WHERE userid=" + data1[0].userid, function(msg, err) {
+                                    if (err) {
+                                        console.log("Error in store.js", err);
+                                    } else {}
+                                });
+                                return res.json(resdata4);
+                            }
+                        })
+                    } else if (data1[0].role == 'Sub-Admin') {
+                        let resdata5 = [];
+                        db.executeSql("select * from admin where uid=" + data1[0].userid, function(data7, err) {
+                            if (err) {
+                                console.log(err);
+                            } else {
+                                resdata5.push(data7[0]);
+                                resdata5[0].token = token;
+                                resdata5[0].role = data1[0].role;
+                                resdata5[0].last_login = data1[0].out_time;
+                                resdata5[0].last_inTime = data1[0].in_time;
+                                db.executeSql("UPDATE  `users` SET status=true,in_time=CURRENT_TIMESTAMP WHERE userid=" + data1[0].userid, function(msg, err) {
+                                    if (err) {
+                                        console.log("Error in store.js", err);
+                                    } else {}
+                                });
+                                return res.json(resdata5);
+                            }
+                        })
+
+                    }
+
+
+                } else {
+
+                }
+            });
+        }
+
+    });
+
+});
+
+router.post("/UpdateLogoutDetails", (req, res, next) => {
+    console.log(req.body)
+    db.executeSql("UPDATE users SET status=false,out_time=CURRENT_TIMESTAMP WHERE userid=" + req.body.userid, function(msg, err) {
+        if (err) {
+            console.log("Error in store.js", err);
+        } else {
+            db.executeSql("INSERT INTO `logintime`(`userid`, `login_minute`, `login_date`)VALUES(" + req.body.userid + "," + req.body.loginMinute + ",CURRENT_TIMESTAMP);", function(data, err) {
+                if (err) {
+                    console.log("Error in store.js", err);
+                } else {
+                    return res.json('Success');
+                }
+            });
+        }
+    });
+});
 
 
 function generateUUID() {
