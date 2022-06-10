@@ -25,7 +25,16 @@ router.post("/SaveServicesList", (req, res, next) => {
         }
     });
 });
+router.post("/SaveSalaryList", (req, res, next) => {
+    db.executeSql("INSERT INTO `salary`(`salary`, `desc`, `paiddate`, `empid`)VALUES(" + req.body.salary + " , '" + req.body.desc + "' , '" + req.body.paiddate + "' ," + req.body.empid + ");", function (data, err) {
+        if (err) {
+            res.json("error");
+        } else {
 
+            return res.json(data);
+        }
+    });
+});
 
 router.get("/GetAllServices", (req, res, next) => {
     db.executeSql("select * from serviceslist", function(data, err) {
@@ -79,6 +88,28 @@ router.post("/UpdateStockList", (req, res, next) => {
         }
     });
 });
+
+router.post("/UpdateSalaryList", (req, res, next) => {
+    db.executeSql("UPDATE `salary` SET `salary`= " + req.body.salary + " ,`desc`='" + req.body.desc + "',`paiddate`='" + req.body.paiddate + "' WHERE id= " + req.body.id + ";", function (data, err) {
+        if (err) {
+            console.log("Error in store.js", err);
+        } else {
+            return res.json(data);
+        }
+    });
+});
+
+router.post("/RemoveSalaryList", (req, res, next) => {
+
+    console.log(req.body);
+    db.executeSql("Delete from salary where id=" + req.body.id, function (data, err) {
+        if (err) {
+            console.log("Error in store.js", err);
+        } else {
+            return res.json(data);
+        }
+    });
+})
 
 router.get("/RemoveStockList/:id", (req, res, next) => {
 
@@ -156,6 +187,17 @@ router.post("/RemoveEmployeeList", (req, res, next) => {
         }
     });
 })
+
+router.post("/GetAllSalaryList", (req, res, next) => {
+    console.log(req.body);
+    db.executeSql("select s.id,s.salary,s.desc,s.paiddate,s.empid,e.id as eId,e.fname,e.lname,e.contact,e.whatsapp,e.address,e.city,e.pincode,e.gender from salary s join employee e on s.empid=e.id where s.empid="+ req.body.id, function (data, err) {
+        if (err) {
+            console.log(err);
+        } else {
+            return res.json(data);
+        }
+    })
+});
 
 router.post("/UpdateEmployeeList", (req, res, next) => {
     db.executeSql("UPDATE `employee` SET fname='" + req.body.fname + "',lname='" + req.body.lname + "',contact='" + req.body.contact + "',whatsapp='" + req.body.whatsapp + "',address='" + req.body.address + "',city='" + req.body.city + "',gender='" + req.body.gender + "',updateddate=CURRENT_TIMESTAMP WHERE id=" + req.body.id + ";", function(data, err) {
@@ -279,6 +321,15 @@ router.get("/GetAllEnquiryList", (req, res, next) => {
     })
 });
 
+router.post("/UpdateSalaryStatus", (req, res, next) => {
+    db.executeSql("UPDATE  `salary` SET status=" + req.body.status + " WHERE id=" + req.body.id + ";", function (data, err) {
+        if (err) {
+            console.log("Error in store.js", err);
+        } else {
+            return res.json(data);
+        }
+    });
+})
 
 var nowDate = new Date();
 date = nowDate.getFullYear() + '-' + (nowDate.getMonth() + 1) + '-' + nowDate.getDate();
