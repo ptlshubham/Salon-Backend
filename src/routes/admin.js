@@ -16,7 +16,7 @@ const nodemailer = require('nodemailer');
 
 
 router.post("/SaveServicesList", (req, res, next) => {
-    db.executeSql("INSERT INTO `serviceslist`(`name`, `price`, `time`, `point`, `isactive`, `createdate`)VALUES('" + req.body.name + "'," + req.body.price + "," + req.body.time + "," + req.body.point + ",true,CURRENT_TIMESTAMP);", function(data, err) {
+    db.executeSql("INSERT INTO `serviceslist`(`name`, `price`, `time`, `point`, `isactive`, `createdate`,`epoint`)VALUES('" + req.body.name + "'," + req.body.price + "," + req.body.time + "," + req.body.point + ",true,CURRENT_TIMESTAMP,"+req.body.epoint+");", function(data, err) {
         if (err) {
             res.json("error");
         } else {
@@ -47,7 +47,7 @@ router.get("/GetAllServices", (req, res, next) => {
 });
 
 router.post("/UpdateServicesList", (req, res, next) => {
-    db.executeSql("UPDATE  `serviceslist` SET name='" + req.body.name + "',price=" + req.body.price + ",time=" + req.body.time + ",point=" + req.body.point + ",updateddate=CURRENT_TIMESTAMP WHERE id=" + req.body.id + ";", function(data, err) {
+    db.executeSql("UPDATE  `serviceslist` SET name='" + req.body.name + "',price=" + req.body.price + ",time=" + req.body.time + ",point=" + req.body.point +",epoint="+req.body.epoint+ ",updateddate=CURRENT_TIMESTAMP WHERE id=" + req.body.id + ";", function(data, err) {
         if (err) {
             console.log("Error in store.js", err);
         } else {
