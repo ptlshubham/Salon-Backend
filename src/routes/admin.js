@@ -211,7 +211,7 @@ router.post("/UpdateEmployeeList", (req, res, next) => {
 
 router.post("/SaveCustomerList", (req, res, next) => {
     console.log(req.body)
-    db.executeSql("INSERT INTO `customer`(`fname`,`lname`,`email`,`contact`,`whatsapp`,`gender`,`createddate`,`address`)VALUES('" + req.body.fname + "','" + req.body.lname + "','" + req.body.email + "','" + req.body.contact + "','" + req.body.whatsapp + "','" + req.body.gender + "',CURRENT_TIMESTAMP,'" + req.body.address + "');", function(data, err) {
+    db.executeSql("INSERT INTO `customer`(`fname`,`lname`,`email`,`contact`,`whatsapp`,`gender`,`createddate`,`address`,`vip`)VALUES('" + req.body.fname + "','" + req.body.lname + "','" + req.body.email + "','" + req.body.contact + "','" + req.body.whatsapp + "','" + req.body.gender + "',CURRENT_TIMESTAMP,'" + req.body.address + "'," + req.body.vip + ");", function(data, err) {
         if (err) {
             console.log(err)
         } else {
@@ -395,7 +395,7 @@ router.get("/GetMonthlyTotal", (req, res, next) => {
 
 
 router.post("/UpdateCustomerList", (req, res, next) => {
-    db.executeSql("UPDATE  `customer` SET fname='" + req.body.fname + "',lname='" + req.body.lname + "',email='" + req.body.email + "',contact='" + req.body.contact + "',whatsapp='" + req.body.whatsapp + "',gender='" + req.body.gender + "',updateddate=CURRENT_TIMESTAMP,address='" + req.body.address + "' WHERE id=" + req.body.id + ";", function(data, err) {
+    db.executeSql("UPDATE  `customer` SET fname='" + req.body.fname + "',lname='" + req.body.lname + "',email='" + req.body.email + "',contact='" + req.body.contact + "',whatsapp='" + req.body.whatsapp + "',gender='" + req.body.gender + "',vip=" + req.body.vip + ",updateddate=CURRENT_TIMESTAMP,address='" + req.body.address + "' WHERE id=" + req.body.id + ";", function(data, err) {
         if (err) {
             console.log("Error in store.js", err);
         } else {
