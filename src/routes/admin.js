@@ -690,6 +690,38 @@ router.get("/getMonthlyExpensesList", (req, res, next) => {
     })
 });
 
+
+router.post("/SaveProductsListURL", (req, res, next) => {
+    console.log(req.body)
+    db.executeSql("INSERT INTO `products`(`name`, `image`, `category`, `price`, `quantity`, `purchasedate`, `vendorname`, `vendorcontact`, `descripition`, `isactive`, `createddate`, `updateddate`) VALUES ('" + req.body.name + "','" + req.body.image + "','" + req.body.category + "','" + req.body.price + "','" + req.body.quantity + "','"+ req.body.purchasedate+"','"+ req.body.vendorname + "','" + req.body.vendorcontact + "','" + req.body.descripition + "',true,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP);", function(data, err) {
+        if (err) {
+            console.log(err)
+        } else {
+            return res.json('success');
+        }
+    });
+});
+router.get("/GetAllProductsListURL", (req, res, next) => {
+    db.executeSql("select * from products", function(data, err) {
+        if (err) {
+            console.log(err);
+        } else {
+            return res.json(data);
+        }
+    })
+});
+
+router.get("/RemoveProductDetailsURL/:id", (req, res, next) => {
+
+    db.executeSql("Delete from products where id=" + req.params.id, function(data, err) {
+        if (err) {
+            console.log("Error in store.js", err);
+        } else {
+            return res.json(data);
+        }
+    });
+})
+
 // let secret = 'prnv';
 router.post('/login', function(req, res, next) {
 
