@@ -720,6 +720,15 @@ router.get("/RemoveCategoryDetails/:id", (req, res, next) => {
         }
     });
 })
+router.get("/GetAllCategoryList", (req, res, next) => {
+    db.executeSql("select * from category", function(data, err) {
+        if (err) {
+            console.log(err);
+        } else {
+            return res.json(data);
+        }
+    })
+});
 router.post("/SaveProductsListURL", (req, res, next) => {
     console.log(req.body)
     db.executeSql("INSERT INTO `products`(`name`, `image`, `category`, `price`, `quantity`, `purchasedate`, `vendorname`, `vendorcontact`, `descripition`, `isactive`, `createddate`, `updateddate`) VALUES ('" + req.body.name + "','" + req.body.image + "','" + req.body.category + "','" + req.body.price + "','" + req.body.quantity + "','"+ req.body.purchasedate+"','"+ req.body.vendorname + "','" + req.body.vendorcontact + "','" + req.body.descripition + "',true,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP);", function(data, err) {
