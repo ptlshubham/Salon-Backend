@@ -722,6 +722,16 @@ router.get("/RemoveProductDetailsURL/:id", (req, res, next) => {
     });
 })
 
+router.post("/UpdateProductList", (req, res, next) => {
+    console.log(req.body)
+    db.executeSql("UPDATE `products` SET name='" + req.body.name + "',descripition='" + req.body.descripition + "',category='" + req.body.category + "',purchasedate='" + req.body.purchasedate + "',quantity=" + req.body.quantity + ",price=" + req.body.price  + " where id="+req.body.id+";", function(data, err) {
+        if (err) {
+            console.log("Error in store.js", err);
+        } else {
+            return res.json(data);
+        }
+    });
+})
 // let secret = 'prnv';
 router.post('/login', function(req, res, next) {
 
