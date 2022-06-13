@@ -157,7 +157,7 @@ router.post("/SaveEmployeeList", (req, res, next) => {
 //     })
 // });
 router.get("/GetAllEmployee", (req, res, next) => {
-    db.executeSql("select * from employee", function(data, err) {
+    db.executeSql("select * from employee where isactive=true", function (data, err) {
         if (err) {
             console.log(err);
         } else {
@@ -179,7 +179,7 @@ router.get("/GetEmployeeService", (req, res, next) => {
 router.post("/RemoveEmployeeList", (req, res, next) => {
 
     console.log(req.body);
-    db.executeSql("Delete from employee where id=" + req.body.id, function(data, err) {
+    db.executeSql("update `employee` set isactive='0' where id=" + req.body.id, function (data, err) {
         if (err) {
             console.log("Error in store.js", err);
         } else {
