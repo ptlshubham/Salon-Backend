@@ -697,9 +697,17 @@ router.post("/SaveProductsListURL", (req, res, next) => {
         if (err) {
             console.log(err)
         } else {
-            return res.json('success');
+            for (let i = 0; i < req.body.multi.length; i++) {
+                db.executeSql("INSERT INTO `images`(`productid`,`catid`,`listimages`,`createddate`)VALUES(" + data.insertId + ",1,'" + req.body.multi[i] + "',CURRENT_TIMESTAMP);", function (data, err) {
+                    if (err) {
+                        console.log("Error in store.js", err);
+                    } else { }
+                });
+            }
         }
     });
+    return res.json('success');
+
 });
 router.get("/GetAllProductsListURL", (req, res, next) => {
     db.executeSql("select * from products", function(data, err) {
@@ -714,6 +722,87 @@ router.get("/GetAllProductsListURL", (req, res, next) => {
 router.get("/RemoveProductDetailsURL/:id", (req, res, next) => {
 
     db.executeSql("Delete from products where id=" + req.params.id, function(data, err) {
+        if (err) {
+            console.log("Error in store.js", err);
+        } else {
+            return res.json(data);
+        }
+    });
+})
+router.post("/UploadProductImage", (req, res, next) => {
+    var imgname = generateUUID();
+
+    const storage = multer.diskStorage({
+        destination: function (req, file, cb) {
+            cb(null, 'images/products');
+        },
+        // By default, multer removes file extensions so let's add them back
+        filename: function (req, file, cb) {
+
+            cb(null, imgname + path.extname(file.originalname));
+        }
+    });
+    let upload = multer({ storage: storage }).single('file');
+    upload(req, res, function (err) {
+        console.log("path=", config.url + 'images/products/' + req.file.filename);
+
+        if (req.fileValidationError) {
+            console.log("err1", req.fileValidationError);
+            return res.json("err1", req.fileValidationError);
+        } else if (!req.file) {
+            console.log('Please select an image to upload');
+            return res.json('Please select an image to upload');
+        } else if (err instanceof multer.MulterError) {
+            console.log("err3");
+            return res.json("err3", err);
+        } else if (err) {
+            console.log("err4");
+            return res.json("err4", err);
+        }
+        return res.json('/images/products/' + req.file.filename);
+
+        console.log("You have uploaded this image");
+    });
+});
+
+router.post("/UploadMultiProductImage", (req, res, next) => {
+    var imgname = generateUUID();
+
+    const storage = multer.diskStorage({
+        destination: function (req, file, cb) {
+            cb(null, 'images/listimages');
+        },
+        // By default, multer removes file extensions so let's add them back
+        filename: function (req, file, cb) {
+
+            cb(null, imgname + path.extname(file.originalname));
+        }
+    });
+    let upload = multer({ storage: storage }).single('file');
+    upload(req, res, function (err) {
+        console.log("path=", config.url + '/images/listimages/' + req.file.filename);
+
+        if (req.fileValidationError) {
+            console.log("err1", req.fileValidationError);
+            return res.json("err1", req.fileValidationError);
+        } else if (!req.file) {
+            console.log('Please select an image to upload');
+            return res.json('Please select an image to upload');
+        } else if (err instanceof multer.MulterError) {
+            console.log("err3");
+            return res.json("err3", err);
+        } else if (err) {
+            console.log("err4");
+            return res.json("err4", err);
+        }
+        return res.json('/images/listimages/' + req.file.filename);
+        console.log("You have uploaded this image");
+    });
+});
+
+router.get("/RemoveRecentUoloadImage", midway.checkToken, (req, res, next) => {
+    console.log(req.body);
+    db.executeSql("SELECT * FROM images ORDER BY createddate DESC LIMIT 1", function (data, err) {
         if (err) {
             console.log("Error in store.js", err);
         } else {
