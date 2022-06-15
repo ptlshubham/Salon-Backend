@@ -859,6 +859,86 @@ router.post("/UpdateProductList", (req, res, next) => {
         }
     });
 })
+router.post("/Verification", (req, res, next) => {
+    let otp = Math.floor(100000 + Math.random() * 900000);
+    console.log(req.body, otp);
+    db.executeSql("INSERT INTO `registerotp`(`email`, `otp`, `isactive`,`createdate`) VALUES ('" + req.body.email + "'," + otp + ",true,CURRENT_TIMESTAMP)", function (data1, err) {
+        if (err) {
+            console.log(err);
+        } else {
+            const transporter = nodemailer.createTransport({
+                service: 'gmail',
+                host: "smtp.gmail.com",
+                port: 465,
+                secure: false, // true for 465, false for other ports
+                auth: {
+                    user: 'keryaritsolutions@gmail.com', // generated ethereal user
+                    pass: 'sHAIL@2210', // generated ethereal password
+                },
+            });
+            const output = `
+                        <h3>One Time Password</h3>
+                        <p>To authenticate, please use the following One Time Password(OTP):<h3>` + otp + `</h3></p>
+                        <p>OTP valid for only 2 Minutes.</P>
+                        <p>Don't share this OTP with anyone.</p>
+`;
+            const mailOptions = {
+                from: '"KerYar" <kushshah3603@gmail.com>',
+                subject: "Password resetting",
+                to: req.body.email,
+                Name: '',
+                html: output
+
+            };
+            transporter.sendMail(mailOptions, function (error, info) {
+                console.log('fgfjfj')
+                if (error) {
+                    console.log(error);
+                    res.json("Error");
+                } else {
+                    console.log('Email sent: ' + info.response);
+                    res.json(data);
+                }
+            });
+        }
+    })
+    console.log(req.body)
+
+});
+
+router.post("/GetRegisterOtp", (req, res, next) => {
+    console.log(req.body)
+    db.executeSql("select * from registerotp where email = '" + req.body.email + "'", function (data, err) {
+        if (err) {
+            console.log("Error in store.js", err);
+        } else {
+            return res.json(data);
+        }
+    });
+
+
+});
+
+router.post("/SaveUserCustomerList", (req, res, next) => {
+    var salt = '7fa73b47df808d36c5fe328546ddef8b9011b2c6';
+    var repass = salt + '' + req.body.password;
+    var encPassword = crypto.createHash('sha1').update(repass).digest('hex');
+    db.executeSql("INSERT INTO `users`(`email`,`password`,`role`,`isactive`)VALUES('" + req.body.email + "','" + encPassword + "','Customer',true);", function (data, err) {
+        if (err) {
+            console.log(err)
+        } else {
+            db.executeSql("INSERT INTO `customer`(`fname`,`lname`,`email`,`contact`,`gender`,`createddate`,`uid`)VALUES('" + req.body.fname + "','" + req.body.lname + "','" + req.body.email + "','" + req.body.contact + "','" + req.body.gender + "',CURRENT_TIMESTAMP," + data.insertId + ");", function (data, err) {
+                if (err) {
+                    console.log(err)
+                } else {
+                    console.log(data);
+                }
+            });
+        }
+        return res.json('success');
+    });
+});
+
 // let secret = 'prnv';
 router.post('/login', function(req, res, next) {
 
