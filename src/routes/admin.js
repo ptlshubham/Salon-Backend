@@ -692,7 +692,7 @@ router.get("/getMonthlyExpensesList", (req, res, next) => {
 
 router.post("/UpdateCategoryList", (req, res, next) => {
     console.log(req.body)
-    db.executeSql("UPDATE `category` SET name='" + req.body.name + "', where id=" + req.body.id + ";", function (data, err) {
+    db.executeSql("UPDATE `category` SET name='" + req.body.name + "' where id="+req.body.id+";", function(data, err) {
         if (err) {
             console.log("Error in store.js", err);
         } else {
