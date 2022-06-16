@@ -939,6 +939,49 @@ router.post("/SaveUserCustomerList", (req, res, next) => {
     });
 });
 
+router.post("/SaveVendorList", (req, res, next) => {
+    console.log(req.body)
+    db.executeSql("INSERT INTO `vendor`( `fname`, `gst`, `contact`, `whatsapp`, `address`, `city`, `pincode`, `isactive`, `createdate`, `updatedate`) VALUES ('" + req.body.fname + "','" + req.body.gst + "','" + req.body.contact + "','" + req.body.whatsapp + "','" + req.body.address + "','"+ req.body.city+"',"+ req.body.pincode + ",true,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP);", function(data, err) {
+        if (err) {
+            console.log(err)
+        } else {
+
+            return res.json('success');
+        }
+    });
+});
+router.get("/GetAllVendor", (req, res, next) => {
+    db.executeSql("select * from vendor", function(data, err) {
+        if (err) {
+            console.log(err);
+        } else {
+            return res.json(data);
+        }
+    })
+});
+
+router.post("/RemoveVendorList", (req, res, next) => {
+
+    console.log(req.body);
+    db.executeSql("Delete from vendor where id=" + req.body.id, function(data, err) {
+        if (err) {
+            console.log("Error in store.js", err);
+        } else {
+            return res.json(data);
+        }
+    });
+})
+
+router.post("/UpdateVendorList", (req, res, next) => {
+    db.executeSql("UPDATE `vendor` SET fname='" + req.body.fname + "',gst='" + req.body.gst + "',contact='" + req.body.contact + "',whatsapp='" + req.body.whatsapp + "',address='" + req.body.address + "',city='" + req.body.city +  "',updatedate=CURRENT_TIMESTAMP WHERE id=" + req.body.id + ";", function(data, err) {
+        if (err) {
+            console.log("Error in store.js", err);
+        } else {
+            return res.json(data);
+        }
+    });
+});
+
 // let secret = 'prnv';
 router.post('/login', function(req, res, next) {
 
