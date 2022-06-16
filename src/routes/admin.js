@@ -56,39 +56,6 @@ router.post("/UpdateServicesList", (req, res, next) => {
     });
 });
 
-router.post("/SaveStockList", (req, res, next) => {
-    console.log(req.body)
-    if(req.body.sdealdate ===undefined){req.body.sdealdate='CURRENT_TIMESTAMP';}
-    db.executeSql("INSERT INTO `stocklist`( `sname`, `sprice`, `sserialnumber`, `squality`, `stype`, `sdealername`, `sdealercontact`, `sdealdate`) VALUES( '" + req.body.sname + "' , " + req.body.sprice + " , " + req.body.sserialnumber + " , " + req.body.squality + " , '" + req.body.stype + "' , '" + req.body.sdealername + "' , " + req.body.sdealercontact + " , '" + req.body.sdealdate + "');", function (data, err) {
-        if (err) {
-            console.log(err);
-            res.json("error");
-        } else {
-            return res.json(data);  
-        }
-    });
-});
-
-router.get("/GetAllStock", (req, res, next) => {
-    db.executeSql("select * from stocklist", function (data, err) {
-        if (err) {
-            console.log(err);
-        } else {
-            return res.json(data);
-        }
-    })
-});
-
-router.post("/UpdateStockList", (req, res, next) => {
-    db.executeSql("UPDATE  `stocklist` SET sname='" + req.body.sname + "' , sprice=" + req.body.sprice + " , sserialnumber=" + req.body.sserialnumber + " , squality=" + req.body.squality + " , stype='" + req.body.stype + "' , sdealername='" + req.body.sdealername + "' , sdealercontact=" + req.body.sdealercontact + " , sdealdate='" + req.body.sdealdate + "'  WHERE id=" + req.body.id + ";", function (data, err) {
-        if (err) {
-            console.log("Error in store.js", err);
-        } else {
-            return res.json(data);
-        }
-    });
-});
-
 router.post("/UpdateSalaryList", (req, res, next) => {
     db.executeSql("UPDATE `salary` SET `salary`= " + req.body.salary + " ,`desc`='" + req.body.desc + "',`paiddate`='" + req.body.paiddate + "' WHERE id= " + req.body.id + ";", function (data, err) {
         if (err) {
@@ -105,17 +72,6 @@ router.post("/RemoveSalaryList", (req, res, next) => {
     db.executeSql("Delete from salary where id=" + req.body.id, function (data, err) {
         if (err) {
             console.log("Error in store.js", err);
-        } else {
-            return res.json(data);
-        }
-    });
-})
-
-router.get("/RemoveStockList/:id", (req, res, next) => {
-
-    db.executeSql("Delete from stocklist where id=" + req.params.id, function (data, err) {
-        if (err) {
-            console.log(err);
         } else {
             return res.json(data);
         }
