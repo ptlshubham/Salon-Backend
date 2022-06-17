@@ -807,7 +807,7 @@ router.get("/RemoveRecentUoloadImage", midway.checkToken, (req, res, next) => {
 
 router.post("/UpdateProductList", (req, res, next) => {
     console.log(req.body)
-    db.executeSql("UPDATE `products` SET name='" + req.body.name + "',descripition='" + req.body.descripition + "',category='" + req.body.category + "',purchasedate='" + req.body.purchasedate + "',quantity=" + req.body.quantity + ",price=" + req.body.price  + " where id="+req.body.id+";", function(data, err) {
+    db.executeSql("UPDATE `products` SET name='" + req.body.name + "',descripition='" + req.body.descripition + "',category='" + req.body.category + "',purchasedate='" + req.body.purchasedate + "',quantity=" + req.body.quantity + ",price=" + req.body.price  + ",display="+req.body.display+" where id="+req.body.id+";", function(data, err) {
         if (err) {
             console.log("Error in store.js", err);
         } else {
