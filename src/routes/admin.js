@@ -215,9 +215,19 @@ router.post("/SaveOfferList", (req, res, next) => {
     });
 
 });
+// router.post("/GetUsedServicesByOffer", (req, res, next) => {
+
+//     db.executeSql("select s.offerid,s.servicesname,s.offername,s.,s.offerprice,sl.id as slId,sl.totalprice,sl.time,sl.point from offerservices s join serviceslist sl on s.servicesid=sl.id where s.appointmentid = " + req.body.id + "", function (data, err) {
+//         if (err) {
+//             console.log("Error in store.js", err);
+//         } else {
+//             return res.json(data);
+//         }
+//     });
+// })
 router.post("/GetUsedServicesByOffer", (req, res, next) => {
 
-    db.executeSql("select s.offerid,s.servicesname,s.offername,s.,s.offerprice,sl.id as slId,sl.totalprice,sl.time,sl.point from offerservices s join serviceslist sl on s.servicesid=sl.id where s.appointmentid = " + req.body.id + "", function (data, err) {
+    db.executeSql("select s.offerid,s.servicesname,s.offername,s.offerprice,sl.id as slId,sl.offerid,sl.servicesname,sl.offername,sl.offerprice from offerservices s join serviceslist sl on s.servicesid=sl.id where s.offerappointmentid = " + req.body.id + "", function (data, err) {
         if (err) {
             console.log("Error in store.js", err);
         } else {
@@ -225,7 +235,84 @@ router.post("/GetUsedServicesByOffer", (req, res, next) => {
         }
     });
 })
+router.get("/removeOfferDetails/:id", (req, res, next) => {
 
+    db.executeSql("Delete from offer where id=" + req.params.id, function (data, err) {
+        if (err) {
+            console.log(err);
+        } else {
+            return res.json(data);
+        }
+    });
+})
+
+router.post("/getAllOfferDataList", (req, res, next) => {
+
+    db.executeSql("select * from offerappointment where offerid = " + req.body.id + "", function (data, err) {
+        if (err) {
+            console.log("Error in store.js", err);
+        } else {
+            return res.json(data);
+        }
+    });
+})
+router.post("/getAllMembershipDataList", (req, res, next) => {
+
+    db.executeSql("select * from membershipappointment where membershipid = " + req.body.id + "", function (data, err) {
+        if (err) {
+            console.log("Error in store.js", err);
+        } else {
+            return res.json(data);
+        }
+    });
+})
+router.post("/SaveMembershipList", (req, res, next) => {
+    console.log(req.body)
+
+    db.executeSql("INSERT INTO `membership`(`membershipname`,`membershipprice`,`totalprice`,`quantity`,`finalprice`)VALUES('" + req.body.membershipname + "'," + req.body.membershipprice + "," + req.body.totalprice + "," +  req.body.quantity + "," + req.body.finalprice + ");", function (data, err) {
+        if (err) {
+            console.log(err)
+        } else {
+            for (let i = 0; i < req.body.services.length; i++) {
+                db.executeSql("INSERT INTO `membershipservices`(`membershipid`,`servicesname`,`totalprice`,`membershipname`,`membershipprice`,`finalprice`) VALUES(" + data.insertId + ",'" + req.body.services[i].selectedServ + "'," + req.body.totalprice + ",'" + req.body.membershipname + "'," + req.body.membershipprice + "," +  req.body.finalprice +  ");", function (data1, err) {
+                    if (err) {
+                        console.log(err);
+                    } else { }
+                });
+            }
+        }
+        return res.json('success');
+    });
+});
+router.post("/GetUsedServicesByMembership", (req, res, next) => {
+
+    db.executeSql("select s.membershipid,s.servicesname,s.totalprice,s.membershipname,s.membershipprice,finalprice,sl.id as slId,sl.membershipid,sl.servicesname,sl.totalprice,sl.membershipname,sl.membershipprice,sl.finalprice from membershipservices s join serviceslist sl on s.servicesid=sl.id where s.membershipappointmentid = " + req.body.id + "", function (data, err) {
+        if (err) {
+            console.log("Error in store.js", err);
+        } else {
+            return res.json(data);
+        }
+    });
+})
+router.get("/removeMembershipDetails/:id", (req, res, next) => {
+
+    db.executeSql("Delete from membership where id=" + req.params.id, function (data, err) {
+        if (err) {
+            console.log(err);
+        } else {
+            return res.json(data);
+        }
+    });
+})
+router.get("/GetAllMembership", (req, res, next) => {
+    db.executeSql("select * from membership", function (data, err) {
+        if (err) {
+            console.log(err);
+        } else {
+            return res.json(data);
+        }
+    })
+});
 router.post("/SaveAppointmentList", (req, res, next) => {
     console.log(req.body)
     db.executeSql("INSERT INTO `appointment`(`custid`, `empname`, `totalprice`, `totalpoint`, `totaltime`, `isactive`, `createddate`,`ispayment`)VALUES(" + req.body.custid + ",'" + req.body.emp + "','" + req.body.totalprice + "','" + req.body.totalpoint + "','" + req.body.totaltime + "'," + req.body.isactive + ",CURRENT_TIMESTAMP,false);", function(data, err) {
