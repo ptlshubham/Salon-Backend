@@ -748,7 +748,7 @@ router.post("/SaveProductsListURL", (req, res, next) => {
 
 });
 router.get("/GetAllProductsListURL", (req, res, next) => {
-    db.executeSql("select * from products", function(data, err) {
+    db.executeSql("select * from products where display= true", function(data, err) {
         if (err) {
             console.log(err);
         } else {
