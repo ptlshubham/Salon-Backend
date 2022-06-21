@@ -7,14 +7,24 @@ const config = require("../../config");
 var midway = require('./midway');
 const jwt = require('jsonwebtoken');
 var crypto = require('crypto');
-const { equal } = require("assert");
-const { Console } = require("console");
-const { json } = require("body-parser");
 const nodemailer = require('nodemailer');
 var handlebars = require("handlebars");
 const fs = require('fs');
-// const today = new Date();
-// const utcMonth = today.getUTCMonth();
+const schedule = require('node-schedule');
+let  dates =  new Date(new Date().setDate(new Date().getDate() - 60));
+
+console.log(dates.toISOString().slice(0, 10));
+const job = schedule.scheduleJob('54 * * * *', function(){
+    console.log('hello schedule')
+    db.executeSql("UPDATE `customer` SET `status`=false WHERE updateddate='"+dates.toISOString().slice(0, 10)+"';", function(data, err) {
+        
+        if (err) {
+            console.log(err);
+        } else {
+            console.log(data);
+        }
+    });
+  });
 
 
 router.post("/SaveServicesList", (req, res, next) => {
