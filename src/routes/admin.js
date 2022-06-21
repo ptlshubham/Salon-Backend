@@ -403,8 +403,8 @@ router.post("/ForgotPassword", (req, res, next) => {
                         port: 465,
                         secure: false, // true for 465, false for other ports
                         auth: {
-                            user: 'keryaritsolutions@gmail.com', // generated ethereal user
-                            pass: 'sHAIL@2210', // generated ethereal password
+                            user: 'ptlshubham@gmail.com', // generated ethereal user
+                            pass: 'qrrimzmxjcpabunj', // generated ethereal password
                         },
                     });
                     const output = `
@@ -415,7 +415,7 @@ router.post("/ForgotPassword", (req, res, next) => {
                     <a href="http://localhost:4200/password">Change Password</a>
 `;
                     const mailOptions = {
-                        from: '"KerYar" <keryaritsolutions@gmail.com>',
+                        from: '"KerYar" <ptlshubham@gmail.com>',
                         subject: "Password resetting",
                         to: req.body.email,
                         Name: '',
@@ -441,7 +441,7 @@ router.post("/ForgotPassword", (req, res, next) => {
 
 router.post("/GetOneTimePassword", (req, res, next) => {
     console.log(req.body)
-    db.executeSql("select * from otp where userid = " + req.body.id + " and otp = " + req.body.otp + " ", function(data, err) {
+    db.executeSql("select * from otp where userid = '" + req.body.id + "' " + " and otp =' " + req.body.otp + "' ", function(data, err) {
         if (err) {
             console.log("Error in store.js", err);
         } else {
@@ -462,8 +462,8 @@ router.post("/ChackForPassword", midway.checkToken, (req, res, next) => {
     })
 })
 
-router.post("/updatePasswordAccordingRole", (req, res, next) => {
-    console.log(req.body)
+router.post("/UpdatePassword", (req, res, next) => {
+    console.log(req.body);
     var salt = '7fa73b47df808d36c5fe328546ddef8b9011b2c6';
     var repass = salt + '' + req.body.password;
     var encPassword = crypto.createHash('sha1').update(repass).digest('hex');
@@ -937,6 +937,36 @@ router.post("/UpdateVendorList", (req, res, next) => {
         }
     });
 });
+router.get("/GetCustDetails", (req, res, next) => {
+    db.executeSql("select c.fname,c.lname,c.contact,c.whatsapp,c.email,c.gender from customer c where custid = id" + req.body.id + "", function (data, err) {
+        if (err) {
+            console.log(err);
+        } else {
+            return res.json(data);
+        }
+    });
+})
+
+router.post("/GetCustomerDataById", (req, res, next) => {
+    console.log(req.body)
+    db.executeSql("select * from customer where id = " + req.body.id+"", function (data, err) {
+        if (err) {
+            console.log("Error in store.js", err);
+        } else {
+            return res.json(data);
+        }
+    });
+});
+router.post("/GetCustomerTotalPoints", (req, res, next) => {
+    db.executeSql("select * from point where custid = " + req.body.id + "", function (data, err) {
+        if (err) {
+            console.log("Error in store.js", err);
+        } else {
+            return res.json(data);
+        }
+    });
+})
+
 
 // let secret = 'prnv';
 router.post('/login', function(req, res, next) {
