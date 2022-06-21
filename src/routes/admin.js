@@ -1127,15 +1127,15 @@ router.post("/GetCustomerDataById", (req, res, next) => {
         }
     });
 });
-router.post("/GetCustomerTotalPoints", (req, res, next) => {
-    db.executeSql("select * from point where custid = " + req.body.id + "", function (data, err) {
-        if (err) {
-            console.log("Error in store.js", err);
-        } else {
-            return res.json(data);
-        }
-    });
-})
+// router.post("/GetCustomerTotalPoints", (req, res, next) => {
+//     db.executeSql("select * from point where custid = " + req.body.id + "", function (data, err) {
+//         if (err) {
+//             console.log("Error in store.js", err);
+//         } else {
+//             return res.json(data);
+//         }
+//     });
+// })
 
 
 // let secret = 'prnv';
