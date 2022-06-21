@@ -369,30 +369,32 @@ router.post("/ChackForPassword", (req, res, next) => {
     var salt = '7fa73b47df808d36c5fe328546ddef8b9011b2c6';
     var repass = salt + '' + req.body.pass;
     var encPassword = crypto.createHash('sha1').update(repass).digest('hex');
-    db.executeSql("select * from admin where id=" + req.body.id + " and password='" + encPassword + "'", function(data, err) {
+    db.executeSql("select * from users where userid=" + req.body.id + " and password='" + encPassword + "'", function(data, err) {
         if (err) {
+
             console.log(err);
         } else {
+            console.log(data);
             return res.json(data)
         }
     })
 })
 
-router.post("/updatePasswordAccordingRole", (req, res, next) => {
-    console.log(req.body)
-    var salt = '7fa73b47df808d36c5fe328546ddef8b9011b2c6';
-    var repass = salt + '' + req.body.password;
-    var encPassword = crypto.createHash('sha1').update(repass).digest('hex');
-    if (req.body.role == 'Admin') {
-        db.executeSql("UPDATE  `admin` SET password='" + encPassword + "' WHERE id=" + req.body.id + ";", function(data, err) {
-            if (err) {
-                console.log("Error in store.js", err);
-            } else {
-                return res.json(data);
-            }
-        });
-    }
-});
+// router.post("/updatePasswordAccordingRole", (req, res, next) => {
+//     console.log(req.body)
+//     var salt = '7fa73b47df808d36c5fe328546ddef8b9011b2c6';
+//     var repass = salt + '' + req.body.password;
+//     var encPassword = crypto.createHash('sha1').update(repass).digest('hex');
+//     if (req.body.role == 'Admin') {
+//         db.executeSql("UPDATE  `admin` SET password='" + encPassword + "' WHERE id=" + req.body.id + ";", function(data, err) {
+//             if (err) {
+//                 console.log("Error in store.js", err);
+//             } else {
+//                 return res.json(data);
+//             }
+//         });
+//     }
+// });
 
 
 router.get("/GetAllEnquiryList", (req, res, next) => {
@@ -575,8 +577,30 @@ router.post("/ForgotPassword", (req, res, next) => {
                 if (err) {
                     console.log(err);
                 } else {
-                    const replacements = {
-                        votp: otp,
+                    const transporter = nodemailer.createTransport({
+                        service: 'gmail',
+                        host: "smtp.gmail.com",
+                        port: 465,
+                        secure: false, // true for 465, false for other ports
+                        auth: {
+                            user: 'ptlshubham@gmail.com', // generated ethereal user
+                            pass: 'qrrimzmxjcpabunj', // generated ethereal password
+                        },
+                    });
+                    const output = `
+                    <h3>One Time Password</h3>
+                    <p>To authenticate, please use the following One Time Password(OTP):<h3>` + otp + `</h3></p>
+                    <p>OTP valid for only 2 Minutes.</P>
+                    <p>Don't share this OTP with anyone.</p>
+                    <a href="http://localhost:4200/password">Change Password</a>
+`;
+                    const mailOptions = {
+                        from: '"KerYar" <ptlshubham@gmail.com>',
+                        subject: "Password resetting",
+                        to: req.body.email,
+                        Name: '',
+                        html: output
+
                     };
                     mail('verification.html', replacements, req.body.email, "Password resetting", " ")
                 }
@@ -588,7 +612,7 @@ router.post("/ForgotPassword", (req, res, next) => {
 
 router.post("/GetOneTimePassword", (req, res, next) => {
     console.log(req.body)
-    db.executeSql("select * from otp where userid = " + req.body.id + " and otp = " + req.body.otp + " ", function(data, err) {
+    db.executeSql("select * from otp where userid = '" + req.body.id + "' " + " and otp =' " + req.body.otp + "' ", function(data, err) {
         if (err) {
             console.log("Error in store.js", err);
         } else {
@@ -596,21 +620,21 @@ router.post("/GetOneTimePassword", (req, res, next) => {
         }
     });
 });
-router.post("/ChackForPassword", midway.checkToken, (req, res, next) => {
-    var salt = '7fa73b47df808d36c5fe328546ddef8b9011b2c6';
-    var repass = salt + '' + req.body.pass;
-    var encPassword = crypto.createHash('sha1').update(repass).digest('hex');
-    db.executeSql("select * from users where userid=" + req.body.id + " and password='" + encPassword + "'", function(data, err) {
-        if (err) {
-            console.log(err);
-        } else {
-            return res.json(data)
-        }
-    })
-})
+// router.post("/ChackForPassword", midway.checkToken, (req, res, next) => {
+//     var salt = '7fa73b47df808d36c5fe328546ddef8b9011b2c6';
+//     var repass = salt + '' + req.body.pass;
+//     var encPassword = crypto.createHash('sha1').update(repass).digest('hex');
+//     db.executeSql("select * from users where userid=" + req.body.id + " and password='" + encPassword + "'", function(data, err) {
+//         if (err) {
+//             console.log(err);
+//         } else {
+//             return res.json(data)
+//         }
+//     })
+// })
 
-router.post("/updatePasswordAccordingRole", (req, res, next) => {
-    console.log(req.body)
+router.post("/UpdatePassword", (req, res, next) => {
+    console.log(req.body);
     var salt = '7fa73b47df808d36c5fe328546ddef8b9011b2c6';
     var repass = salt + '' + req.body.password;
     var encPassword = crypto.createHash('sha1').update(repass).digest('hex');
@@ -851,7 +875,7 @@ router.post("/SaveProductsListURL", (req, res, next) => {
 
 });
 router.get("/GetAllProductsListURL", (req, res, next) => {
-    db.executeSql("select * from products", function(data, err) {
+    db.executeSql("select * from products where display= true", function(data, err) {
         if (err) {
             console.log(err);
         } else {
@@ -964,8 +988,7 @@ router.post("/UpdateProductList", (req, res, next) => {
 })
 router.post("/Verification", (req, res, next) => {
     let otp = Math.floor(100000 + Math.random() * 900000);
-    console.log(req.body, otp);
-    db.executeSql("INSERT INTO `registerotp`(`email`, `otp`, `isactive`,`createdate`) VALUES ('" + req.body.email + "'," + otp + ",true,CURRENT_TIMESTAMP)", function(data1, err) {
+    db.executeSql("INSERT INTO `registerotp`(`email`, `otp`, `isactive`,`createdate`,`updateddate`) VALUES ('" + req.body.email + "'," + otp + ",true,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP)", function (data1, err) {
         if (err) {
             console.log(err);
         } else {
@@ -975,8 +998,8 @@ router.post("/Verification", (req, res, next) => {
                 port: 465,
                 secure: false, // true for 465, false for other ports
                 auth: {
-                    user: 'keryaritsolutions@gmail.com', // generated ethereal user
-                    pass: 'sHAIL@2210', // generated ethereal password
+                    user: 'ptlshubham@gmail.com', // generated ethereal user
+                    pass: 'qrrimzmxjcpabunj', // generated ethereal password
                 },
             });
             const output = `
@@ -986,7 +1009,7 @@ router.post("/Verification", (req, res, next) => {
                         <p>Don't share this OTP with anyone.</p>
 `;
             const mailOptions = {
-                from: '"KerYar" <kushshah3603@gmail.com>',
+                from: '"KerYar" <ptlshubham@gmail.com>',
                 subject: "Password resetting",
                 to: req.body.email,
                 Name: '',
@@ -1000,13 +1023,13 @@ router.post("/Verification", (req, res, next) => {
                     res.json("Error");
                 } else {
                     console.log('Email sent: ' + info.response);
-                    res.json(data);
+                    data1.otp = otp;
+                    res.json(data1);
                 }
             });
         }
     })
     console.log(req.body)
-
 });
 
 router.post("/GetRegisterOtp", (req, res, next) => {
@@ -1084,6 +1107,36 @@ router.post("/UpdateVendorList", (req, res, next) => {
         }
     });
 });
+router.get("/GetCustDetails", (req, res, next) => {
+    db.executeSql("select c.fname,c.lname,c.contact,c.whatsapp,c.email,c.gender from customer c where custid = id" + req.body.id + "", function (data, err) {
+        if (err) {
+            console.log(err);
+        } else {
+            return res.json(data);
+        }
+    });
+})
+
+router.post("/GetCustomerDataById", (req, res, next) => {
+    console.log(req.body)
+    db.executeSql("select * from customer where id = " + req.body.id+"", function (data, err) {
+        if (err) {
+            console.log("Error in store.js", err);
+        } else {
+            return res.json(data);
+        }
+    });
+});
+// router.post("/GetCustomerTotalPoints", (req, res, next) => {
+//     db.executeSql("select * from point where custid = " + req.body.id + "", function (data, err) {
+//         if (err) {
+//             console.log("Error in store.js", err);
+//         } else {
+//             return res.json(data);
+//         }
+//     });
+// })
+
 
 router.post("/UploadBannersImage",  (req, res, next) => {
     var imgname = generateUUID();
@@ -1216,25 +1269,19 @@ router.post('/login', function(req, res, next) {
 });
 let secret = 'prnv';
 router.post('/GetUsersLogin', function(req, res, next) {
-    // restart1();
     const body = req.body;
-    console.log(body, 'Main Email');
     var salt = '7fa73b47df808d36c5fe328546ddef8b9011b2c6';
     var repass = salt + '' + body.password;
     var encPassword = crypto.createHash('sha1').update(repass).digest('hex');
     db.executeSql("select * from users where email='" + req.body.email + "';", function(data, err) {
-
-        if (data == null || data == undefined) {
-
+        console.log(data);
+        if (data == null || data == undefined || data.length ===0) {
             return res.json(1);
         } else {
             // var time = get_time_diff;
             // console.log(time);
             db.executeSql("select * from users where email='" + req.body.email + "' and password='" + encPassword + "';", function(data1, err) {
-                console.log(data1);
-                console.log('main');
                 if (data1.length > 0) {
-
                     module.exports.user1 = {
                         username: data1[0].email,
                         password: data1[0].password
@@ -1270,7 +1317,7 @@ router.post('/GetUsersLogin', function(req, res, next) {
 
                     } else if (data1[0].role == 'Customer') {
                         let resdata1 = [];
-                        db.executeSql("select * from customer where uid=" + data1[0].userid, function(data3, err) {
+                        db.executeSql("select * from customer where id=" + data1[0].userid, function(data3, err) {
                             if (err) {
                                 console.log(err);
                             } else {
@@ -1279,6 +1326,7 @@ router.post('/GetUsersLogin', function(req, res, next) {
                                 resdata1[0].role = data1[0].role;
                                 resdata1[0].last_login = data1[0].out_time;
                                 resdata1[0].last_inTime = data1[0].in_time;
+                                
                                 db.executeSql("UPDATE  `users` SET status=true,in_time=CURRENT_TIMESTAMP WHERE userid=" + data1[0].userid, function(msg, err) {
                                     if (err) {
                                         console.log("Error in store.js", err);
@@ -1368,7 +1416,7 @@ router.post('/GetUsersLogin', function(req, res, next) {
 
 
                 } else {
-
+                    return res.json(2);
                 }
             });
         }
