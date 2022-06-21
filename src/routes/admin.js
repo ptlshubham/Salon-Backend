@@ -835,7 +835,7 @@ router.get("/GetAllCategoryList", (req, res, next) => {
         }
     })
 });
-router.post("/SaveProductsListURL", (req, res, next) => {
+router.post("/SaveProductsList", (req, res, next) => {
     console.log(req.body)
     db.executeSql("INSERT INTO `products`(`name`, `image`, `category`, `price`, `quantity`, `purchasedate`, `vendorname`, `vendorcontact`, `descripition`, `isactive`, `createddate`, `updateddate`,`display`) VALUES ('" + req.body.name + "','" + req.body.image + "','" + req.body.category + "','" + req.body.price + "','" + req.body.quantity + "','" + req.body.purchasedate + "','" + req.body.vendorname + "','" + req.body.vendorcontact + "','" + req.body.descripition + "',true,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP," + req.body.display + ");", function (data, err) {
         if (err) {
@@ -853,8 +853,8 @@ router.post("/SaveProductsListURL", (req, res, next) => {
     return res.json('success');
 
 });
-router.get("/GetAllProductsListURL", (req, res, next) => {
-    db.executeSql("select * from products where display= true", function (data, err) {
+router.get("/GetAllProductsList", (req, res, next) => {
+    db.executeSql("select * from products", function (data, err) {
         if (err) {
             console.log(err);
         } else {
@@ -863,7 +863,7 @@ router.get("/GetAllProductsListURL", (req, res, next) => {
     })
 });
 
-router.get("/RemoveProductDetailsURL/:id", (req, res, next) => {
+router.get("/RemoveProductDetails/:id", (req, res, next) => {
 
     db.executeSql("Delete from products where id=" + req.params.id, function (data, err) {
         if (err) {
