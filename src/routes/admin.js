@@ -381,10 +381,8 @@ router.post("/ChackForPassword", (req, res, next) => {
     var encPassword = crypto.createHash('sha1').update(repass).digest('hex');
     db.executeSql("select * from users where userid=" + req.body.id + " and password='" + encPassword + "'", function (data, err) {
         if (err) {
-
             console.log(err);
         } else {
-            console.log(data);
             return res.json(data)
         }
     })
@@ -688,6 +686,25 @@ router.post("/GetAllCustomerDataList", (req, res, next) => {
             return res.json(data);
         }
     });
+})
+
+router.post("/GetCustomerById", (req, res, next) => {
+    db.executeSql("select * from customer where uid=" + req.body.id + "", function (data, err) {
+        if (err) {
+            console.log(err);
+        } else {
+            let cid=data[0].id
+            db.executeSql("select * from appointment where custid = " +cid+ "", function (data1, err) {
+                if (err) {
+                    console.log("Error in store.js", err);
+                } else {
+                   
+                }
+                return res.json(data1);
+            });
+        }
+    })
+
 })
 
 router.post("/GetUsedServicesByCustomer", (req, res, next) => {
