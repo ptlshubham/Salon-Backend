@@ -257,10 +257,18 @@ router.get("/removeOfferDetails/:id", (req, res, next) => {
         }
     });
 })
-
+router.get("/GetActiveOffer", (req, res, next) => {
+    db.executeSql("select * from offer where status=true", function (data, err) {
+        if (err) {
+            console.log(err);
+        } else {
+            return res.json(data);
+        }
+    })
+});
 router.post("/getAllOfferDataList", (req, res, next) => {
 
-    db.executeSql("select * from offerappointment where offerid = " + req.body.id + "", function (data, err) {
+    db.executeSql("select * from offerservices where offerid = " + req.body.id + "", function (data, err) {
         if (err) {
             console.log("Error in store.js", err);
         } else {
@@ -1235,7 +1243,16 @@ router.post("/UpdateActiveWebBanners",  (req, res, next) => {
         }
     });
 });
-
+router.post("/UpdateActiveOffers",  (req, res, next) => {
+    console.log(req.body)
+    db.executeSql("UPDATE  `OFFER` SET status=" + req.body.status + " WHERE id=" + req.body.id + ";", function(data, err) {
+        if (err) {
+            console.log("Error in store.js", err);
+        } else {
+            return res.json(data);
+        }
+    });
+});
 router.get("/GetWebBanner",  (req, res, next) => {
     db.executeSql("select * from webbanners where status=1", function(data, err) {
         if (err) {
