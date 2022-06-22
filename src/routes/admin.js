@@ -201,7 +201,7 @@ router.get("/GetAllOffer", (req, res, next) => {
 router.post("/SaveOfferList", (req, res, next) => {
     console.log(req.body)
 
-    db.executeSql("INSERT INTO `offer`(`offername`,`totalprice`,`offerprice`,`percentage`)VALUES('" + req.body.offername + "'," + req.body.totalprice + "," + req.body.offerprice + "," + req.body.percentage + ");", function(data, err) {
+    db.executeSql("INSERT INTO `offer`(`offername`,`totalprice`,`offerprice`,`percentage`,`status`)VALUES('" + req.body.offername + "'," + req.body.totalprice + "," + req.body.offerprice + "," + req.body.percentage + ",true);", function(data, err) {
         if (err) {
             console.log(err)
         } else {
@@ -271,7 +271,7 @@ router.post("/getAllMembershipDataList", (req, res, next) => {
 router.post("/SaveMembershipList", (req, res, next) => {
     console.log(req.body)
 
-    db.executeSql("INSERT INTO `membership`(`membershipname`,`membershipprice`,`totalprice`,`quantity`,`finalprice`)VALUES('" + req.body.membershipname + "'," + req.body.membershipprice + "," + req.body.totalprice + "," + req.body.quantity + "," + req.body.finalprice + ");", function(data, err) {
+    db.executeSql("INSERT INTO `membership`(`membershipname`,`membershipprice`,`totalprice`,`quantity`,`finalprice`,`status`)VALUES('" + req.body.membershipname + "'," + req.body.membershipprice + "," + req.body.totalprice + "," + req.body.quantity + "," + req.body.finalprice + ",true);", function(data, err) {
         if (err) {
             console.log(err)
         } else {
