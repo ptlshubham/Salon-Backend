@@ -322,7 +322,7 @@ router.post("/SaveAppointmentList", (req, res, next) => {
             console.log(err)
         } else {
             for (let i = 0; i < req.body.selectedService.length; i++) {
-                db.executeSql("INSERT INTO `custservices`(`servicesid`,`servicesname`,`custid`,`appointmentid`,`employeename`,`empid`) VALUES(" + req.body.selectedService[i].selectedServid + ",'" + req.body.selectedService[i].selectedServ + "'," + req.body.custid + "," + data.insertId + ",'" + req.body.selectedService[i].selectedEmp + "'," + req.body.selectedService[i].selectedEmpid + ");", function(data1, err) {
+                db.executeSql("INSERT INTO `custservices`(`servicesid`,`servicesname`,`custid`,`appointmentid`,`employeename`,`empid`) VALUES(" + req.body.selectedService[i].selectedServid + ",'" + req.body.selectedService[i].servicesname + "'," + req.body.custid + "," + data.insertId + ",'" + req.body.selectedService[i].employeename + "'," + req.body.selectedService[i].selectedEmpid + ");", function(data1, err) {
                     if (err) {
                         console.log(err);
                     } else {}
@@ -678,7 +678,7 @@ router.post("/GetAllCustomerDataList", (req, res, next) => {
 })
 
 router.post("/GetUsedServicesByCustomer", (req, res, next) => {
-
+    console.log(req.body.id)
     db.executeSql("select s.servicesid,s.servicesname,s.custid,s.appointmentid,s.employeename,s.empid,sl.id as slId,sl.price,sl.time,sl.point from custservices s join serviceslist sl on s.servicesid=sl.id where s.appointmentid = " + req.body.id + "", function(data, err) {
         if (err) {
             console.log("Error in store.js", err);
