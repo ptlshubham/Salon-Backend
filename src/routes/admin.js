@@ -342,7 +342,7 @@ router.post("/SaveAppointmentList", (req, res, next) => {
                 console.log(err)
             } else {
                 for (let i = 0; i < req.body.selectedService.length; i++) {
-                    db.executeSql("INSERT INTO `custservices`(`servicesid`,`servicesname`,`custid`,`appointmentid`,`employeename`,`empid`) VALUES(" + req.body.selectedService[i].selectedServid + ",'" + req.body.selectedService[i].selectedServ + "'," + req.body.custid + "," + data.insertId + ",'" + req.body.selectedService[i].selectedEmp + "'," + req.body.selectedService[i].selectedEmpid + ");", function(data1, err) {
+                    db.executeSql("INSERT INTO `custservices`(`servicesid`,`servicesname`,`custid`,`appointmentid`,`employeename`,`empid`) VALUES(" + req.body.selectedService[i].selectedServid + ",'" + req.body.selectedService[i].servicesname + "'," + req.body.custid + "," + data.insertId + ",'" + req.body.selectedService[i].employeename + "'," + req.body.selectedService[i].selectedEmpid + ");", function(data1, err) {
                         if (err) {
                             console.log(err);
                         } else {}
