@@ -14,7 +14,7 @@ const schedule = require('node-schedule');
 let  dates =  new Date(new Date().setDate(new Date().getDate() - 60));
 
 console.log(dates.toISOString().slice(0, 10));
-const job = schedule.scheduleJob('54 * * * *', function(){
+const job = schedule.scheduleJob('0 0 * * *', function(){
     console.log('hello schedule')
     db.executeSql("UPDATE `customer` SET `status`=false WHERE updateddate='"+dates.toISOString().slice(0, 10)+"';", function(data, err) {
         
