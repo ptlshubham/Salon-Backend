@@ -7,14 +7,24 @@ const config = require("../../config");
 var midway = require('./midway');
 const jwt = require('jsonwebtoken');
 var crypto = require('crypto');
-const { equal } = require("assert");
-const { Console } = require("console");
-const { json } = require("body-parser");
 const nodemailer = require('nodemailer');
 var handlebars = require("handlebars");
 const fs = require('fs');
-// const today = new Date();
-// const utcMonth = today.getUTCMonth();
+const schedule = require('node-schedule');
+let dates = new Date(new Date().setDate(new Date().getDate() - 60));
+
+console.log(dates.toISOString().slice(0, 10));
+const job = schedule.scheduleJob('0 0 * * *', function() {
+    console.log('hello schedule')
+    db.executeSql("UPDATE `customer` SET `status`=false WHERE updateddate='" + dates.toISOString().slice(0, 10) + "';", function(data, err) {
+
+        if (err) {
+            console.log(err);
+        } else {
+            console.log(data);
+        }
+    });
+});
 
 
 router.post("/SaveServicesList", (req, res, next) => {
@@ -201,7 +211,7 @@ router.get("/GetAllOffer", (req, res, next) => {
 router.post("/SaveOfferList", (req, res, next) => {
     console.log(req.body)
 
-    db.executeSql("INSERT INTO `offer`(`offername`,`totalprice`,`offerprice`,`percentage`)VALUES('" + req.body.offername + "'," + req.body.totalprice + "," + req.body.offerprice + "," + req.body.percentage + ");", function(data, err) {
+    db.executeSql("INSERT INTO `offer`(`offername`,`totalprice`,`offerprice`,`percentage`,`status`)VALUES('" + req.body.offername + "'," + req.body.totalprice + "," + req.body.offerprice + "," + req.body.percentage + ",true);", function(data, err) {
         if (err) {
             console.log(err)
         } else {
@@ -247,10 +257,18 @@ router.get("/removeOfferDetails/:id", (req, res, next) => {
         }
     });
 })
-
+router.get("/GetActiveOffer", (req, res, next) => {
+    db.executeSql("select * from offer where status=true", function(data, err) {
+        if (err) {
+            console.log(err);
+        } else {
+            return res.json(data);
+        }
+    })
+});
 router.post("/getAllOfferDataList", (req, res, next) => {
 
-    db.executeSql("select * from offerappointment where offerid = " + req.body.id + "", function(data, err) {
+    db.executeSql("select * from offerservices where offerid = " + req.body.id + "", function(data, err) {
         if (err) {
             console.log("Error in store.js", err);
         } else {
@@ -271,7 +289,7 @@ router.post("/getAllMembershipDataList", (req, res, next) => {
 router.post("/SaveMembershipList", (req, res, next) => {
     console.log(req.body)
 
-    db.executeSql("INSERT INTO `membership`(`membershipname`,`membershipprice`,`totalprice`,`quantity`,`finalprice`)VALUES('" + req.body.membershipname + "'," + req.body.membershipprice + "," + req.body.totalprice + "," + req.body.quantity + "," + req.body.finalprice + ");", function(data, err) {
+    db.executeSql("INSERT INTO `membership`(`membershipname`,`membershipprice`,`totalprice`,`quantity`,`finalprice`,`status`)VALUES('" + req.body.membershipname + "'," + req.body.membershipprice + "," + req.body.totalprice + "," + req.body.quantity + "," + req.body.finalprice + ",true);", function(data, err) {
         if (err) {
             console.log(err)
         } else {
@@ -317,42 +335,82 @@ router.get("/GetAllMembership", (req, res, next) => {
 });
 router.post("/SaveAppointmentList", (req, res, next) => {
     console.log(req.body)
-    db.executeSql("INSERT INTO `appointment`(`custid`, `empname`, `totalprice`, `totalpoint`, `totaltime`, `isactive`, `createddate`,`ispayment`)VALUES(" + req.body.custid + ",'" + req.body.emp + "','" + req.body.totalprice + "','" + req.body.totalpoint + "','" + req.body.totaltime + "'," + req.body.isactive + ",CURRENT_TIMESTAMP,false);", function(data, err) {
-        if (err) {
-            console.log(err)
-        } else {
-            for (let i = 0; i < req.body.selectedService.length; i++) {
-                db.executeSql("INSERT INTO `custservices`(`servicesid`,`servicesname`,`custid`,`appointmentid`,`employeename`,`empid`) VALUES(" + req.body.selectedService[i].selectedServid + ",'" + req.body.selectedService[i].servicesname + "'," + req.body.custid + "," + data.insertId + ",'" + req.body.selectedService[i].employeename + "'," + req.body.selectedService[i].selectedEmpid + ");", function(data1, err) {
-                    if (err) {
-                        console.log(err);
-                    } else {}
-                });
-            }
-            if (req.body.tCustPoint == 0) {
-                console.log('undefined');
-
-                db.executeSql("INSERT INTO `point`( `custid`, `totalcustpoint`)VALUES(" + req.body.custid + "," + req.body.lessPoints + ");", function(data, err) {
-                    if (err) {
-                        console.log(err);
-                    } else {
-                        console.log(data);
-                    }
-                });
+    var checkdate = req.body.selectdate;
+    if (checkdate == undefined) {
+        db.executeSql("INSERT INTO `appointment`(`custid`, `empname`, `totalprice`, `totalpoint`, `totaltime`, `isactive`, `createddate`,`updatedate`,`ispayment`,`appointmentdate`)VALUES(" + req.body.custid + ",'" + req.body.emp + "','" + req.body.totalprice + "','" + req.body.totalpoint + "','" + req.body.totaltime + "'," + req.body.isactive + ",CURRENT_TIMESTAMP,CURRENT_TIMESTAMP,false,CURRENT_TIMESTAMP    );", function(data, err) {
+            if (err) {
+                console.log(err)
             } else {
-                console.log('defined')
-                console.log(req.body)
-                db.executeSql("UPDATE `point` SET totalcustpoint=" + req.body.lessPoints + " WHERE custid=" + req.body.custid + ";", function(data, err) {
-                    if (err) {
-                        console.log(err);
-                    } else {
-                        console.log(data);
-                    }
-                });
-            }
+                for (let i = 0; i < req.body.selectedService.length; i++) {
+                    db.executeSql("INSERT INTO `custservices`(`servicesid`,`servicesname`,`custid`,`appointmentid`,`employeename`,`empid`) VALUES(" + req.body.selectedService[i].selectedServid + ",'" + req.body.selectedService[i].selectedServ + "'," + req.body.custid + "," + data.insertId + ",'" + req.body.selectedService[i].selectedEmp + "'," + req.body.selectedService[i].selectedEmpid + ");", function(data1, err) {
+                        if (err) {
+                            console.log(err);
+                        } else {}
+                    });
+                }
+                if (req.body.tCustPoint == 0) {
+                    console.log('undefined');
 
-        }
-        return res.json('success');
-    });
+                    db.executeSql("INSERT INTO `point`( `custid`, `totalcustpoint`)VALUES(" + req.body.custid + "," + req.body.lessPoints + ");", function(data, err) {
+                        if (err) {
+                            console.log(err);
+                        } else {
+                            console.log(data);
+                        }
+                    });
+                } else {
+                    console.log('defined')
+                    console.log(req.body)
+                    db.executeSql("UPDATE `point` SET totalcustpoint=" + req.body.lessPoints + " WHERE custid=" + req.body.custid + ";", function(data, err) {
+                        if (err) {
+                            console.log(err);
+                        } else {
+                            console.log(data);
+                        }
+                    });
+                }
+
+            }
+            return res.json('success');
+        });
+    } else {
+        db.executeSql("INSERT INTO `appointment`(`custid`, `empname`, `totalprice`, `totalpoint`, `totaltime`, `isactive`, `createddate`,`updatedate`,`ispayment`,`appointmentdate`)VALUES(" + req.body.custid + ",'" + req.body.emp + "','" + req.body.totalprice + "','" + req.body.totalpoint + "','" + req.body.totaltime + "'," + req.body.isactive + ",CURRENT_TIMESTAMP,CURRENT_TIMESTAMP,false,'" + req.body.selectdate + "');", function(data, err) {
+            if (err) {
+                console.log(err)
+            } else {
+                for (let i = 0; i < req.body.selectedService.length; i++) {
+                    db.executeSql("INSERT INTO `custservices`(`servicesid`,`servicesname`,`custid`,`appointmentid`,`employeename`,`empid`) VALUES(" + req.body.selectedService[i].selectedServid + ",'" + req.body.selectedService[i].servicesname + "'," + req.body.custid + "," + data.insertId + ",'" + req.body.selectedService[i].employeename + "'," + req.body.selectedService[i].selectedEmpid + ");", function(data1, err) {
+                        if (err) {
+                            console.log(err);
+                        } else {}
+                    });
+                }
+                if (req.body.tCustPoint == 0) {
+                    console.log('undefined');
+
+                    db.executeSql("INSERT INTO `point`( `custid`, `totalcustpoint`)VALUES(" + req.body.custid + "," + req.body.lessPoints + ");", function(data, err) {
+                        if (err) {
+                            console.log(err);
+                        } else {
+                            console.log(data);
+                        }
+                    });
+                } else {
+                    console.log('defined')
+                    console.log(req.body)
+                    db.executeSql("UPDATE `point` SET totalcustpoint=" + req.body.lessPoints + " WHERE custid=" + req.body.custid + ";", function(data, err) {
+                        if (err) {
+                            console.log(err);
+                        } else {
+                            console.log(data);
+                        }
+                    });
+                }
+
+            }
+            return res.json('success');
+        });
+    }
 });
 
 
@@ -369,7 +427,7 @@ router.post("/ChackForPassword", (req, res, next) => {
     var salt = '7fa73b47df808d36c5fe328546ddef8b9011b2c6';
     var repass = salt + '' + req.body.pass;
     var encPassword = crypto.createHash('sha1').update(repass).digest('hex');
-    db.executeSql("select * from admin where id=" + req.body.id + " and password='" + encPassword + "'", function(data, err) {
+    db.executeSql("select * from users where userid=" + req.body.id + " and password='" + encPassword + "'", function(data, err) {
         if (err) {
             console.log(err);
         } else {
@@ -378,21 +436,21 @@ router.post("/ChackForPassword", (req, res, next) => {
     })
 })
 
-router.post("/updatePasswordAccordingRole", (req, res, next) => {
-    console.log(req.body)
-    var salt = '7fa73b47df808d36c5fe328546ddef8b9011b2c6';
-    var repass = salt + '' + req.body.password;
-    var encPassword = crypto.createHash('sha1').update(repass).digest('hex');
-    if (req.body.role == 'Admin') {
-        db.executeSql("UPDATE  `admin` SET password='" + encPassword + "' WHERE id=" + req.body.id + ";", function(data, err) {
-            if (err) {
-                console.log("Error in store.js", err);
-            } else {
-                return res.json(data);
-            }
-        });
-    }
-});
+// router.post("/updatePasswordAccordingRole", (req, res, next) => {
+//     console.log(req.body)
+//     var salt = '7fa73b47df808d36c5fe328546ddef8b9011b2c6';
+//     var repass = salt + '' + req.body.password;
+//     var encPassword = crypto.createHash('sha1').update(repass).digest('hex');
+//     if (req.body.role == 'Admin') {
+//         db.executeSql("UPDATE  `admin` SET password='" + encPassword + "' WHERE id=" + req.body.id + ";", function(data, err) {
+//             if (err) {
+//                 console.log("Error in store.js", err);
+//             } else {
+//                 return res.json(data);
+//             }
+//         });
+//     }
+// });
 
 
 router.get("/GetAllEnquiryList", (req, res, next) => {
@@ -579,6 +637,7 @@ router.post("/ForgotPassword", (req, res, next) => {
                         votp: otp,
                     };
                     mail('verification.html', replacements, req.body.email, "Password resetting", " ")
+                    res.json(data);
                 }
             })
 
@@ -588,7 +647,7 @@ router.post("/ForgotPassword", (req, res, next) => {
 
 router.post("/GetOneTimePassword", (req, res, next) => {
     console.log(req.body)
-    db.executeSql("select * from otp where userid = " + req.body.id + " and otp = " + req.body.otp + " ", function(data, err) {
+    db.executeSql("select * from otp where userid = '" + req.body.id + "' " + " and otp =' " + req.body.otp + "' ", function(data, err) {
         if (err) {
             console.log("Error in store.js", err);
         } else {
@@ -596,21 +655,21 @@ router.post("/GetOneTimePassword", (req, res, next) => {
         }
     });
 });
-router.post("/ChackForPassword", midway.checkToken, (req, res, next) => {
-    var salt = '7fa73b47df808d36c5fe328546ddef8b9011b2c6';
-    var repass = salt + '' + req.body.pass;
-    var encPassword = crypto.createHash('sha1').update(repass).digest('hex');
-    db.executeSql("select * from users where userid=" + req.body.id + " and password='" + encPassword + "'", function(data, err) {
-        if (err) {
-            console.log(err);
-        } else {
-            return res.json(data)
-        }
-    })
-})
+// router.post("/ChackForPassword", midway.checkToken, (req, res, next) => {
+//     var salt = '7fa73b47df808d36c5fe328546ddef8b9011b2c6';
+//     var repass = salt + '' + req.body.pass;
+//     var encPassword = crypto.createHash('sha1').update(repass).digest('hex');
+//     db.executeSql("select * from users where userid=" + req.body.id + " and password='" + encPassword + "'", function(data, err) {
+//         if (err) {
+//             console.log(err);
+//         } else {
+//             return res.json(data)
+//         }
+//     })
+// })
 
-router.post("/updatePasswordAccordingRole", (req, res, next) => {
-    console.log(req.body)
+router.post("/UpdatePassword", (req, res, next) => {
+    console.log(req.body);
     var salt = '7fa73b47df808d36c5fe328546ddef8b9011b2c6';
     var repass = salt + '' + req.body.password;
     var encPassword = crypto.createHash('sha1').update(repass).digest('hex');
@@ -677,8 +736,27 @@ router.post("/GetAllCustomerDataList", (req, res, next) => {
     });
 })
 
+router.post("/GetCustomerById", (req, res, next) => {
+    db.executeSql("select * from customer where uid=" + req.body.id + "", function(data, err) {
+        if (err) {
+            console.log(err);
+        } else {
+            let cid = data[0].id
+            db.executeSql("select * from appointment where custid = " + cid + "", function(data1, err) {
+                if (err) {
+                    console.log("Error in store.js", err);
+                } else {
+
+                }
+                return res.json(data1);
+            });
+        }
+    })
+
+})
+
 router.post("/GetUsedServicesByCustomer", (req, res, next) => {
-    console.log(req.body.id)
+
     db.executeSql("select s.servicesid,s.servicesname,s.custid,s.appointmentid,s.employeename,s.empid,sl.id as slId,sl.price,sl.time,sl.point from custservices s join serviceslist sl on s.servicesid=sl.id where s.appointmentid = " + req.body.id + "", function(data, err) {
         if (err) {
             console.log("Error in store.js", err);
@@ -832,7 +910,7 @@ router.get("/GetAllCategoryList", (req, res, next) => {
         }
     })
 });
-router.post("/SaveProductsListURL", (req, res, next) => {
+router.post("/SaveProductsList", (req, res, next) => {
     console.log(req.body)
     db.executeSql("INSERT INTO `products`(`name`, `image`, `category`, `price`, `quantity`, `purchasedate`, `vendorname`, `vendorcontact`, `descripition`, `isactive`, `createddate`, `updateddate`,`display`) VALUES ('" + req.body.name + "','" + req.body.image + "','" + req.body.category + "','" + req.body.price + "','" + req.body.quantity + "','" + req.body.purchasedate + "','" + req.body.vendorname + "','" + req.body.vendorcontact + "','" + req.body.descripition + "',true,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP," + req.body.display + ");", function(data, err) {
         if (err) {
@@ -850,7 +928,7 @@ router.post("/SaveProductsListURL", (req, res, next) => {
     return res.json('success');
 
 });
-router.get("/GetAllProductsListURL", (req, res, next) => {
+router.get("/GetAllProductsList", (req, res, next) => {
     db.executeSql("select * from products", function(data, err) {
         if (err) {
             console.log(err);
@@ -860,7 +938,7 @@ router.get("/GetAllProductsListURL", (req, res, next) => {
     })
 });
 
-router.get("/RemoveProductDetailsURL/:id", (req, res, next) => {
+router.get("/RemoveProductDetails/:id", (req, res, next) => {
 
     db.executeSql("Delete from products where id=" + req.params.id, function(data, err) {
         if (err) {
@@ -952,6 +1030,17 @@ router.get("/RemoveRecentUoloadImage", midway.checkToken, (req, res, next) => {
     });
 })
 
+router.get("/CourosalImage/:id", (req, res, next) => {
+    console.log(req.body);
+    db.executeSql("SELECT * FROM images, products WHERE  images.productid = products.id AND productid=" + req.params.id, function(data, err) {
+        if (err) {
+            console.log("Error in store.js", err);
+        } else {
+            return res.json(data);
+        }
+    });
+})
+
 router.post("/UpdateProductList", (req, res, next) => {
     console.log(req.body)
     db.executeSql("UPDATE `products` SET name='" + req.body.name + "',descripition='" + req.body.descripition + "',category='" + req.body.category + "',purchasedate='" + req.body.purchasedate + "',quantity=" + req.body.quantity + ",price=" + req.body.price + ",display=" + req.body.display + " where id=" + req.body.id + ";", function(data, err) {
@@ -964,8 +1053,7 @@ router.post("/UpdateProductList", (req, res, next) => {
 })
 router.post("/Verification", (req, res, next) => {
     let otp = Math.floor(100000 + Math.random() * 900000);
-    console.log(req.body, otp);
-    db.executeSql("INSERT INTO `registerotp`(`email`, `otp`, `isactive`,`createdate`) VALUES ('" + req.body.email + "'," + otp + ",true,CURRENT_TIMESTAMP)", function(data1, err) {
+    db.executeSql("INSERT INTO `registerotp`(`email`, `otp`, `isactive`,`createdate`,`updateddate`) VALUES ('" + req.body.email + "'," + otp + ",true,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP)", function(data1, err) {
         if (err) {
             console.log(err);
         } else {
@@ -975,8 +1063,8 @@ router.post("/Verification", (req, res, next) => {
                 port: 465,
                 secure: false, // true for 465, false for other ports
                 auth: {
-                    user: 'keryaritsolutions@gmail.com', // generated ethereal user
-                    pass: 'sHAIL@2210', // generated ethereal password
+                    user: 'ptlshubham@gmail.com', // generated ethereal user
+                    pass: 'qrrimzmxjcpabunj', // generated ethereal password
                 },
             });
             const output = `
@@ -986,7 +1074,7 @@ router.post("/Verification", (req, res, next) => {
                         <p>Don't share this OTP with anyone.</p>
 `;
             const mailOptions = {
-                from: '"KerYar" <kushshah3603@gmail.com>',
+                from: '"KerYar" <ptlshubham@gmail.com>',
                 subject: "Password resetting",
                 to: req.body.email,
                 Name: '',
@@ -1000,13 +1088,13 @@ router.post("/Verification", (req, res, next) => {
                     res.json("Error");
                 } else {
                     console.log('Email sent: ' + info.response);
-                    res.json(data);
+                    data1.otp = otp;
+                    res.json(data1);
                 }
             });
         }
     })
     console.log(req.body)
-
 });
 
 router.post("/GetRegisterOtp", (req, res, next) => {
@@ -1084,7 +1172,136 @@ router.post("/UpdateVendorList", (req, res, next) => {
         }
     });
 });
+router.get("/GetCustDetails", (req, res, next) => {
+    db.executeSql("select c.fname,c.lname,c.contact,c.whatsapp,c.email,c.gender from customer c where custid = id" + req.body.id + "", function(data, err) {
+        if (err) {
+            console.log(err);
+        } else {
+            return res.json(data);
+        }
+    });
+})
 
+router.post("/GetCustomerDataById", (req, res, next) => {
+    console.log(req.body)
+    db.executeSql("select * from customer where id = " + req.body.id + "", function(data, err) {
+        if (err) {
+            console.log("Error in store.js", err);
+        } else {
+            return res.json(data);
+        }
+    });
+});
+// router.post("/GetCustomerTotalPoints", (req, res, next) => {
+//     db.executeSql("select * from point where custid = " + req.body.id + "", function (data, err) {
+//         if (err) {
+//             console.log("Error in store.js", err);
+//         } else {
+//             return res.json(data);
+//         }
+//     });
+// })
+
+
+router.post("/UploadBannersImage", (req, res, next) => {
+    var imgname = generateUUID();
+
+    const storage = multer.diskStorage({
+        destination: function(req, file, cb) {
+            cb(null, 'images/banners');
+        },
+        // By default, multer removes file extensions so let's add them back
+        filename: function(req, file, cb) {
+
+            cb(null, imgname + path.extname(file.originalname));
+        }
+    });
+    let upload = multer({ storage: storage }).single('file');
+    upload(req, res, function(err) {
+        console.log("path=", config.url + 'images/banners/' + req.file.filename);
+
+        if (req.fileValidationError) {
+            console.log("err1", req.fileValidationError);
+            return res.json("err1", req.fileValidationError);
+        } else if (!req.file) {
+            console.log('Please select an image to upload');
+            return res.json('Please select an image to upload');
+        } else if (err instanceof multer.MulterError) {
+            console.log("err3");
+            return res.json("err3", err);
+        } else if (err) {
+            console.log("err4");
+            return res.json("err4", err);
+        }
+        return res.json('/images/banners/' + req.file.filename);
+
+        console.log("You have uploaded this image");
+    });
+});
+
+router.post("/SaveWebBanners", (req, res, next) => {
+    console.log(req.body);
+    db.executeSql("INSERT INTO `webbanners`(`name`,`bannersimage`,`status`)VALUES('" + req.body.name + "','" + req.body.bannersimage + "'," + req.body.status + ");", function(data, err) {
+        if (err) {
+            res.json("error");
+        } else {
+            res.json("success");
+        }
+    });
+});
+
+router.get("/GetWebBanners", (req, res, next) => {
+    console.log("call-4");
+    console.log(req.body.id)
+    db.executeSql("select * from webbanners ", function(data, err) {
+        if (err) {
+            console.log("Error in store.js", err);
+        } else {
+            return res.json(data);
+        }
+    });
+});
+
+router.post("/RemoveWebBanners", (req, res, next) => {
+    console.log(req.id)
+    db.executeSql("Delete from webbanners where id=" + req.body.id, function(data, err) {
+        if (err) {
+            console.log("Error in store.js", err);
+        } else {
+            return res.json(data);
+        }
+    });
+});
+
+router.post("/UpdateActiveWebBanners", (req, res, next) => {
+    console.log(req.body)
+    db.executeSql("UPDATE  `webbanners` SET status=" + req.body.status + " WHERE id=" + req.body.id + ";", function(data, err) {
+        if (err) {
+            console.log("Error in store.js", err);
+        } else {
+            return res.json(data);
+        }
+    });
+});
+router.post("/UpdateActiveOffers", (req, res, next) => {
+    console.log(req.body)
+    db.executeSql("UPDATE  `OFFER` SET status=" + req.body.status + " WHERE id=" + req.body.id + ";", function(data, err) {
+        if (err) {
+            console.log("Error in store.js", err);
+        } else {
+            return res.json(data);
+        }
+    });
+});
+router.get("/GetWebBanner", (req, res, next) => {
+    db.executeSql("select * from webbanners where status=1", function(data, err) {
+        if (err) {
+            console.log("Error in store.js", err);
+        } else {
+            return res.json(data);
+        }
+    });
+});
 // let secret = 'prnv';
 router.post('/login', function(req, res, next) {
 
@@ -1126,25 +1343,19 @@ router.post('/login', function(req, res, next) {
 });
 let secret = 'prnv';
 router.post('/GetUsersLogin', function(req, res, next) {
-    // restart1();
     const body = req.body;
-    console.log(body, 'Main Email');
     var salt = '7fa73b47df808d36c5fe328546ddef8b9011b2c6';
     var repass = salt + '' + body.password;
     var encPassword = crypto.createHash('sha1').update(repass).digest('hex');
     db.executeSql("select * from users where email='" + req.body.email + "';", function(data, err) {
-
-        if (data == null || data == undefined) {
-
+        console.log(data);
+        if (data == null || data == undefined || data.length === 0) {
             return res.json(1);
         } else {
             // var time = get_time_diff;
             // console.log(time);
             db.executeSql("select * from users where email='" + req.body.email + "' and password='" + encPassword + "';", function(data1, err) {
-                console.log(data1);
-                console.log('main');
                 if (data1.length > 0) {
-
                     module.exports.user1 = {
                         username: data1[0].email,
                         password: data1[0].password
@@ -1180,7 +1391,7 @@ router.post('/GetUsersLogin', function(req, res, next) {
 
                     } else if (data1[0].role == 'Customer') {
                         let resdata1 = [];
-                        db.executeSql("select * from customer where uid=" + data1[0].userid, function(data3, err) {
+                        db.executeSql("select * from customer where id=" + data1[0].userid, function(data3, err) {
                             if (err) {
                                 console.log(err);
                             } else {
@@ -1189,6 +1400,7 @@ router.post('/GetUsersLogin', function(req, res, next) {
                                 resdata1[0].role = data1[0].role;
                                 resdata1[0].last_login = data1[0].out_time;
                                 resdata1[0].last_inTime = data1[0].in_time;
+
                                 db.executeSql("UPDATE  `users` SET status=true,in_time=CURRENT_TIMESTAMP WHERE userid=" + data1[0].userid, function(msg, err) {
                                     if (err) {
                                         console.log("Error in store.js", err);
@@ -1278,7 +1490,7 @@ router.post('/GetUsersLogin', function(req, res, next) {
 
 
                 } else {
-
+                    return res.json(2);
                 }
             });
         }
