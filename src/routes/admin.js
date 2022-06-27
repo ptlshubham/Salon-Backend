@@ -826,6 +826,55 @@ router.post("/SaveCategoryList", (req, res, next) => {
         }
     });
 });
+router.post("/saveCartList", (req, res, next) => {
+    console.log(req.body)
+    db.executeSql("INSERT INTO `cartlist`( `userid`, `productid`, `quantity`,`price`, `createddate`, `updateddate`) VALUES ('" + req.body.uid + "','" + req.body.id + "','" + req.body.quant + "','"+ req.body.price + "',CURRENT_TIMESTAMP,CURRENT_TIMESTAMP);", function (data, err) {
+        if (err) {
+            console.log(err)
+        } else {
+            return res.json('success');
+        }
+    });
+});
+router.post("/saveOrderList", (req, res, next) => {
+    console.log(req.body)
+    db.executeSql("INSERT INTO `order`( `userid`, `productid`, `quantity`, `price`, `total`,`orderdate`, `createddate`, `updateddate`,`isactive`) VALUES ('" + req.body.uid + "','" + req.body.id + "','" + req.body.quantity + "','"+ req.body.price + "','"+req.body.total+"',CURRENT_TIMESTAMP,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP,true);", function (data, err) {
+        if (err) {
+            console.log(err)
+        } else {
+            return res.json('success');
+        }
+    });
+});
+router.post("/updateCartList", (req, res, next) => {
+    console.log(req.body)
+    db.executeSql("UPDATE `cartlist` SET quantity=" + req.body.quantity  + " where id=" + req.body.id + ";", function (data, err) {
+        if (err) {
+            console.log("Error in store.js", err);
+        } else {
+            return res.json(data);
+        }
+    });
+})
+router.get("/getAllCartList", (req, res, next) => {
+    db.executeSql("select * from products , cartlist WHERE products.id=cartlist.productid ", function (data, err) {
+        if (err) {
+            console.log(err);
+        } else {
+            return res.json(data);
+        }
+    })
+});
+router.post("/removeCartDetails", (req, res, next) => {
+    console.log(req.body.id)
+    db.executeSql("Delete from cartlist where id=" + req.body.id, function (data, err) {
+        if (err) {
+            console.log("Error in store.js", err);
+        } else {
+            return res.json(data);
+        }
+    });
+})
 router.get("/RemoveCategoryDetails/:id", (req, res, next) => {
     console.log(req.params.id)
     db.executeSql("Delete from category where id=" + req.params.id, function (data, err) {
