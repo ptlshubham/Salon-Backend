@@ -741,8 +741,8 @@ router.post("/GetCustomerById", (req, res, next) => {
         if (err) {
             console.log(err);
         } else {
-            let cid = data[0].id
-            db.executeSql("select * from appointment where custid = " + cid + "", function(data1, err) {
+          if(data.length >0){
+            db.executeSql("select * from appointment where custid = " + data[0].id + "", function(data1, err) {
                 if (err) {
                     console.log("Error in store.js", err);
                 } else {
@@ -750,6 +750,10 @@ router.post("/GetCustomerById", (req, res, next) => {
                 }
                 return res.json(data1);
             });
+          }else{
+            res.json('customer not found');
+          }
+          
         }
     })
 
@@ -979,6 +983,15 @@ router.post("/SaveProductsList", (req, res, next) => {
 });
 router.get("/GetAllProductsList", (req, res, next) => {
     db.executeSql("select * from products", function(data, err) {
+        if (err) {
+            console.log(err);
+        } else {
+            return res.json(data);
+        }
+    })
+});
+router.get("/GetActiveProducts", (req, res, next) => {
+    db.executeSql("select * from products where display=true", function(data, err) {
         if (err) {
             console.log(err);
         } else {
@@ -1284,7 +1297,7 @@ router.post("/UploadBannersImage", (req, res, next) => {
         }
         return res.json('/images/banners/' + req.file.filename);
 
-        console.log("You have uploaded this image");
+       
     });
 });
 
