@@ -289,12 +289,12 @@ router.post("/getAllMembershipDataList", (req, res, next) => {
 router.post("/SaveMembershipList", (req, res, next) => {
     console.log(req.body)
 
-    db.executeSql("INSERT INTO `membership`(`membershipname`,`membershipprice`,`totalprice`,`quantity`,`finalprice`,`status`)VALUES('" + req.body.membershipname + "'," + req.body.membershipprice + "," + req.body.totalprice + "," + req.body.quantity + "," + req.body.finalprice + ",true);", function(data, err) {
+    db.executeSql("INSERT INTO `membership`(`membershipname`,`membershipdiscount`,`totalprice`,`membershipprice`,`status`)VALUES('" + req.body.membershipname + "'," + req.body.membershipdiscount + "," + req.body.totalprice + "," + req.body.membershipprice + ",true);", function(data, err) {
         if (err) {
             console.log(err)
         } else {
             for (let i = 0; i < req.body.services.length; i++) {
-                db.executeSql("INSERT INTO `membershipservices`(`membershipid`,`servicesname`,`totalprice`,`membershipname`,`membershipprice`,`finalprice`) VALUES(" + data.insertId + ",'" + req.body.services[i].selectedServ + "'," + req.body.totalprice + ",'" + req.body.membershipname + "'," + req.body.membershipprice + "," + req.body.finalprice + ");", function (data1, err) {
+                db.executeSql("INSERT INTO `membershipservices` ( `membershipid`, `servicesname`, `serviceid`, `totalprice`, `membershipname`, `quantity`, `serviceprice`) VALUES(" + data.insertId + ",'" + req.body.services[i].selectedServ + "',"+req.body.services[i].selectedServid+"," + req.body.services[i].finalprice + ",'" + req.body.membershipname + "'," + req.body.services[i].serprice + ","+req.body.services[i].quantity+");", function (data1, err) {
                     if (err) {
                         console.log(err);
                     } else { }
@@ -738,7 +738,8 @@ router.post("/GetAllCustomerDataList", (req, res, next) => {
 })
 
 router.post("/GetCustomerById", (req, res, next) => {
-    db.executeSql("select * from customer where uid=" + req.body.id + "", function (data, err) {
+    console.log(req.body.id);
+    db.executeSql("select * from customer where id=" + req.body.id + "", function (data, err) {
         if (err) {
             console.log(err);
         } else {
@@ -1349,7 +1350,6 @@ router.post('/GetUsersLogin', function (req, res, next) {
     var repass = salt + '' + body.password;
     var encPassword = crypto.createHash('sha1').update(repass).digest('hex');
     db.executeSql("select * from users where email='" + req.body.email + "';", function (data, err) {
-        console.log(data);
         if (data == null || data == undefined || data.length === 0) {
             return res.json(1);
         } else {
@@ -1391,11 +1391,14 @@ router.post('/GetUsersLogin', function (req, res, next) {
                         })
 
                     } else if (data1[0].role == 'Customer') {
+                        console.log('helllllllll')
                         let resdata1 = [];
-                        db.executeSql("select * from customer where id=" + data1[0].userid, function (data3, err) {
+                        db.executeSql("SELECT * FROM `customer` WHERE uid=" + data1[0].userid, function (data3, err) {
                             if (err) {
+                                console.log("data");
                                 console.log(err);
                             } else {
+                                console.log(data1[0].userid)
                                 resdata1.push(data3[0]);
                                 resdata1[0].token = token;
                                 resdata1[0].role = data1[0].role;
