@@ -11,24 +11,24 @@ const nodemailer = require('nodemailer');
 var handlebars = require("handlebars");
 const fs = require('fs');
 const schedule = require('node-schedule');
-let  dates =  new Date(new Date().setDate(new Date().getDate() - 60));
+let dates = new Date(new Date().setDate(new Date().getDate() - 60));
 
 console.log(dates.toISOString().slice(0, 10));
-const job = schedule.scheduleJob('0 0 * * *', function(){
+const job = schedule.scheduleJob('0 0 * * *', function() {
     console.log('hello schedule')
-    db.executeSql("UPDATE `customer` SET `status`=false WHERE updateddate='"+dates.toISOString().slice(0, 10)+"';", function(data, err) {
-        
+    db.executeSql("UPDATE `customer` SET `status`=false WHERE updateddate='" + dates.toISOString().slice(0, 10) + "';", function(data, err) {
+
         if (err) {
             console.log(err);
         } else {
             console.log(data);
         }
     });
-  });
+});
 
 
 router.post("/SaveServicesList", (req, res, next) => {
-    db.executeSql("INSERT INTO `serviceslist`(`name`, `price`, `time`, `point`, `isactive`, `createdate`,`epoint`)VALUES('" + req.body.name + "'," + req.body.price + "," + req.body.time + "," + req.body.point + ",true,CURRENT_TIMESTAMP," + req.body.epoint + ");", function (data, err) {
+    db.executeSql("INSERT INTO `serviceslist`(`name`, `price`, `time`, `point`, `isactive`, `createdate`,`epoint`)VALUES('" + req.body.name + "'," + req.body.price + "," + req.body.time + "," + req.body.point + ",true,CURRENT_TIMESTAMP," + req.body.epoint + ");", function(data, err) {
         if (err) {
             res.json("error");
         } else {
@@ -38,7 +38,7 @@ router.post("/SaveServicesList", (req, res, next) => {
     });
 });
 router.post("/SaveSalaryList", (req, res, next) => {
-    db.executeSql("INSERT INTO `salary`(`salary`, `desc`, `paiddate`, `empid`)VALUES(" + req.body.salary + " , '" + req.body.desc + "' , '" + req.body.paiddate + "' ," + req.body.empid + ");", function (data, err) {
+    db.executeSql("INSERT INTO `salary`(`salary`, `desc`, `paiddate`, `empid`)VALUES(" + req.body.salary + " , '" + req.body.desc + "' , '" + req.body.paiddate + "' ," + req.body.empid + ");", function(data, err) {
         if (err) {
             res.json("error");
         } else {
@@ -49,7 +49,7 @@ router.post("/SaveSalaryList", (req, res, next) => {
 });
 
 router.get("/GetAllServices", (req, res, next) => {
-    db.executeSql("select * from serviceslist", function (data, err) {
+    db.executeSql("select * from serviceslist", function(data, err) {
         if (err) {
             console.log(err);
         } else {
@@ -59,7 +59,7 @@ router.get("/GetAllServices", (req, res, next) => {
 });
 
 router.post("/UpdateServicesList", (req, res, next) => {
-    db.executeSql("UPDATE  `serviceslist` SET name='" + req.body.name + "',price=" + req.body.price + ",time=" + req.body.time + ",point=" + req.body.point + ",epoint=" + req.body.epoint + ",updateddate=CURRENT_TIMESTAMP WHERE id=" + req.body.id + ";", function (data, err) {
+    db.executeSql("UPDATE  `serviceslist` SET name='" + req.body.name + "',price=" + req.body.price + ",time=" + req.body.time + ",point=" + req.body.point + ",epoint=" + req.body.epoint + ",updateddate=CURRENT_TIMESTAMP WHERE id=" + req.body.id + ";", function(data, err) {
         if (err) {
             console.log("Error in store.js", err);
         } else {
@@ -69,7 +69,7 @@ router.post("/UpdateServicesList", (req, res, next) => {
 });
 
 router.post("/UpdateSalaryList", (req, res, next) => {
-    db.executeSql("UPDATE `salary` SET `salary`= " + req.body.salary + " ,`desc`='" + req.body.desc + "',`paiddate`='" + req.body.paiddate + "' WHERE id= " + req.body.id + ";", function (data, err) {
+    db.executeSql("UPDATE `salary` SET `salary`= " + req.body.salary + " ,`desc`='" + req.body.desc + "',`paiddate`='" + req.body.paiddate + "' WHERE id= " + req.body.id + ";", function(data, err) {
         if (err) {
             console.log("Error in store.js", err);
         } else {
@@ -81,7 +81,7 @@ router.post("/UpdateSalaryList", (req, res, next) => {
 router.post("/RemoveSalaryList", (req, res, next) => {
 
     console.log(req.body);
-    db.executeSql("Delete from salary where id=" + req.body.id, function (data, err) {
+    db.executeSql("Delete from salary where id=" + req.body.id, function(data, err) {
         if (err) {
             console.log("Error in store.js", err);
         } else {
@@ -92,7 +92,7 @@ router.post("/RemoveSalaryList", (req, res, next) => {
 
 router.post("/SaveEmployeeList", (req, res, next) => {
     console.log(req.body)
-    db.executeSql("INSERT INTO `employee`(`fname`,`lname`,`contact`,`whatsapp`,`address`,`city`,`pincode`,`gender`,`isactive`,`createddate`)VALUES('" + req.body.fname + "','" + req.body.lname + "','" + req.body.contact + "','" + req.body.whatsapp + "','" + req.body.address + "','" + req.body.city + "'," + req.body.pincode + ",'" + req.body.gender + "'," + req.body.isactive + ",CURRENT_TIMESTAMP);", function (data, err) {
+    db.executeSql("INSERT INTO `employee`(`fname`,`lname`,`contact`,`whatsapp`,`address`,`city`,`pincode`,`gender`,`isactive`,`createddate`)VALUES('" + req.body.fname + "','" + req.body.lname + "','" + req.body.contact + "','" + req.body.whatsapp + "','" + req.body.address + "','" + req.body.city + "'," + req.body.pincode + ",'" + req.body.gender + "'," + req.body.isactive + ",CURRENT_TIMESTAMP);", function(data, err) {
         if (err) {
             console.log(err)
         } else {
@@ -100,7 +100,7 @@ router.post("/SaveEmployeeList", (req, res, next) => {
             console.log(req.body.service.length)
             for (let i = 0; i < req.body.service.length; i++) {
                 console.log(req.body.service[i]);
-                db.executeSql("INSERT INTO `empservices`(`servicesid`,`servicesname`,`empid`) VALUES(" + req.body.service[i].servicesId + ",'" + req.body.service[i].servicesName + "'," + data.insertId + ");", function (data1, err) {
+                db.executeSql("INSERT INTO `empservices`(`servicesid`,`servicesname`,`empid`) VALUES(" + req.body.service[i].servicesId + ",'" + req.body.service[i].servicesName + "'," + data.insertId + ");", function(data1, err) {
                     if (err) {
                         console.log(err);
 
@@ -125,7 +125,7 @@ router.post("/SaveEmployeeList", (req, res, next) => {
 //     })
 // });
 router.get("/GetAllEmployee", (req, res, next) => {
-    db.executeSql("select * from employee where isactive=true", function (data, err) {
+    db.executeSql("select * from employee where isactive=true", function(data, err) {
         if (err) {
             console.log(err);
         } else {
@@ -135,7 +135,7 @@ router.get("/GetAllEmployee", (req, res, next) => {
 });
 
 router.get("/GetEmployeeService", (req, res, next) => {
-    db.executeSql("select * from empservices", function (data, err) {
+    db.executeSql("select * from empservices", function(data, err) {
         if (err) {
             console.log(err);
         } else {
@@ -147,7 +147,7 @@ router.get("/GetEmployeeService", (req, res, next) => {
 router.post("/RemoveEmployeeList", (req, res, next) => {
 
     console.log(req.body);
-    db.executeSql("update `employee` set isactive='0' where id=" + req.body.id, function (data, err) {
+    db.executeSql("update `employee` set isactive='0' where id=" + req.body.id, function(data, err) {
         if (err) {
             console.log("Error in store.js", err);
         } else {
@@ -158,7 +158,7 @@ router.post("/RemoveEmployeeList", (req, res, next) => {
 
 router.post("/GetAllSalaryList", (req, res, next) => {
     console.log(req.body);
-    db.executeSql("select s.id,s.salary,s.desc,s.paiddate,s.empid,e.id as eId,e.fname,e.lname,e.contact,e.whatsapp,e.address,e.city,e.pincode,e.gender from salary s join employee e on s.empid=e.id where s.empid=" + req.body.id, function (data, err) {
+    db.executeSql("select s.id,s.salary,s.desc,s.paiddate,s.empid,e.id as eId,e.fname,e.lname,e.contact,e.whatsapp,e.address,e.city,e.pincode,e.gender from salary s join employee e on s.empid=e.id where s.empid=" + req.body.id, function(data, err) {
         if (err) {
             console.log(err);
         } else {
@@ -168,7 +168,7 @@ router.post("/GetAllSalaryList", (req, res, next) => {
 });
 
 router.post("/UpdateEmployeeList", (req, res, next) => {
-    db.executeSql("UPDATE `employee` SET fname='" + req.body.fname + "',lname='" + req.body.lname + "',contact='" + req.body.contact + "',whatsapp='" + req.body.whatsapp + "',address='" + req.body.address + "',city='" + req.body.city + "',gender='" + req.body.gender + "',updateddate=CURRENT_TIMESTAMP WHERE id=" + req.body.id + ";", function (data, err) {
+    db.executeSql("UPDATE `employee` SET fname='" + req.body.fname + "',lname='" + req.body.lname + "',contact='" + req.body.contact + "',whatsapp='" + req.body.whatsapp + "',address='" + req.body.address + "',city='" + req.body.city + "',gender='" + req.body.gender + "',updateddate=CURRENT_TIMESTAMP WHERE id=" + req.body.id + ";", function(data, err) {
         if (err) {
             console.log("Error in store.js", err);
         } else {
@@ -179,7 +179,7 @@ router.post("/UpdateEmployeeList", (req, res, next) => {
 
 router.post("/SaveCustomerList", (req, res, next) => {
     console.log(req.body)
-    db.executeSql("INSERT INTO `customer`(`fname`,`lname`,`email`,`contact`,`whatsapp`,`gender`,`createddate`,`address`,`vip`)VALUES('" + req.body.fname + "','" + req.body.lname + "','" + req.body.email + "','" + req.body.contact + "','" + req.body.whatsapp + "','" + req.body.gender + "',CURRENT_TIMESTAMP,'" + req.body.address + "'," + req.body.vip + ");", function (data, err) {
+    db.executeSql("INSERT INTO `customer`(`fname`,`lname`,`email`,`contact`,`whatsapp`,`gender`,`createddate`,`address`,`vip`)VALUES('" + req.body.fname + "','" + req.body.lname + "','" + req.body.email + "','" + req.body.contact + "','" + req.body.whatsapp + "','" + req.body.gender + "',CURRENT_TIMESTAMP,'" + req.body.address + "'," + req.body.vip + ");", function(data, err) {
         if (err) {
             console.log(err)
         } else {
@@ -190,7 +190,7 @@ router.post("/SaveCustomerList", (req, res, next) => {
 
 
 router.get("/GetAllCustomer", (req, res, next) => {
-    db.executeSql("select * from customer", function (data, err) {
+    db.executeSql("select * from customer", function(data, err) {
         if (err) {
             console.log(err);
         } else {
@@ -200,7 +200,7 @@ router.get("/GetAllCustomer", (req, res, next) => {
 });
 
 router.get("/GetAllOffer", (req, res, next) => {
-    db.executeSql("select * from offer", function (data, err) {
+    db.executeSql("select * from offer", function(data, err) {
         if (err) {
             console.log(err);
         } else {
@@ -216,10 +216,10 @@ router.post("/SaveOfferList", (req, res, next) => {
             console.log(err)
         } else {
             for (let i = 0; i < req.body.services.length; i++) {
-                db.executeSql("INSERT INTO `offerservices`(`offerid`,`servicesname`,`totalprice`,`offername`,`offerprice`) VALUES(" + data.insertId + ",'" + req.body.services[i].selectedServ + "'," + req.body.totalprice + ",'" + req.body.offername + "'," + req.body.offerprice + ");", function (data1, err) {
+                db.executeSql("INSERT INTO `offerservices`(`offerid`,`servicesname`,`totalprice`,`offername`,`offerprice`) VALUES(" + data.insertId + ",'" + req.body.services[i].selectedServ + "'," + req.body.totalprice + ",'" + req.body.offername + "'," + req.body.offerprice + ");", function(data1, err) {
                     if (err) {
                         console.log(err);
-                    } else { }
+                    } else {}
                 });
             }
         }
@@ -239,7 +239,7 @@ router.post("/SaveOfferList", (req, res, next) => {
 // })
 router.post("/GetUsedServicesByOffer", (req, res, next) => {
 
-    db.executeSql("select s.offerid,s.servicesname,s.offername,s.offerprice,sl.id as slId,sl.offerid,sl.servicesname,sl.offername,sl.offerprice from offerservices s join serviceslist sl on s.servicesid=sl.id where s.offerappointmentid = " + req.body.id + "", function (data, err) {
+    db.executeSql("select s.offerid,s.servicesname,s.offername,s.offerprice,sl.id as slId,sl.offerid,sl.servicesname,sl.offername,sl.offerprice from offerservices s join serviceslist sl on s.servicesid=sl.id where s.offerappointmentid = " + req.body.id + "", function(data, err) {
         if (err) {
             console.log("Error in store.js", err);
         } else {
@@ -249,7 +249,7 @@ router.post("/GetUsedServicesByOffer", (req, res, next) => {
 })
 router.get("/removeOfferDetails/:id", (req, res, next) => {
 
-    db.executeSql("Delete from offer where id=" + req.params.id, function (data, err) {
+    db.executeSql("Delete from offer where id=" + req.params.id, function(data, err) {
         if (err) {
             console.log(err);
         } else {
@@ -258,7 +258,7 @@ router.get("/removeOfferDetails/:id", (req, res, next) => {
     });
 })
 router.get("/GetActiveOffer", (req, res, next) => {
-    db.executeSql("select * from offer where status=true", function (data, err) {
+    db.executeSql("select * from offer where status=true", function(data, err) {
         if (err) {
             console.log(err);
         } else {
@@ -268,7 +268,7 @@ router.get("/GetActiveOffer", (req, res, next) => {
 });
 router.post("/getAllOfferDataList", (req, res, next) => {
 
-    db.executeSql("select * from offerservices where offerid = " + req.body.id + "", function (data, err) {
+    db.executeSql("select * from offerservices where offerid = " + req.body.id + "", function(data, err) {
         if (err) {
             console.log("Error in store.js", err);
         } else {
@@ -278,7 +278,7 @@ router.post("/getAllOfferDataList", (req, res, next) => {
 })
 router.post("/getAllMembershipDataList", (req, res, next) => {
 
-    db.executeSql("select * from membershipappointment where membershipid = " + req.body.id + "", function (data, err) {
+    db.executeSql("select * from membershipappointment where membershipid = " + req.body.id + "", function(data, err) {
         if (err) {
             console.log("Error in store.js", err);
         } else {
@@ -297,7 +297,7 @@ router.post("/SaveMembershipList", (req, res, next) => {
                 db.executeSql("INSERT INTO `membershipservices` ( `membershipid`, `servicesname`, `serviceid`, `totalprice`, `membershipname`, `quantity`, `serviceprice`) VALUES(" + data.insertId + ",'" + req.body.services[i].selectedServ + "',"+req.body.services[i].selectedServid+"," + req.body.services[i].finalprice + ",'" + req.body.membershipname + "'," + req.body.services[i].serprice + ","+req.body.services[i].quantity+");", function (data1, err) {
                     if (err) {
                         console.log(err);
-                    } else { }
+                    } else {}
                 });
             }
         }
@@ -306,7 +306,7 @@ router.post("/SaveMembershipList", (req, res, next) => {
 });
 router.post("/GetUsedServicesByMembership", (req, res, next) => {
 
-    db.executeSql("select s.membershipid,s.servicesname,s.totalprice,s.membershipname,s.membershipprice,finalprice,sl.id as slId,sl.membershipid,sl.servicesname,sl.totalprice,sl.membershipname,sl.membershipprice,sl.finalprice from membershipservices s join serviceslist sl on s.servicesid=sl.id where s.membershipappointmentid = " + req.body.id + "", function (data, err) {
+    db.executeSql("select s.membershipid,s.servicesname,s.totalprice,s.membershipname,s.membershipprice,finalprice,sl.id as slId,sl.membershipid,sl.servicesname,sl.totalprice,sl.membershipname,sl.membershipprice,sl.finalprice from membershipservices s join serviceslist sl on s.servicesid=sl.id where s.membershipappointmentid = " + req.body.id + "", function(data, err) {
         if (err) {
             console.log("Error in store.js", err);
         } else {
@@ -316,7 +316,7 @@ router.post("/GetUsedServicesByMembership", (req, res, next) => {
 })
 router.get("/removeMembershipDetails/:id", (req, res, next) => {
 
-    db.executeSql("Delete from membership where id=" + req.params.id, function (data, err) {
+    db.executeSql("Delete from membership where id=" + req.params.id, function(data, err) {
         if (err) {
             console.log(err);
         } else {
@@ -325,7 +325,7 @@ router.get("/removeMembershipDetails/:id", (req, res, next) => {
     });
 })
 router.get("/GetAllMembership", (req, res, next) => {
-    db.executeSql("select * from membership", function (data, err) {
+    db.executeSql("select * from membership", function(data, err) {
         if (err) {
             console.log(err);
         } else {
@@ -336,22 +336,22 @@ router.get("/GetAllMembership", (req, res, next) => {
 router.post("/SaveAppointmentList", (req, res, next) => {
     console.log(req.body)
     var checkdate = req.body.selectdate;
-    if(checkdate == undefined){
-        db.executeSql("INSERT INTO `appointment`(`custid`, `empname`, `totalprice`, `totalpoint`, `totaltime`, `isactive`, `createddate`,`updatedate`,`ispayment`,`appointmentdate`)VALUES(" + req.body.custid + ",'" + req.body.emp + "','" + req.body.totalprice + "','" + req.body.totalpoint + "','" + req.body.totaltime + "'," + req.body.isactive + ",CURRENT_TIMESTAMP,CURRENT_TIMESTAMP,false,CURRENT_TIMESTAMP    );", function (data, err) {
+    if (checkdate == undefined) {
+        db.executeSql("INSERT INTO `appointment`(`custid`, `empname`, `totalprice`, `totalpoint`, `totaltime`, `isactive`, `createddate`,`updatedate`,`ispayment`,`appointmentdate`)VALUES(" + req.body.custid + ",'" + req.body.emp + "','" + req.body.totalprice + "','" + req.body.totalpoint + "','" + req.body.totaltime + "'," + req.body.isactive + ",CURRENT_TIMESTAMP,CURRENT_TIMESTAMP,false,CURRENT_TIMESTAMP    );", function(data, err) {
             if (err) {
                 console.log(err)
             } else {
                 for (let i = 0; i < req.body.selectedService.length; i++) {
-                    db.executeSql("INSERT INTO `custservices`(`servicesid`,`servicesname`,`custid`,`appointmentid`,`employeename`,`empid`) VALUES(" + req.body.selectedService[i].selectedServid + ",'" + req.body.selectedService[i].selectedServ + "'," + req.body.custid + "," + data.insertId + ",'" + req.body.selectedService[i].selectedEmp + "'," + req.body.selectedService[i].selectedEmpid + ");", function (data1, err) {
+                    db.executeSql("INSERT INTO `custservices`(`servicesid`,`servicesname`,`custid`,`appointmentid`,`employeename`,`empid`) VALUES(" + req.body.selectedService[i].selectedServid + ",'" + req.body.selectedService[i].servicesname + "'," + req.body.custid + "," + data.insertId + ",'" + req.body.selectedService[i].employeename + "'," + req.body.selectedService[i].selectedEmpid + ");", function(data1, err) {
                         if (err) {
                             console.log(err);
-                        } else { }
+                        } else {}
                     });
                 }
                 if (req.body.tCustPoint == 0) {
                     console.log('undefined');
-    
-                    db.executeSql("INSERT INTO `point`( `custid`, `totalcustpoint`)VALUES(" + req.body.custid + "," + req.body.lessPoints + ");", function (data, err) {
+
+                    db.executeSql("INSERT INTO `point`( `custid`, `totalcustpoint`)VALUES(" + req.body.custid + "," + req.body.lessPoints + ");", function(data, err) {
                         if (err) {
                             console.log(err);
                         } else {
@@ -361,7 +361,7 @@ router.post("/SaveAppointmentList", (req, res, next) => {
                 } else {
                     console.log('defined')
                     console.log(req.body)
-                    db.executeSql("UPDATE `point` SET totalcustpoint=" + req.body.lessPoints + " WHERE custid=" + req.body.custid + ";", function (data, err) {
+                    db.executeSql("UPDATE `point` SET totalcustpoint=" + req.body.lessPoints + " WHERE custid=" + req.body.custid + ";", function(data, err) {
                         if (err) {
                             console.log(err);
                         } else {
@@ -369,54 +369,53 @@ router.post("/SaveAppointmentList", (req, res, next) => {
                         }
                     });
                 }
-    
+
             }
             return res.json('success');
         });
-    }
-    else{
-    db.executeSql("INSERT INTO `appointment`(`custid`, `empname`, `totalprice`, `totalpoint`, `totaltime`, `isactive`, `createddate`,`updatedate`,`ispayment`,`appointmentdate`)VALUES(" + req.body.custid + ",'" + req.body.emp + "','" + req.body.totalprice + "','" + req.body.totalpoint + "','" + req.body.totaltime + "'," + req.body.isactive + ",CURRENT_TIMESTAMP,CURRENT_TIMESTAMP,false,'"+ req.body.selectdate +"');", function (data, err) {
-        if (err) {
-            console.log(err)
-        } else {
-            for (let i = 0; i < req.body.selectedService.length; i++) {
-                db.executeSql("INSERT INTO `custservices`(`servicesid`,`servicesname`,`custid`,`appointmentid`,`employeename`,`empid`) VALUES(" + req.body.selectedService[i].selectedServid + ",'" + req.body.selectedService[i].selectedServ + "'," + req.body.custid + "," + data.insertId + ",'" + req.body.selectedService[i].selectedEmp + "'," + req.body.selectedService[i].selectedEmpid + ");", function (data1, err) {
-                    if (err) {
-                        console.log(err);
-                    } else { }
-                });
-            }
-            if (req.body.tCustPoint == 0) {
-                console.log('undefined');
-
-                db.executeSql("INSERT INTO `point`( `custid`, `totalcustpoint`)VALUES(" + req.body.custid + "," + req.body.lessPoints + ");", function (data, err) {
-                    if (err) {
-                        console.log(err);
-                    } else {
-                        console.log(data);
-                    }
-                });
+    } else {
+        db.executeSql("INSERT INTO `appointment`(`custid`, `empname`, `totalprice`, `totalpoint`, `totaltime`, `isactive`, `createddate`,`updatedate`,`ispayment`,`appointmentdate`)VALUES(" + req.body.custid + ",'" + req.body.emp + "','" + req.body.totalprice + "','" + req.body.totalpoint + "','" + req.body.totaltime + "'," + req.body.isactive + ",CURRENT_TIMESTAMP,CURRENT_TIMESTAMP,false,'" + req.body.selectdate + "');", function(data, err) {
+            if (err) {
+                console.log(err)
             } else {
-                console.log('defined')
-                console.log(req.body)
-                db.executeSql("UPDATE `point` SET totalcustpoint=" + req.body.lessPoints + " WHERE custid=" + req.body.custid + ";", function (data, err) {
-                    if (err) {
-                        console.log(err);
-                    } else {
-                        console.log(data);
-                    }
-                });
-            }
+                for (let i = 0; i < req.body.selectedService.length; i++) {
+                    db.executeSql("INSERT INTO `custservices`(`servicesid`,`servicesname`,`custid`,`appointmentid`,`employeename`,`empid`) VALUES(" + req.body.selectedService[i].selectedServid + ",'" + req.body.selectedService[i].servicesname + "'," + req.body.custid + "," + data.insertId + ",'" + req.body.selectedService[i].employeename + "'," + req.body.selectedService[i].selectedEmpid + ");", function(data1, err) {
+                        if (err) {
+                            console.log(err);
+                        } else {}
+                    });
+                }
+                if (req.body.tCustPoint == 0) {
+                    console.log('undefined');
 
-        }
-        return res.json('success');
-    });
+                    db.executeSql("INSERT INTO `point`( `custid`, `totalcustpoint`)VALUES(" + req.body.custid + "," + req.body.lessPoints + ");", function(data, err) {
+                        if (err) {
+                            console.log(err);
+                        } else {
+                            console.log(data);
+                        }
+                    });
+                } else {
+                    console.log('defined')
+                    console.log(req.body)
+                    db.executeSql("UPDATE `point` SET totalcustpoint=" + req.body.lessPoints + " WHERE custid=" + req.body.custid + ";", function(data, err) {
+                        if (err) {
+                            console.log(err);
+                        } else {
+                            console.log(data);
+                        }
+                    });
+                }
+
+            }
+            return res.json('success');
+        });
     }
 });
 
 
 router.get("/GetAllAppointment", (req, res, next) => {
-    db.executeSql("select a.id,a.custid,a.empname,a.totalprice,a.totalpoint,a.totaltime,a.isactive,a.createddate,a.updatedate,c.id as cId,c.fname,c.lname,c.email,c.contact,c.whatsapp,c.gender from appointment a join customer c on a.custid=c.id where isactive=true", function (data, err) {
+    db.executeSql("select a.id,a.custid,a.empname,a.totalprice,a.totalpoint,a.totaltime,a.isactive,a.createddate,a.updatedate,c.id as cId,c.fname,c.lname,c.email,c.contact,c.whatsapp,c.gender from appointment a join customer c on a.custid=c.id where isactive=true", function(data, err) {
         if (err) {
             console.log(err);
         } else {
@@ -428,7 +427,7 @@ router.post("/ChackForPassword", (req, res, next) => {
     var salt = '7fa73b47df808d36c5fe328546ddef8b9011b2c6';
     var repass = salt + '' + req.body.pass;
     var encPassword = crypto.createHash('sha1').update(repass).digest('hex');
-    db.executeSql("select * from users where userid=" + req.body.id + " and password='" + encPassword + "'", function (data, err) {
+    db.executeSql("select * from users where userid=" + req.body.id + " and password='" + encPassword + "'", function(data, err) {
         if (err) {
             console.log(err);
         } else {
@@ -455,7 +454,7 @@ router.post("/ChackForPassword", (req, res, next) => {
 
 
 router.get("/GetAllEnquiryList", (req, res, next) => {
-    db.executeSql("select * from enquiry", function (data, err) {
+    db.executeSql("select * from enquiry", function(data, err) {
         if (err) {
             console.log(err);
         } else {
@@ -465,7 +464,7 @@ router.get("/GetAllEnquiryList", (req, res, next) => {
 });
 
 router.post("/UpdateSalaryStatus", (req, res, next) => {
-    db.executeSql("UPDATE  `salary` SET status=" + req.body.status + " WHERE id=" + req.body.id + ";", function (data, err) {
+    db.executeSql("UPDATE  `salary` SET status=" + req.body.status + " WHERE id=" + req.body.id + ";", function(data, err) {
         if (err) {
             console.log("Error in store.js", err);
         } else {
@@ -477,7 +476,7 @@ router.post("/UpdateSalaryStatus", (req, res, next) => {
 var nowDate = new Date();
 date = nowDate.getFullYear() + '-' + (nowDate.getMonth() + 1) + '-' + nowDate.getDate();
 router.get("/GetDailyTotal", (req, res, next) => {
-    db.executeSql("select * from appointment where createddate='" + date + "' and ispayment=true", function (data, err) {
+    db.executeSql("select * from appointment where createddate='" + date + "' and ispayment=true", function(data, err) {
         if (err) {
             console.log(err);
         } else {
@@ -488,7 +487,7 @@ router.get("/GetDailyTotal", (req, res, next) => {
 });
 
 router.get("/GetMonthlyTotal", (req, res, next) => {
-    db.executeSql("select * from appointment where  DATE_FORMAT(createddate, '%m') = DATE_FORMAT(CURRENT_TIMESTAMP, '%m') and ispayment=true", function (data, err) {
+    db.executeSql("select * from appointment where  DATE_FORMAT(createddate, '%m') = DATE_FORMAT(CURRENT_TIMESTAMP, '%m') and ispayment=true", function(data, err) {
         if (err) {
             console.log(err);
         } else {
@@ -499,7 +498,7 @@ router.get("/GetMonthlyTotal", (req, res, next) => {
 
 
 router.post("/UpdateCustomerList", (req, res, next) => {
-    db.executeSql("UPDATE  `customer` SET fname='" + req.body.fname + "',lname='" + req.body.lname + "',email='" + req.body.email + "',contact='" + req.body.contact + "',whatsapp='" + req.body.whatsapp + "',gender='" + req.body.gender + "',vip=" + req.body.vip + ",updateddate=CURRENT_TIMESTAMP,address='" + req.body.address + "' WHERE id=" + req.body.id + ";", function (data, err) {
+    db.executeSql("UPDATE  `customer` SET fname='" + req.body.fname + "',lname='" + req.body.lname + "',email='" + req.body.email + "',contact='" + req.body.contact + "',whatsapp='" + req.body.whatsapp + "',gender='" + req.body.gender + "',vip=" + req.body.vip + ",updateddate=CURRENT_TIMESTAMP,address='" + req.body.address + "' WHERE id=" + req.body.id + ";", function(data, err) {
         if (err) {
             console.log("Error in store.js", err);
         } else {
@@ -512,7 +511,7 @@ router.post("/UpdateCustomerList", (req, res, next) => {
 
 router.get("/removeCustomerDetails/:id", (req, res, next) => {
 
-    db.executeSql("Delete from customer where id=" + req.params.id, function (data, err) {
+    db.executeSql("Delete from customer where id=" + req.params.id, function(data, err) {
         if (err) {
             console.log("Error in store.js", err);
         } else {
@@ -523,7 +522,7 @@ router.get("/removeCustomerDetails/:id", (req, res, next) => {
 
 router.get("/RemoveServicesList/:id", (req, res, next) => {
 
-    db.executeSql("Delete from serviceslist where id=" + req.params.id, function (data, err) {
+    db.executeSql("Delete from serviceslist where id=" + req.params.id, function(data, err) {
         if (err) {
             console.log(err);
         } else {
@@ -608,7 +607,7 @@ function mail(filename, data, toemail, subj, mailname) {
         }]
 
     };
-    transporter.sendMail(mailOptions, function (error, info) {
+    transporter.sendMail(mailOptions, function(error, info) {
         console.log('fgfjfj')
         if (error) {
             console.log(error);
@@ -624,13 +623,13 @@ function mail(filename, data, toemail, subj, mailname) {
 router.post("/ForgotPassword", (req, res, next) => {
     let otp = Math.floor(100000 + Math.random() * 900000);
     console.log(req.body);
-    db.executeSql("select * from users where email='" + req.body.email + "';", function (data, err) {
+    db.executeSql("select * from users where email='" + req.body.email + "';", function(data, err) {
         if (err) {
             console.log("Error in store.js", err);
             return res.json('err');
         } else {
             console.log(data[0]);
-            db.executeSql("INSERT INTO `otp`(`userid`, `otp`, `createddate`, `createdtime`,`role`,`isactive`) VALUES (" + data[0].userid + "," + otp + ",CURRENT_TIMESTAMP,CURRENT_TIMESTAMP,'" + data[0].role + "',true)", function (data1, err) {
+            db.executeSql("INSERT INTO `otp`(`userid`, `otp`, `createddate`, `createdtime`,`role`,`isactive`) VALUES (" + data[0].userid + "," + otp + ",CURRENT_TIMESTAMP,CURRENT_TIMESTAMP,'" + data[0].role + "',true)", function(data1, err) {
                 if (err) {
                     console.log(err);
                 } else {
@@ -648,7 +647,7 @@ router.post("/ForgotPassword", (req, res, next) => {
 
 router.post("/GetOneTimePassword", (req, res, next) => {
     console.log(req.body)
-    db.executeSql("select * from otp where userid = '" + req.body.id + "' " + " and otp =' " + req.body.otp + "' ", function (data, err) {
+    db.executeSql("select * from otp where userid = '" + req.body.id + "' " + " and otp =' " + req.body.otp + "' ", function(data, err) {
         if (err) {
             console.log("Error in store.js", err);
         } else {
@@ -674,7 +673,7 @@ router.post("/UpdatePassword", (req, res, next) => {
     var salt = '7fa73b47df808d36c5fe328546ddef8b9011b2c6';
     var repass = salt + '' + req.body.password;
     var encPassword = crypto.createHash('sha1').update(repass).digest('hex');
-    db.executeSql("UPDATE users SET password='" + encPassword + "' WHERE userid=" + req.body.id + ";", function (data, err) {
+    db.executeSql("UPDATE users SET password='" + encPassword + "' WHERE userid=" + req.body.id + ";", function(data, err) {
         if (err) {
             console.log("Error in store.js", err);
         } else {
@@ -686,7 +685,7 @@ router.post("/UpdatePassword", (req, res, next) => {
 
 
 router.post("/UpdateActiveStatus", (req, res, next) => {
-    db.executeSql("UPDATE  `appointment` SET isactive=" + req.body.isactive + ", updatedate=CURRENT_TIMESTAMP,ispayment=true WHERE id=" + req.body.id + ";", function (data, err) {
+    db.executeSql("UPDATE  `appointment` SET isactive=" + req.body.isactive + ", updatedate=CURRENT_TIMESTAMP,ispayment=true WHERE id=" + req.body.id + ";", function(data, err) {
         if (err) {
             console.log("Error in store.js", err);
         } else {
@@ -696,7 +695,7 @@ router.post("/UpdateActiveStatus", (req, res, next) => {
 })
 
 router.post("/GetViewAppointment", (req, res, next) => {
-    db.executeSql("select * from appointment where custid = " + req.body.id + "", function (data, err) {
+    db.executeSql("select * from appointment where custid = " + req.body.id + "", function(data, err) {
         if (err) {
             console.log("Error in store.js", err);
         } else {
@@ -706,7 +705,7 @@ router.post("/GetViewAppointment", (req, res, next) => {
 })
 
 router.post("/UpdateEnquiryStatus", (req, res, next) => {
-    db.executeSql("UPDATE  `enquiry` SET isactive=" + req.body.isactive + " WHERE id=" + req.body.id + ";", function (data, err) {
+    db.executeSql("UPDATE  `enquiry` SET isactive=" + req.body.isactive + " WHERE id=" + req.body.id + ";", function(data, err) {
         if (err) {
             console.log("Error in store.js", err);
         } else {
@@ -717,7 +716,7 @@ router.post("/UpdateEnquiryStatus", (req, res, next) => {
 
 
 router.post("/GetCustomerTotalPoints", (req, res, next) => {
-    db.executeSql("select * from point where custid = " + req.body.id + "", function (data, err) {
+    db.executeSql("select * from point where custid = " + req.body.id + "", function(data, err) {
         if (err) {
             console.log("Error in store.js", err);
         } else {
@@ -728,7 +727,7 @@ router.post("/GetCustomerTotalPoints", (req, res, next) => {
 
 router.post("/GetAllCustomerDataList", (req, res, next) => {
 
-    db.executeSql("select * from appointment where custid = " + req.body.id + "", function (data, err) {
+    db.executeSql("select * from appointment where custid = " + req.body.id + "", function(data, err) {
         if (err) {
             console.log("Error in store.js", err);
         } else {
@@ -738,20 +737,23 @@ router.post("/GetAllCustomerDataList", (req, res, next) => {
 })
 
 router.post("/GetCustomerById", (req, res, next) => {
-    console.log(req.body.id);
-    db.executeSql("select * from customer where id=" + req.body.id + "", function (data, err) {
+    db.executeSql("select * from customer where uid=" + req.body.id + "", function(data, err) {
         if (err) {
             console.log(err);
         } else {
-            let cid=data[0].id
-            db.executeSql("select * from appointment where custid = " +cid+ "", function (data1, err) {
+          if(data.length >0){
+            db.executeSql("select * from appointment where custid = " + data[0].id + "", function(data1, err) {
                 if (err) {
                     console.log("Error in store.js", err);
                 } else {
-                   
+
                 }
                 return res.json(data1);
             });
+          }else{
+            res.json('customer not found');
+          }
+          
         }
     })
 
@@ -759,7 +761,7 @@ router.post("/GetCustomerById", (req, res, next) => {
 
 router.post("/GetUsedServicesByCustomer", (req, res, next) => {
 
-    db.executeSql("select s.servicesid,s.servicesname,s.custid,s.appointmentid,s.employeename,s.empid,sl.id as slId,sl.price,sl.time,sl.point from custservices s join serviceslist sl on s.servicesid=sl.id where s.appointmentid = " + req.body.id + "", function (data, err) {
+    db.executeSql("select s.servicesid,s.servicesname,s.custid,s.appointmentid,s.employeename,s.empid,sl.id as slId,sl.price,sl.time,sl.point from custservices s join serviceslist sl on s.servicesid=sl.id where s.appointmentid = " + req.body.id + "", function(data, err) {
         if (err) {
             console.log("Error in store.js", err);
         } else {
@@ -776,7 +778,7 @@ var yyyy = today.getFullYear();
 today = yyyy + '-' + mm + '-' + dd;
 
 router.get("/GetAllCompletedServices", (req, res, next) => {
-    db.executeSql("select a.id,a.custid,a.empname,a.totalprice,a.totalpoint,a.totaltime,a.isactive,a.createddate,a.updatedate,c.id as cId,c.fname,c.lname,c.email,c.contact,c.whatsapp,c.gender from appointment a join customer c on a.custid=c.id where a.isactive=false and a.createddate='" + today + "'", function (data, err) {
+    db.executeSql("select a.id,a.custid,a.empname,a.totalprice,a.totalpoint,a.totaltime,a.isactive,a.createddate,a.updatedate,c.id as cId,c.fname,c.lname,c.email,c.contact,c.whatsapp,c.gender from appointment a join customer c on a.custid=c.id where a.isactive=false and a.createddate='" + today + "'", function(data, err) {
         if (err) {
             console.log(err);
         } else {
@@ -786,7 +788,7 @@ router.get("/GetAllCompletedServices", (req, res, next) => {
 });
 
 router.post("/SaveModeOfPayment", (req, res, next) => {
-    db.executeSql("INSERT INTO `payment`(`cid`, `appointmentid`, `cname`, `modeofpayment`, `tprice`, `tpoint`, `pdate`,`createddate`) VALUES (" + req.body.cid + "," + req.body.appointmentid + ",'" + req.body.cname + "','" + req.body.modeofpayment + "'," + req.body.tprice + "," + req.body.tpoint + ",CURRENT_TIMESTAMP,CURRENT_TIMESTAMP);", function (data, err) {
+    db.executeSql("INSERT INTO `payment`(`cid`, `appointmentid`, `cname`, `modeofpayment`, `tprice`, `tpoint`, `pdate`,`createddate`) VALUES (" + req.body.cid + "," + req.body.appointmentid + ",'" + req.body.cname + "','" + req.body.modeofpayment + "'," + req.body.tprice + "," + req.body.tpoint + ",CURRENT_TIMESTAMP,CURRENT_TIMESTAMP);", function(data, err) {
         if (err) {
             res.json("error");
         } else {
@@ -797,7 +799,7 @@ router.post("/SaveModeOfPayment", (req, res, next) => {
 });
 
 router.get("/GetAllModeOfPayment", (req, res, next) => {
-    db.executeSql("select * from payment where pdate ='" + today + "' ", function (data, err) {
+    db.executeSql("select * from payment where pdate ='" + today + "' ", function(data, err) {
         if (err) {
             console.log("Error in store.js", err);
         } else {
@@ -807,7 +809,7 @@ router.get("/GetAllModeOfPayment", (req, res, next) => {
 })
 
 router.get("/GetMonthlyPayment", (req, res, next) => {
-    db.executeSql("select * from payment ", function (data, err) {
+    db.executeSql("select * from payment ", function(data, err) {
         if (err) {
             console.log("Error in store.js", err);
         } else {
@@ -818,7 +820,7 @@ router.get("/GetMonthlyPayment", (req, res, next) => {
 
 
 router.post("/SaveExpensesList", (req, res, next) => {
-    db.executeSql("INSERT INTO expenses (expensesdate, expensesname, expensesprices, employeename, paymenttype) VALUES ('" + req.body.expensesdate + "','" + req.body.expensesname + "','" + req.body.expensesprices + "','" + req.body.employeename + "','" + req.body.paymenttype + "');", function (data, err) {
+    db.executeSql("INSERT INTO expenses (expensesdate, expensesname, expensesprices, employeename, paymenttype) VALUES ('" + req.body.expensesdate + "','" + req.body.expensesname + "','" + req.body.expensesprices + "','" + req.body.employeename + "','" + req.body.paymenttype + "');", function(data, err) {
         console.log(req.body.expensesdate, " , ", req.body.expensesdate);
         if (err) {
             res.json("error");
@@ -830,7 +832,7 @@ router.post("/SaveExpensesList", (req, res, next) => {
 });
 
 router.get("/GetAllExpenses", (req, res, next) => {
-    db.executeSql("select * from expenses", function (data, err) {
+    db.executeSql("select * from expenses", function(data, err) {
         if (err) {
             console.log(err);
         } else {
@@ -840,7 +842,7 @@ router.get("/GetAllExpenses", (req, res, next) => {
 });
 
 router.post("/RemoveExpensesDetails", (req, res, next) => {
-    db.executeSql("Delete from expenses where id=" + req.body.id, function (data, err) {
+    db.executeSql("Delete from expenses where id=" + req.body.id, function(data, err) {
         if (err) {
             console.log("Error in store.js", err);
         } else {
@@ -854,7 +856,7 @@ router.post("/UpdateExpensesDetails", (req, res, next) => {
     var newMonth = new Date(req.body.expensesdate).getMonth();
     var newyear = new Date(req.body.expensesdate).getFullYear();
     var querydate = new Date(newyear, newMonth, newdate)
-    db.executeSql("UPDATE expenses SET expensesdate='" + querydate.toISOString() + "',expensesname='" + req.body.expensesname + "',expensesprices='" + req.body.expensesprices + "',employeename='" + req.body.employeename + "',paymenttype='" + req.body.paymenttype + "' WHERE id=" + req.body.id + ";", function (data, err) {
+    db.executeSql("UPDATE expenses SET expensesdate='" + querydate.toISOString() + "',expensesname='" + req.body.expensesname + "',expensesprices='" + req.body.expensesprices + "',employeename='" + req.body.employeename + "',paymenttype='" + req.body.paymenttype + "' WHERE id=" + req.body.id + ";", function(data, err) {
         if (err) {
             console.log("Error in store.js", err);
         } else {
@@ -864,7 +866,7 @@ router.post("/UpdateExpensesDetails", (req, res, next) => {
 })
 
 router.get("/getMonthlyExpensesList", (req, res, next) => {
-    db.executeSql("select * from expenses where  DATE_FORMAT(expensesdate, '%m') = DATE_FORMAT(CURRENT_TIMESTAMP, '%m')", function (data, err) {
+    db.executeSql("select * from expenses where  DATE_FORMAT(expensesdate, '%m') = DATE_FORMAT(CURRENT_TIMESTAMP, '%m')", function(data, err) {
         if (err) {
             console.log(err);
         } else {
@@ -875,7 +877,7 @@ router.get("/getMonthlyExpensesList", (req, res, next) => {
 
 router.post("/UpdateCategoryList", (req, res, next) => {
     console.log(req.body)
-    db.executeSql("UPDATE `category` SET name='" + req.body.name + "' where id=" + req.body.id + ";", function (data, err) {
+    db.executeSql("UPDATE `category` SET name='" + req.body.name + "' where id=" + req.body.id + ";", function(data, err) {
         if (err) {
             console.log("Error in store.js", err);
         } else {
@@ -885,7 +887,7 @@ router.post("/UpdateCategoryList", (req, res, next) => {
 })
 router.post("/SaveCategoryList", (req, res, next) => {
     console.log(req.body)
-    db.executeSql("INSERT INTO `category`( `name`, `isactive`, `createddate`) VALUES ('" + req.body.name + "',true,CURRENT_TIMESTAMP);", function (data, err) {
+    db.executeSql("INSERT INTO `category`( `name`, `isactive`, `createddate`) VALUES ('" + req.body.name + "',true,CURRENT_TIMESTAMP);", function(data, err) {
         if (err) {
             console.log(err)
         } else {
@@ -893,9 +895,58 @@ router.post("/SaveCategoryList", (req, res, next) => {
         }
     });
 });
+router.post("/saveCartList", (req, res, next) => {
+    console.log(req.body)
+    db.executeSql("INSERT INTO `cartlist`( `userid`, `productid`, `quantity`,`price`, `createddate`, `updateddate`) VALUES ('" + req.body.uid + "','" + req.body.id + "','" + req.body.quant + "','"+ req.body.price + "',CURRENT_TIMESTAMP,CURRENT_TIMESTAMP);", function (data, err) {
+        if (err) {
+            console.log(err)
+        } else {
+            return res.json('success');
+        }
+    });
+});
+router.post("/saveOrderList", (req, res, next) => {
+    console.log(req.body)
+    db.executeSql("INSERT INTO `order`( `userid`, `productid`, `quantity`, `price`, `total`,`orderdate`, `createddate`, `updateddate`,`isactive`) VALUES ('" + req.body.uid + "','" + req.body.id + "','" + req.body.quantity + "','"+ req.body.price + "','"+req.body.total+"',CURRENT_TIMESTAMP,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP,true);", function (data, err) {
+        if (err) {
+            console.log(err)
+        } else {
+            return res.json('success');
+        }
+    });
+});
+router.post("/updateCartList", (req, res, next) => {
+    console.log(req.body)
+    db.executeSql("UPDATE `cartlist` SET quantity=" + req.body.quantity  + " where id=" + req.body.id + ";", function (data, err) {
+        if (err) {
+            console.log("Error in store.js", err);
+        } else {
+            return res.json(data);
+        }
+    });
+})
+router.get("/getAllCartList", (req, res, next) => {
+    db.executeSql("select * from products , cartlist WHERE products.id=cartlist.productid ", function (data, err) {
+        if (err) {
+            console.log(err);
+        } else {
+            return res.json(data);
+        }
+    })
+});
+router.post("/removeCartDetails", (req, res, next) => {
+    console.log(req.body.id)
+    db.executeSql("Delete from cartlist where id=" + req.body.id, function (data, err) {
+        if (err) {
+            console.log("Error in store.js", err);
+        } else {
+            return res.json(data);
+        }
+    });
+})
 router.get("/RemoveCategoryDetails/:id", (req, res, next) => {
     console.log(req.params.id)
-    db.executeSql("Delete from category where id=" + req.params.id, function (data, err) {
+    db.executeSql("Delete from category where id=" + req.params.id, function(data, err) {
         if (err) {
             console.log("Error in store.js", err);
         } else {
@@ -904,7 +955,7 @@ router.get("/RemoveCategoryDetails/:id", (req, res, next) => {
     });
 })
 router.get("/GetAllCategoryList", (req, res, next) => {
-    db.executeSql("select * from category", function (data, err) {
+    db.executeSql("select * from category", function(data, err) {
         if (err) {
             console.log(err);
         } else {
@@ -914,15 +965,15 @@ router.get("/GetAllCategoryList", (req, res, next) => {
 });
 router.post("/SaveProductsList", (req, res, next) => {
     console.log(req.body)
-    db.executeSql("INSERT INTO `products`(`name`, `image`, `category`, `price`, `quantity`, `purchasedate`, `vendorname`, `vendorcontact`, `descripition`, `isactive`, `createddate`, `updateddate`,`display`) VALUES ('" + req.body.name + "','" + req.body.image + "','" + req.body.category + "','" + req.body.price + "','" + req.body.quantity + "','" + req.body.purchasedate + "','" + req.body.vendorname + "','" + req.body.vendorcontact + "','" + req.body.descripition + "',true,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP," + req.body.display + ");", function (data, err) {
+    db.executeSql("INSERT INTO `products`(`name`, `image`, `category`, `price`, `quantity`, `purchasedate`, `vendorname`, `vendorcontact`, `descripition`, `isactive`, `createddate`, `updateddate`,`display`) VALUES ('" + req.body.name + "','" + req.body.image + "','" + req.body.category + "','" + req.body.price + "','" + req.body.quantity + "','" + req.body.purchasedate + "','" + req.body.vendorname + "','" + req.body.vendorcontact + "','" + req.body.descripition + "',true,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP," + req.body.display + ");", function(data, err) {
         if (err) {
             console.log(err)
         } else {
             for (let i = 0; i < req.body.multi.length; i++) {
-                db.executeSql("INSERT INTO `images`(`productid`,`catid`,`listimages`,`createddate`)VALUES(" + data.insertId + ",1,'" + req.body.multi[i] + "',CURRENT_TIMESTAMP);", function (data, err) {
+                db.executeSql("INSERT INTO `images`(`productid`,`catid`,`listimages`,`createddate`)VALUES(" + data.insertId + ",1,'" + req.body.multi[i] + "',CURRENT_TIMESTAMP);", function(data, err) {
                     if (err) {
                         console.log("Error in store.js", err);
-                    } else { }
+                    } else {}
                 });
             }
         }
@@ -931,7 +982,16 @@ router.post("/SaveProductsList", (req, res, next) => {
 
 });
 router.get("/GetAllProductsList", (req, res, next) => {
-    db.executeSql("select * from products", function (data, err) {
+    db.executeSql("select * from products", function(data, err) {
+        if (err) {
+            console.log(err);
+        } else {
+            return res.json(data);
+        }
+    })
+});
+router.get("/GetActiveProducts", (req, res, next) => {
+    db.executeSql("select * from products where display=true", function(data, err) {
         if (err) {
             console.log(err);
         } else {
@@ -942,7 +1002,7 @@ router.get("/GetAllProductsList", (req, res, next) => {
 
 router.get("/RemoveProductDetails/:id", (req, res, next) => {
 
-    db.executeSql("Delete from products where id=" + req.params.id, function (data, err) {
+    db.executeSql("Delete from products where id=" + req.params.id, function(data, err) {
         if (err) {
             console.log("Error in store.js", err);
         } else {
@@ -954,17 +1014,17 @@ router.post("/UploadProductImage", (req, res, next) => {
     var imgname = generateUUID();
 
     const storage = multer.diskStorage({
-        destination: function (req, file, cb) {
+        destination: function(req, file, cb) {
             cb(null, 'images/products');
         },
         // By default, multer removes file extensions so let's add them back
-        filename: function (req, file, cb) {
+        filename: function(req, file, cb) {
 
             cb(null, imgname + path.extname(file.originalname));
         }
     });
     let upload = multer({ storage: storage }).single('file');
-    upload(req, res, function (err) {
+    upload(req, res, function(err) {
         console.log("path=", config.url + 'images/products/' + req.file.filename);
 
         if (req.fileValidationError) {
@@ -990,17 +1050,17 @@ router.post("/UploadMultiProductImage", (req, res, next) => {
     var imgname = generateUUID();
 
     const storage = multer.diskStorage({
-        destination: function (req, file, cb) {
+        destination: function(req, file, cb) {
             cb(null, 'images/listimages');
         },
         // By default, multer removes file extensions so let's add them back
-        filename: function (req, file, cb) {
+        filename: function(req, file, cb) {
 
             cb(null, imgname + path.extname(file.originalname));
         }
     });
     let upload = multer({ storage: storage }).single('file');
-    upload(req, res, function (err) {
+    upload(req, res, function(err) {
         console.log("path=", config.url + '/images/listimages/' + req.file.filename);
 
         if (req.fileValidationError) {
@@ -1023,7 +1083,7 @@ router.post("/UploadMultiProductImage", (req, res, next) => {
 
 router.get("/RemoveRecentUoloadImage", midway.checkToken, (req, res, next) => {
     console.log(req.body);
-    db.executeSql("SELECT * FROM images ORDER BY createddate DESC LIMIT 1", function (data, err) {
+    db.executeSql("SELECT * FROM images ORDER BY createddate DESC LIMIT 1", function(data, err) {
         if (err) {
             console.log("Error in store.js", err);
         } else {
@@ -1034,7 +1094,7 @@ router.get("/RemoveRecentUoloadImage", midway.checkToken, (req, res, next) => {
 
 router.get("/CourosalImage/:id", (req, res, next) => {
     console.log(req.body);
-    db.executeSql("SELECT * FROM images, products WHERE  images.productid = products.id AND productid="+ req.params.id, function(data, err) {
+    db.executeSql("SELECT * FROM images, products WHERE  images.productid = products.id AND productid=" + req.params.id, function(data, err) {
         if (err) {
             console.log("Error in store.js", err);
         } else {
@@ -1045,7 +1105,7 @@ router.get("/CourosalImage/:id", (req, res, next) => {
 
 router.post("/UpdateProductList", (req, res, next) => {
     console.log(req.body)
-    db.executeSql("UPDATE `products` SET name='" + req.body.name + "',descripition='" + req.body.descripition + "',category='" + req.body.category + "',purchasedate='" + req.body.purchasedate + "',quantity=" + req.body.quantity + ",price=" + req.body.price + ",display=" + req.body.display + " where id=" + req.body.id + ";", function (data, err) {
+    db.executeSql("UPDATE `products` SET name='" + req.body.name + "',descripition='" + req.body.descripition + "',category='" + req.body.category + "',purchasedate='" + req.body.purchasedate + "',quantity=" + req.body.quantity + ",price=" + req.body.price + ",display=" + req.body.display + " where id=" + req.body.id + ";", function(data, err) {
         if (err) {
             console.log("Error in store.js", err);
         } else {
@@ -1055,7 +1115,7 @@ router.post("/UpdateProductList", (req, res, next) => {
 })
 router.post("/Verification", (req, res, next) => {
     let otp = Math.floor(100000 + Math.random() * 900000);
-    db.executeSql("INSERT INTO `registerotp`(`email`, `otp`, `isactive`,`createdate`,`updateddate`) VALUES ('" + req.body.email + "'," + otp + ",true,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP)", function (data1, err) {
+    db.executeSql("INSERT INTO `registerotp`(`email`, `otp`, `isactive`,`createdate`,`updateddate`) VALUES ('" + req.body.email + "'," + otp + ",true,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP)", function(data1, err) {
         if (err) {
             console.log(err);
         } else {
@@ -1083,7 +1143,7 @@ router.post("/Verification", (req, res, next) => {
                 html: output
 
             };
-            transporter.sendMail(mailOptions, function (error, info) {
+            transporter.sendMail(mailOptions, function(error, info) {
                 console.log('fgfjfj')
                 if (error) {
                     console.log(error);
@@ -1101,7 +1161,7 @@ router.post("/Verification", (req, res, next) => {
 
 router.post("/GetRegisterOtp", (req, res, next) => {
     console.log(req.body)
-    db.executeSql("select * from registerotp where email = '" + req.body.email + "'", function (data, err) {
+    db.executeSql("select * from registerotp where email = '" + req.body.email + "'", function(data, err) {
         if (err) {
             console.log("Error in store.js", err);
         } else {
@@ -1116,11 +1176,11 @@ router.post("/SaveUserCustomerList", (req, res, next) => {
     var salt = '7fa73b47df808d36c5fe328546ddef8b9011b2c6';
     var repass = salt + '' + req.body.password;
     var encPassword = crypto.createHash('sha1').update(repass).digest('hex');
-    db.executeSql("INSERT INTO `users`(`email`,`password`,`role`,`isactive`)VALUES('" + req.body.email + "','" + encPassword + "','Customer',true);", function (data, err) {
+    db.executeSql("INSERT INTO `users`(`email`,`password`,`role`,`isactive`)VALUES('" + req.body.email + "','" + encPassword + "','Customer',true);", function(data, err) {
         if (err) {
             console.log(err)
         } else {
-            db.executeSql("INSERT INTO `customer`(`fname`,`lname`,`email`,`contact`,`gender`,`createddate`,`uid`)VALUES('" + req.body.fname + "','" + req.body.lname + "','" + req.body.email + "','" + req.body.contact + "','" + req.body.gender + "',CURRENT_TIMESTAMP," + data.insertId + ");", function (data, err) {
+            db.executeSql("INSERT INTO `customer`(`fname`,`lname`,`email`,`contact`,`gender`,`createddate`,`uid`)VALUES('" + req.body.fname + "','" + req.body.lname + "','" + req.body.email + "','" + req.body.contact + "','" + req.body.gender + "',CURRENT_TIMESTAMP," + data.insertId + ");", function(data, err) {
                 if (err) {
                     console.log(err)
                 } else {
@@ -1134,7 +1194,7 @@ router.post("/SaveUserCustomerList", (req, res, next) => {
 
 router.post("/SaveVendorList", (req, res, next) => {
     console.log(req.body)
-    db.executeSql("INSERT INTO `vendor`( `fname`, `gst`, `contact`, `whatsapp`, `address`, `city`, `pincode`, `isactive`, `createdate`, `updatedate`) VALUES ('" + req.body.fname + "','" + req.body.gst + "','" + req.body.contact + "','" + req.body.whatsapp + "','" + req.body.address + "','" + req.body.city + "'," + req.body.pincode + ",true,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP);", function (data, err) {
+    db.executeSql("INSERT INTO `vendor`( `fname`, `gst`, `contact`, `whatsapp`, `address`, `city`, `pincode`, `isactive`, `createdate`, `updatedate`) VALUES ('" + req.body.fname + "','" + req.body.gst + "','" + req.body.contact + "','" + req.body.whatsapp + "','" + req.body.address + "','" + req.body.city + "'," + req.body.pincode + ",true,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP);", function(data, err) {
         if (err) {
             console.log(err)
         } else {
@@ -1144,7 +1204,7 @@ router.post("/SaveVendorList", (req, res, next) => {
     });
 });
 router.get("/GetAllVendor", (req, res, next) => {
-    db.executeSql("select * from vendor", function (data, err) {
+    db.executeSql("select * from vendor", function(data, err) {
         if (err) {
             console.log(err);
         } else {
@@ -1156,7 +1216,7 @@ router.get("/GetAllVendor", (req, res, next) => {
 router.post("/RemoveVendorList", (req, res, next) => {
 
     console.log(req.body);
-    db.executeSql("Delete from vendor where id=" + req.body.id, function (data, err) {
+    db.executeSql("Delete from vendor where id=" + req.body.id, function(data, err) {
         if (err) {
             console.log("Error in store.js", err);
         } else {
@@ -1166,7 +1226,7 @@ router.post("/RemoveVendorList", (req, res, next) => {
 })
 
 router.post("/UpdateVendorList", (req, res, next) => {
-    db.executeSql("UPDATE `vendor` SET fname='" + req.body.fname + "',gst='" + req.body.gst + "',contact='" + req.body.contact + "',whatsapp='" + req.body.whatsapp + "',address='" + req.body.address + "',city='" + req.body.city + "',updatedate=CURRENT_TIMESTAMP WHERE id=" + req.body.id + ";", function (data, err) {
+    db.executeSql("UPDATE `vendor` SET fname='" + req.body.fname + "',gst='" + req.body.gst + "',contact='" + req.body.contact + "',whatsapp='" + req.body.whatsapp + "',address='" + req.body.address + "',city='" + req.body.city + "',updatedate=CURRENT_TIMESTAMP WHERE id=" + req.body.id + ";", function(data, err) {
         if (err) {
             console.log("Error in store.js", err);
         } else {
@@ -1175,7 +1235,7 @@ router.post("/UpdateVendorList", (req, res, next) => {
     });
 });
 router.get("/GetCustDetails", (req, res, next) => {
-    db.executeSql("select c.fname,c.lname,c.contact,c.whatsapp,c.email,c.gender from customer c where custid = id" + req.body.id + "", function (data, err) {
+    db.executeSql("select c.fname,c.lname,c.contact,c.whatsapp,c.email,c.gender from customer c where custid = id" + req.body.id + "", function(data, err) {
         if (err) {
             console.log(err);
         } else {
@@ -1186,7 +1246,7 @@ router.get("/GetCustDetails", (req, res, next) => {
 
 router.post("/GetCustomerDataById", (req, res, next) => {
     console.log(req.body)
-    db.executeSql("select * from customer where id = " + req.body.id + "", function (data, err) {
+    db.executeSql("select * from customer where id = " + req.body.id + "", function(data, err) {
         if (err) {
             console.log("Error in store.js", err);
         } else {
@@ -1205,7 +1265,7 @@ router.post("/GetCustomerDataById", (req, res, next) => {
 // })
 
 
-router.post("/UploadBannersImage",  (req, res, next) => {
+router.post("/UploadBannersImage", (req, res, next) => {
     var imgname = generateUUID();
 
     const storage = multer.diskStorage({
@@ -1237,7 +1297,7 @@ router.post("/UploadBannersImage",  (req, res, next) => {
         }
         return res.json('/images/banners/' + req.file.filename);
 
-        console.log("You have uploaded this image");
+       
     });
 });
 
@@ -1252,7 +1312,7 @@ router.post("/SaveWebBanners", (req, res, next) => {
     });
 });
 
-router.get("/GetWebBanners",  (req, res, next) => {
+router.get("/GetWebBanners", (req, res, next) => {
     console.log("call-4");
     console.log(req.body.id)
     db.executeSql("select * from webbanners ", function(data, err) {
@@ -1264,7 +1324,7 @@ router.get("/GetWebBanners",  (req, res, next) => {
     });
 });
 
-router.post("/RemoveWebBanners",  (req, res, next) => {
+router.post("/RemoveWebBanners", (req, res, next) => {
     console.log(req.id)
     db.executeSql("Delete from webbanners where id=" + req.body.id, function(data, err) {
         if (err) {
@@ -1275,7 +1335,7 @@ router.post("/RemoveWebBanners",  (req, res, next) => {
     });
 });
 
-router.post("/UpdateActiveWebBanners",  (req, res, next) => {
+router.post("/UpdateActiveWebBanners", (req, res, next) => {
     console.log(req.body)
     db.executeSql("UPDATE  `webbanners` SET status=" + req.body.status + " WHERE id=" + req.body.id + ";", function(data, err) {
         if (err) {
@@ -1285,7 +1345,7 @@ router.post("/UpdateActiveWebBanners",  (req, res, next) => {
         }
     });
 });
-router.post("/UpdateActiveOffers",  (req, res, next) => {
+router.post("/UpdateActiveOffers", (req, res, next) => {
     console.log(req.body)
     db.executeSql("UPDATE  `OFFER` SET status=" + req.body.status + " WHERE id=" + req.body.id + ";", function(data, err) {
         if (err) {
@@ -1295,7 +1355,7 @@ router.post("/UpdateActiveOffers",  (req, res, next) => {
         }
     });
 });
-router.get("/GetWebBanner",  (req, res, next) => {
+router.get("/GetWebBanner", (req, res, next) => {
     db.executeSql("select * from webbanners where status=1", function(data, err) {
         if (err) {
             console.log("Error in store.js", err);
@@ -1305,17 +1365,17 @@ router.get("/GetWebBanner",  (req, res, next) => {
     });
 });
 // let secret = 'prnv';
-router.post('/login', function (req, res, next) {
+router.post('/login', function(req, res, next) {
 
     const body = req.body;
     console.log(body);
     var salt = '7fa73b47df808d36c5fe328546ddef8b9011b2c6';
     var repass = salt + '' + body.password;
     var encPassword = crypto.createHash('sha1').update(repass).digest('hex');
-    db.executeSql("select * from admin where email='" + req.body.email + "';", function (data, err) {
+    db.executeSql("select * from admin where email='" + req.body.email + "';", function(data, err) {
         console.log(data);
         if (data.length > 0) {
-            db.executeSql("select * from admin where email='" + req.body.email + "' and password='" + encPassword + "';", function (data1, err) {
+            db.executeSql("select * from admin where email='" + req.body.email + "' and password='" + encPassword + "';", function(data1, err) {
                 console.log(data1);
                 if (data1.length > 0) {
 
@@ -1325,8 +1385,8 @@ router.post('/login', function (req, res, next) {
                     }
                     let token = jwt.sign({ username: data1[0].email, password: data1[0].password },
                         secret, {
-                        expiresIn: '1h' // expires in 24 hours
-                    }
+                            expiresIn: '1h' // expires in 24 hours
+                        }
                     );
                     console.log("token=", token);
                     data[0].token = token;
@@ -1344,18 +1404,19 @@ router.post('/login', function (req, res, next) {
 
 });
 let secret = 'prnv';
-router.post('/GetUsersLogin', function (req, res, next) {
+router.post('/GetUsersLogin', function(req, res, next) {
     const body = req.body;
     var salt = '7fa73b47df808d36c5fe328546ddef8b9011b2c6';
     var repass = salt + '' + body.password;
     var encPassword = crypto.createHash('sha1').update(repass).digest('hex');
-    db.executeSql("select * from users where email='" + req.body.email + "';", function (data, err) {
+    db.executeSql("select * from users where email='" + req.body.email + "';", function(data, err) {
+        console.log(data);
         if (data == null || data == undefined || data.length === 0) {
             return res.json(1);
         } else {
             // var time = get_time_diff;
             // console.log(time);
-            db.executeSql("select * from users where email='" + req.body.email + "' and password='" + encPassword + "';", function (data1, err) {
+            db.executeSql("select * from users where email='" + req.body.email + "' and password='" + encPassword + "';", function(data1, err) {
                 if (data1.length > 0) {
                     module.exports.user1 = {
                         username: data1[0].email,
@@ -1363,8 +1424,8 @@ router.post('/GetUsersLogin', function (req, res, next) {
                     }
                     let token = jwt.sign({ username: data1[0].email, password: data1[0].password },
                         secret, {
-                        expiresIn: '1h' // expires in 24 hours
-                    }
+                            expiresIn: '1h' // expires in 24 hours
+                        }
                     );
                     console.log("token=", token);
 
@@ -1372,7 +1433,7 @@ router.post('/GetUsersLogin', function (req, res, next) {
                     res.cookie('auth', token);
                     if (data1[0].role == 'Admin') {
                         let resdata = [];
-                        db.executeSql("select * from admin where uid=" + data1[0].userid, function (data2, err) {
+                        db.executeSql("select * from admin where uid=" + data1[0].userid, function(data2, err) {
                             if (err) {
                                 console.log(err);
                             } else {
@@ -1381,10 +1442,10 @@ router.post('/GetUsersLogin', function (req, res, next) {
                                 resdata[0].role = data1[0].role;
                                 resdata[0].last_login = data1[0].out_time;
                                 resdata[0].last_inTime = data1[0].in_time;
-                                db.executeSql("UPDATE  `users` SET status=true,in_time=CURRENT_TIMESTAMP WHERE userid=" + data1[0].userid, function (msg, err) {
+                                db.executeSql("UPDATE  `users` SET status=true,in_time=CURRENT_TIMESTAMP WHERE userid=" + data1[0].userid, function(msg, err) {
                                     if (err) {
                                         console.log("Error in store.js", err);
-                                    } else { }
+                                    } else {}
                                 });
                                 return res.json(resdata);
                             }
@@ -1393,7 +1454,7 @@ router.post('/GetUsersLogin', function (req, res, next) {
                     } else if (data1[0].role == 'Customer') {
                         console.log('helllllllll')
                         let resdata1 = [];
-                        db.executeSql("SELECT * FROM `customer` WHERE uid=" + data1[0].userid, function (data3, err) {
+                        db.executeSql("select * from customer where id=" + data1[0].userid, function(data3, err) {
                             if (err) {
                                 console.log("data");
                                 console.log(err);
@@ -1405,17 +1466,17 @@ router.post('/GetUsersLogin', function (req, res, next) {
                                 resdata1[0].last_login = data1[0].out_time;
                                 resdata1[0].last_inTime = data1[0].in_time;
 
-                                db.executeSql("UPDATE  `users` SET status=true,in_time=CURRENT_TIMESTAMP WHERE userid=" + data1[0].userid, function (msg, err) {
+                                db.executeSql("UPDATE  `users` SET status=true,in_time=CURRENT_TIMESTAMP WHERE userid=" + data1[0].userid, function(msg, err) {
                                     if (err) {
                                         console.log("Error in store.js", err);
-                                    } else { }
+                                    } else {}
                                 });
                                 return res.json(resdata1);
                             }
                         })
                     } else if (data1[0].role == 'Student') {
                         let resdata2 = [];
-                        db.executeSql("select * from studentlist where uid=" + data1[0].userid, function (data4, err) {
+                        db.executeSql("select * from studentlist where uid=" + data1[0].userid, function(data4, err) {
                             if (err) {
                                 console.log(err);
                             } else {
@@ -1424,17 +1485,17 @@ router.post('/GetUsersLogin', function (req, res, next) {
                                 resdata2[0].role = data1[0].role;
                                 resdata2[0].last_login = data1[0].out_time;
                                 resdata2[0].last_inTime = data1[0].in_time;
-                                db.executeSql("UPDATE  `users` SET status=true,in_time=CURRENT_TIMESTAMP WHERE userid=" + data1[0].userid, function (msg, err) {
+                                db.executeSql("UPDATE  `users` SET status=true,in_time=CURRENT_TIMESTAMP WHERE userid=" + data1[0].userid, function(msg, err) {
                                     if (err) {
                                         console.log("Error in store.js", err);
-                                    } else { }
+                                    } else {}
                                 });
                                 return res.json(resdata2);
                             }
                         })
                     } else if (data1[0].role == 'Visitor') {
                         let resdata3 = [];
-                        db.executeSql("select * from visitorreg where uid=" + data1[0].userid, function (data5, err) {
+                        db.executeSql("select * from visitorreg where uid=" + data1[0].userid, function(data5, err) {
                             if (err) {
                                 console.log(err);
                             } else {
@@ -1443,17 +1504,17 @@ router.post('/GetUsersLogin', function (req, res, next) {
                                 resdata3[0].role = data1[0].role;
                                 resdata3[0].last_login = data1[0].out_time;
                                 resdata3[0].last_inTime = data1[0].in_time;
-                                db.executeSql("UPDATE  `users` SET status=true,in_time=CURRENT_TIMESTAMP WHERE userid=" + data1[0].userid, function (msg, err) {
+                                db.executeSql("UPDATE  `users` SET status=true,in_time=CURRENT_TIMESTAMP WHERE userid=" + data1[0].userid, function(msg, err) {
                                     if (err) {
                                         console.log("Error in store.js", err);
-                                    } else { }
+                                    } else {}
                                 });
                                 return res.json(resdata3);
                             }
                         })
                     } else if (data1[0].role == 'Parents') {
                         let resdata4 = [];
-                        db.executeSql("select * from parentsinfo where uid=" + data1[0].userid, function (data6, err) {
+                        db.executeSql("select * from parentsinfo where uid=" + data1[0].userid, function(data6, err) {
                             if (err) {
                                 console.log(err);
                             } else {
@@ -1462,17 +1523,17 @@ router.post('/GetUsersLogin', function (req, res, next) {
                                 resdata4[0].role = data1[0].role;
                                 resdata4[0].last_login = data1[0].out_time;
                                 resdata4[0].last_inTime = data1[0].in_time;
-                                db.executeSql("UPDATE  `users` SET status=true,in_time=CURRENT_TIMESTAMP WHERE userid=" + data1[0].userid, function (msg, err) {
+                                db.executeSql("UPDATE  `users` SET status=true,in_time=CURRENT_TIMESTAMP WHERE userid=" + data1[0].userid, function(msg, err) {
                                     if (err) {
                                         console.log("Error in store.js", err);
-                                    } else { }
+                                    } else {}
                                 });
                                 return res.json(resdata4);
                             }
                         })
                     } else if (data1[0].role == 'Sub-Admin') {
                         let resdata5 = [];
-                        db.executeSql("select * from admin where uid=" + data1[0].userid, function (data7, err) {
+                        db.executeSql("select * from admin where uid=" + data1[0].userid, function(data7, err) {
                             if (err) {
                                 console.log(err);
                             } else {
@@ -1481,10 +1542,10 @@ router.post('/GetUsersLogin', function (req, res, next) {
                                 resdata5[0].role = data1[0].role;
                                 resdata5[0].last_login = data1[0].out_time;
                                 resdata5[0].last_inTime = data1[0].in_time;
-                                db.executeSql("UPDATE  `users` SET status=true,in_time=CURRENT_TIMESTAMP WHERE userid=" + data1[0].userid, function (msg, err) {
+                                db.executeSql("UPDATE  `users` SET status=true,in_time=CURRENT_TIMESTAMP WHERE userid=" + data1[0].userid, function(msg, err) {
                                     if (err) {
                                         console.log("Error in store.js", err);
-                                    } else { }
+                                    } else {}
                                 });
                                 return res.json(resdata5);
                             }
@@ -1505,11 +1566,11 @@ router.post('/GetUsersLogin', function (req, res, next) {
 
 router.post("/UpdateLogoutDetails", (req, res, next) => {
     console.log(req.body)
-    db.executeSql("UPDATE users SET status=false,out_time=CURRENT_TIMESTAMP WHERE userid=" + req.body.userid, function (msg, err) {
+    db.executeSql("UPDATE users SET status=false,out_time=CURRENT_TIMESTAMP WHERE userid=" + req.body.userid, function(msg, err) {
         if (err) {
             console.log("Error in store.js", err);
         } else {
-            db.executeSql("INSERT INTO `logintime`(`userid`, `login_minute`, `login_date`)VALUES(" + req.body.userid + "," + req.body.loginMinute + ",CURRENT_TIMESTAMP);", function (data, err) {
+            db.executeSql("INSERT INTO `logintime`(`userid`, `login_minute`, `login_date`)VALUES(" + req.body.userid + "," + req.body.loginMinute + ",CURRENT_TIMESTAMP);", function(data, err) {
                 if (err) {
                     console.log("Error in store.js", err);
                 } else {
@@ -1523,7 +1584,7 @@ router.post("/UpdateLogoutDetails", (req, res, next) => {
 
 function generateUUID() {
     var d = new Date().getTime();
-    var uuid = 'xxxxxxxx-xxxx-4xxx-yxxx'.replace(/[xy]/g, function (c) {
+    var uuid = 'xxxxxxxx-xxxx-4xxx-yxxx'.replace(/[xy]/g, function(c) {
         var r = (d + Math.random() * 16) % 16 | 0;
         d = Math.floor(d / 16);
         return (c == 'x' ? r : (r & 0x3 | 0x8)).toString(16);
