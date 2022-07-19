@@ -897,7 +897,7 @@ router.post("/SaveCategoryList", (req, res, next) => {
 });
 router.post("/saveCartList", (req, res, next) => {
     console.log(req.body)
-    db.executeSql("INSERT INTO `cartlist`( `userid`, `productid`, `quantity`,`price`, `createddate`, `updateddate`) VALUES ('" + req.body.uid + "','" + req.body.id + "','" + req.body.quant + "','"+ req.body.price + "',CURRENT_TIMESTAMP,CURRENT_TIMESTAMP);", function (data, err) {
+    db.executeSql("INSERT INTO `cartlist`( `userid`, `productid`, `quantity`,`price`, `createddate`) VALUES ('" + req.body.uid + "','" + req.body.id + "','" + req.body.quant + "',"+ req.body.price + ",CURRENT_TIMESTAMP);", function (data, err) {
         if (err) {
             console.log(err)
         } else {
@@ -935,8 +935,7 @@ router.get("/getAllCartList", (req, res, next) => {
     })
 });
 router.post("/removeCartDetails", (req, res, next) => {
-    console.log(req.body.id)
-    db.executeSql("Delete from cartlist where id=" + req.body.id, function (data, err) {
+    db.executeSql("Delete from cartlist where userid=" + req.body.userid+" AND productid="+req.body.productid+"", function (data, err) {
         if (err) {
             console.log("Error in store.js", err);
         } else {
@@ -1102,7 +1101,16 @@ router.get("/CourosalImage/:id", (req, res, next) => {
         }
     });
 })
-
+router.get("/GetCartDataByID/:id", (req, res, next) => {
+    console.log(req.body);
+    db.executeSql("select * from cartlist, products WHERE cartlist.productid=products.id AND cartlist.userid=" + req.params.id, function(data, err) {
+        if (err) {
+            console.log("Error in store.js", err);
+        } else {
+            return res.json(data);
+        }
+    });
+})
 router.post("/UpdateProductList", (req, res, next) => {
     console.log(req.body)
     db.executeSql("UPDATE `products` SET name='" + req.body.name + "',descripition='" + req.body.descripition + "',category='" + req.body.category + "',purchasedate='" + req.body.purchasedate + "',quantity=" + req.body.quantity + ",price=" + req.body.price + ",vendorname='"+req.body.vendorname+"',display=" + req.body.display + ",updateddate=CURRENT_TIMESTAMP where id=" + req.body.id + ";", function(data, err) {
