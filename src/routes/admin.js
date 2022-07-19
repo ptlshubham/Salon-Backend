@@ -336,44 +336,88 @@ router.get("/GetAllMembership", (req, res, next) => {
 router.post("/SaveAppointmentList", (req, res, next) => {
     console.log(req.body)
     var checkdate = req.body.selectdate;
+   
     if (checkdate == undefined) {
-        db.executeSql("INSERT INTO `appointment`(`custid`, `empname`, `totalprice`, `totalpoint`, `totaltime`, `isactive`, `createddate`,`updatedate`,`ispayment`,`appointmentdate`)VALUES(" + req.body.custid + ",'" + req.body.emp + "','" + req.body.totalprice + "','" + req.body.totalpoint + "','" + req.body.totaltime + "'," + req.body.isactive + ",CURRENT_TIMESTAMP,CURRENT_TIMESTAMP,false,CURRENT_TIMESTAMP    );", function(data, err) {
-            if (err) {
-                console.log(err)
-            } else {
-                for (let i = 0; i < req.body.selectedService.length; i++) {
-                    db.executeSql("INSERT INTO `custservices`(`servicesid`,`servicesname`,`custid`,`appointmentid`,`employeename`,`empid`) VALUES(" + req.body.selectedService[i].selectedServid + ",'" + req.body.selectedService[i].servicesname + "'," + req.body.custid + "," + data.insertId + ",'" + req.body.selectedService[i].employeename + "'," + req.body.selectedService[i].selectedEmpid + ");", function(data1, err) {
-                        if (err) {
-                            console.log(err);
-                        } else {}
-                    });
-                }
-                if (req.body.tCustPoint == 0) {
-                    console.log('undefined');
-
-                    db.executeSql("INSERT INTO `point`( `custid`, `totalcustpoint`)VALUES(" + req.body.custid + "," + req.body.lessPoints + ");", function(data, err) {
-                        if (err) {
-                            console.log(err);
-                        } else {
-                            console.log(data);
-                        }
-                    });
+        if(req.body.offerId !=undefined){
+            console.log("hddududuududu111111111111");
+          
+            db.executeSql("INSERT INTO `appointment`(`custid`, `empname`, `totalprice`, `totalpoint`, `totaltime`, `isactive`, `createddate`,`updatedate`,`ispayment`,`appointmentdate`)VALUES(" + req.body.custid + ",'" + req.body.emp + "','" + req.body.totalprice + "','" + req.body.totalpoint + "','" + req.body.totaltime + "'," + req.body.isactive + ",CURRENT_TIMESTAMP,CURRENT_TIMESTAMP,false,'" + req.body.selectdate + "');", function(data, err) {
+                if (err) {
+                    console.log(err)
                 } else {
-                    console.log('defined')
-                    console.log(req.body)
-                    db.executeSql("UPDATE `point` SET totalcustpoint=" + req.body.lessPoints + " WHERE custid=" + req.body.custid + ";", function(data, err) {
-                        if (err) {
-                            console.log(err);
-                        } else {
-                            console.log(data);
-                        }
-                    });
+                    for (let i = 0; i < req.body.selectedService.length; i++) {
+                        db.executeSql("INSERT INTO `custservices`(`servicesid`,`servicesname`,`custid`,`appointmentid`,`employeename`,`empid`) VALUES(" + req.body.selectedService[i].selectedServid + ",'" + req.body.selectedService[i].servicesname + "'," + req.body.custid + "," + data.insertId + ",'" + req.body.selectedService[i].employeename + "'," + req.body.selectedService[i].selectedEmpid + ");", function(data1, err) {
+                            if (err) {
+                                console.log(err);
+                            } else {}
+                        });
+                    }
+                    if (req.body.tCustPoint == 0) {
+                        console.log('undefined');
+    
+                        db.executeSql("INSERT INTO `point`( `custid`, `totalcustpoint`)VALUES(" + req.body.custid + "," + req.body.lessPoints + ");", function(data2, err) {
+                            if (err) {
+                                console.log(err);
+                            } else {
+                                console.log(data);
+                            }
+                        });
+                    } else {
+                        console.log('defined')
+                        console.log(req.body)
+                        db.executeSql("UPDATE `point` SET totalcustpoint=" + req.body.lessPoints + " WHERE custid=" + req.body.custid + ";", function(data3, err) {
+                            if (err) {
+                                console.log(err);
+                            } else {
+                                console.log(data);
+                            }
+                        });
+                    }
+    
                 }
-
-            }
-            return res.json('success');
-        });
-    } else {
+                return res.json(data);
+            });
+        }else{
+            db.executeSql("INSERT INTO `appointment`(`custid`, `empname`, `totalprice`, `totalpoint`, `totaltime`, `isactive`, `createddate`,`updatedate`,`ispayment`,`appointmentdate`)VALUES(" + req.body.custid + ",'" + req.body.emp + "','" + req.body.totalprice + "','" + req.body.totalpoint + "','" + req.body.totaltime + "'," + req.body.isactive + ",CURRENT_TIMESTAMP,CURRENT_TIMESTAMP,false,CURRENT_TIMESTAMP    );", function(data, err) {
+                if (err) {
+                    console.log(err)
+                } else {
+                    for (let i = 0; i < req.body.selectedService.length; i++) {
+                        db.executeSql("INSERT INTO `custservices`(`servicesid`,`servicesname`,`custid`,`appointmentid`,`employeename`,`empid`) VALUES(" + req.body.selectedService[i].selectedServid + ",'" + req.body.selectedService[i].servicesname + "'," + req.body.custid + "," + data.insertId + ",'" + req.body.selectedService[i].employeename + "'," + req.body.selectedService[i].selectedEmpid + ");", function(data1, err) {
+                            if (err) {
+                                console.log(err);
+                            } else {}
+                        });
+                    }
+                    if (req.body.tCustPoint == 0) {
+                        console.log('undefined');
+    
+                        db.executeSql("INSERT INTO `point`( `custid`, `totalcustpoint`)VALUES(" + req.body.custid + "," + req.body.lessPoints + ");", function(data, err) {
+                            if (err) {
+                                console.log(err);
+                            } else {
+                                console.log(data);
+                            }
+                        });
+                    } else {
+                        console.log('defined')
+                        console.log(req.body)
+                        db.executeSql("UPDATE `point` SET totalcustpoint=" + req.body.lessPoints + " WHERE custid=" + req.body.custid + ";", function(data, err) {
+                            if (err) {
+                                console.log(err);
+                            } else {
+                                console.log(data);
+                            }
+                        });
+                    }
+    
+                }
+                return res.json('success');
+            });
+        }
+        
+    }
+    else {
         db.executeSql("INSERT INTO `appointment`(`custid`, `empname`, `totalprice`, `totalpoint`, `totaltime`, `isactive`, `createddate`,`updatedate`,`ispayment`,`appointmentdate`)VALUES(" + req.body.custid + ",'" + req.body.emp + "','" + req.body.totalprice + "','" + req.body.totalpoint + "','" + req.body.totaltime + "'," + req.body.isactive + ",CURRENT_TIMESTAMP,CURRENT_TIMESTAMP,false,'" + req.body.selectdate + "');", function(data, err) {
             if (err) {
                 console.log(err)
@@ -412,6 +456,16 @@ router.post("/SaveAppointmentList", (req, res, next) => {
         });
     }
 });
+
+router.post("/saveOfferPurchase",(req,res,next)=>{
+    db.executeSql("INSERT INTO `purchasedoffer`( `custid`, `employeeid`, `offerid`,`appointmentId`, `payment`, `offerprice`, `createddate`, `updateddate`) VALUES ("+req.body.custid+","+req.body.empId+","+req.body.offerId+","+req.body.appointmentId+","+false+","+req.body.offerprice+",CURRENT_TIMESTAMP,null);",function(data,err){
+        if(err){
+            console.log(err);
+        }else{
+            res.json('success');
+        }
+    })
+})
 
 
 router.get("/GetAllAppointment", (req, res, next) => {
