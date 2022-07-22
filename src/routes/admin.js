@@ -288,11 +288,17 @@ router.post("/SaveMembershipList", (req, res, next) => {
                 db.executeSql("INSERT INTO `membershipservices` ( `membershipid`, `servicesname`, `serviceid`, `totalprice`, `membershipname`, `quantity`, `serviceprice`) VALUES(" + data.insertId + ",'" + req.body.services[i].selectedServ + "'," + req.body.services[i].selectedServid + "," + req.body.services[i].finalprice + ",'" + req.body.membershipname + "'," + req.body.services[i].quantity + "," + req.body.services[i].serprice + ");", function (data1, err) {
                     if (err) {
                         console.log(err);
-                    } else { }
+                    } else { 
+                        if(i==req.body.services.length-1){
+                            console.log("prnv")
+                            res.json('success');
+                        }
+                    }
                 });
             }
+
         }
-        return res.json('success');
+       
     });
 });
 router.post("/GetUsedServicesByMembership", (req, res, next) => {
@@ -959,7 +965,10 @@ router.post("/SavePurchaseServiceList", (req, res, next) => {
             if (err) {
                 console.log("Error in store.js", err);
             } else {
-                return res.json(data1);
+                if(i==req.body.services.length-1){
+                    console.log("prnv")
+                    res.json(data1);
+                }
             }
         });
     }
@@ -974,7 +983,7 @@ router.get("/GetAllOrderList", (req, res, next) => {
     })
 })
 router.get("/GetAllMembershipPurchased", (req, res, next) => {
-    db.executeSql("SELECT * FROM purchasedmembership,membership,customer where purchasedmembership.memid=membership.id AND purchasedmembership.cid=customer.id GROUP BY memid;", function (data, err) {
+    db.executeSql("SELECT * FROM purchasedmembership,membership,customer where purchasedmembership.memid=membership.id AND purchasedmembership.cid=customer.id GROUP BY cid,memid;", function (data, err) {
         if (err) {
             console.log(err);
         } else {
