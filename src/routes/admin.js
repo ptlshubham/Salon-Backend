@@ -288,8 +288,8 @@ router.post("/SaveMembershipList", (req, res, next) => {
                 db.executeSql("INSERT INTO `membershipservices` ( `membershipid`, `servicesname`, `serviceid`, `totalprice`, `membershipname`, `quantity`, `serviceprice`) VALUES(" + data.insertId + ",'" + req.body.services[i].selectedServ + "'," + req.body.services[i].selectedServid + "," + req.body.services[i].finalprice + ",'" + req.body.membershipname + "'," + req.body.services[i].quantity + "," + req.body.services[i].serprice + ");", function (data1, err) {
                     if (err) {
                         console.log(err);
-                    } else { 
-                        if(i==req.body.services.length-1){
+                    } else {
+                        if (i == req.body.services.length - 1) {
                             console.log("prnv")
                             res.json('success');
                         }
@@ -298,7 +298,7 @@ router.post("/SaveMembershipList", (req, res, next) => {
             }
 
         }
-       
+
     });
 });
 router.post("/GetUsedServicesByMembership", (req, res, next) => {
@@ -335,8 +335,8 @@ router.post("/SaveAppointmentList", (req, res, next) => {
     var checkdate = req.body.selectdate;
 
     if (checkdate == undefined) {
-        if(req.body.offerId !=undefined){
-            db.executeSql("INSERT INTO `appointment`(`custid`, `empname`, `totalprice`, `totalpoint`, `totaltime`, `isactive`, `createddate`,`updatedate`,`ispayment`,`appointmentdate`)VALUES(" + req.body.custid + ",'" + req.body.emp + "','" + req.body.totalprice + "','" + req.body.totalpoint + "','" + req.body.totaltime + "'," + req.body.isactive + ",CURRENT_TIMESTAMP,CURRENT_TIMESTAMP,false,'" + req.body.selectdate + "');", function(data, err) {
+        if (req.body.offerId != undefined) {
+            db.executeSql("INSERT INTO `appointment`(`custid`, `empname`, `totalprice`, `totalpoint`, `totaltime`, `isactive`, `createddate`,`updatedate`,`ispayment`,`appointmentdate`)VALUES(" + req.body.custid + ",'" + req.body.emp + "','" + req.body.totalprice + "','" + req.body.totalpoint + "','" + req.body.totaltime + "'," + req.body.isactive + ",CURRENT_TIMESTAMP,CURRENT_TIMESTAMP,false,'" + req.body.selectdate + "');", function (data, err) {
                 if (err) {
                     console.log(err)
                 } else {
@@ -348,7 +348,7 @@ router.post("/SaveAppointmentList", (req, res, next) => {
                         });
                     }
                     if (req.body.tCustPoint == 0) {
-                        db.executeSql("INSERT INTO `point`( `custid`, `totalcustpoint`)VALUES(" + req.body.custid + "," + req.body.lessPoints + ");", function(data2, err) {
+                        db.executeSql("INSERT INTO `point`( `custid`, `totalcustpoint`)VALUES(" + req.body.custid + "," + req.body.lessPoints + ");", function (data2, err) {
                             if (err) {
                                 console.log(err);
                             } else {
@@ -383,7 +383,7 @@ router.post("/SaveAppointmentList", (req, res, next) => {
                         });
                     }
                     if (req.body.tCustPoint == 0) {
-                        db.executeSql("INSERT INTO `point`( `custid`, `totalcustpoint`)VALUES(" + req.body.custid + "," + req.body.lessPoints + ");", function(data, err) {
+                        db.executeSql("INSERT INTO `point`( `custid`, `totalcustpoint`)VALUES(" + req.body.custid + "," + req.body.lessPoints + ");", function (data, err) {
                             if (err) {
                                 console.log(err);
                             } else {
@@ -391,7 +391,7 @@ router.post("/SaveAppointmentList", (req, res, next) => {
                             }
                         });
                     } else {
-                        db.executeSql("UPDATE `point` SET totalcustpoint=" + req.body.lessPoints + " WHERE custid=" + req.body.custid + ";", function(data, err) {
+                        db.executeSql("UPDATE `point` SET totalcustpoint=" + req.body.lessPoints + " WHERE custid=" + req.body.custid + ";", function (data, err) {
                             if (err) {
                                 console.log(err);
                             } else {
@@ -403,7 +403,7 @@ router.post("/SaveAppointmentList", (req, res, next) => {
                 }
                 return res.json('success');
             });
-        }  
+        }
     }
     else {
         db.executeSql("INSERT INTO `appointment`(`custid`, `empname`, `totalprice`, `totalpoint`, `totaltime`, `isactive`, `createddate`,`updatedate`,`ispayment`,`appointmentdate`)VALUES(" + req.body.custid + ",'" + req.body.emp + "','" + req.body.totalprice + "','" + req.body.totalpoint + "','" + req.body.totaltime + "'," + req.body.isactive + ",CURRENT_TIMESTAMP,CURRENT_TIMESTAMP,false,'" + req.body.selectdate + "');", function (data, err) {
@@ -418,7 +418,7 @@ router.post("/SaveAppointmentList", (req, res, next) => {
                     });
                 }
                 if (req.body.tCustPoint == 0) {
-                    db.executeSql("INSERT INTO `point`( `custid`, `totalcustpoint`)VALUES(" + req.body.custid + "," + req.body.lessPoints + ");", function(data, err) {
+                    db.executeSql("INSERT INTO `point`( `custid`, `totalcustpoint`)VALUES(" + req.body.custid + "," + req.body.lessPoints + ");", function (data, err) {
                         if (err) {
                             console.log(err);
                         } else {
@@ -426,7 +426,7 @@ router.post("/SaveAppointmentList", (req, res, next) => {
                         }
                     });
                 } else {
-                    db.executeSql("UPDATE `point` SET totalcustpoint=" + req.body.lessPoints + " WHERE custid=" + req.body.custid + ";", function(data, err) {
+                    db.executeSql("UPDATE `point` SET totalcustpoint=" + req.body.lessPoints + " WHERE custid=" + req.body.custid + ";", function (data, err) {
                         if (err) {
                             console.log(err);
                         } else {
@@ -965,7 +965,7 @@ router.post("/SavePurchaseServiceList", (req, res, next) => {
             if (err) {
                 console.log("Error in store.js", err);
             } else {
-                if(i==req.body.services.length-1){
+                if (i == req.body.services.length - 1) {
                     console.log("prnv")
                     res.json(data1);
                 }
@@ -1209,7 +1209,7 @@ router.post("/UpdateProductList", (req, res, next) => {
 })
 router.post("/Verification", (req, res, next) => {
     let otp = Math.floor(100000 + Math.random() * 900000);
-    db.executeSql("INSERT INTO `registerotp`(`email`, `otp`, `isactive`,`createdate`,`updateddate`) VALUES ('" + req.body.email + "'," + otp + ",true,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP)", function (data1, err) {
+    db.executeSql("INSERT INTO `otp`(`otp`,`createddate`,`createdtime`,`role`,`isactive`,`email`) VALUES (" + otp + ",CURRENT_TIMESTAMP,CURRENT_TIMESTAMP,'" + req.body.role + "',true,'" + req.body.email + "')", function (data1, err) {
         if (err) {
             console.log(err);
         } else {
@@ -1255,7 +1255,7 @@ router.post("/Verification", (req, res, next) => {
 
 router.post("/GetRegisterOtp", (req, res, next) => {
     console.log(req.body)
-    db.executeSql("select * from registerotp where email = '" + req.body.email + "'", function (data, err) {
+    db.executeSql("select * from otp where email = '" + req.body.email + "'", function (data, err) {
         if (err) {
             console.log("Error in store.js", err);
         } else {
@@ -1274,7 +1274,7 @@ router.post("/SaveUserCustomerList", (req, res, next) => {
         if (err) {
             console.log(err)
         } else {
-            db.executeSql("INSERT INTO `customer`(`fname`,`lname`,`email`,`contact`,`gender`,`createddate`,`uid`)VALUES('" + req.body.fname + "','" + req.body.lname + "','" + req.body.email + "','" + req.body.contact + "','" + req.body.gender + "',CURRENT_TIMESTAMP," + data.insertId + ");", function (data, err) {
+            db.executeSql("INSERT INTO `customer`(`fname`,`lname`,`email`,`contact`,`gender`,`createddate`,`uid`,`ismembership`)VALUES('" + req.body.fname + "','" + req.body.lname + "','" + req.body.email + "','" + req.body.contact + "','" + req.body.gender + "',CURRENT_TIMESTAMP," + data.insertId + "," + req.body.isMembership + ");", function (data, err) {
                 if (err) {
                     console.log(err)
                 } else {
@@ -1497,6 +1497,16 @@ router.post('/login', function (req, res, next) {
     });
 
 });
+router.post("/removeLastInsertedOTP", (req, res, next) => {
+    console.log(req.body)
+    db.executeSql("Delete from otp where email='" + req.body.email + "'", function (data, err) {
+        if (err) {
+            console.log(err);
+        } else {
+            return res.json(data);
+        }
+    });
+})
 let secret = 'prnv';
 router.post('/GetUsersLogin', function (req, res, next) {
     const body = req.body;
@@ -1548,7 +1558,7 @@ router.post('/GetUsersLogin', function (req, res, next) {
                     } else if (data1[0].role == 'Customer') {
                         console.log('helllllllll')
                         let resdata1 = [];
-                        db.executeSql("select * from customer where id=" + data1[0].userid, function (data3, err) {
+                        db.executeSql("select * from customer where uid=" + data1[0].userid, function (data3, err) {
                             if (err) {
                                 console.log("data");
                                 console.log(err);
@@ -1568,64 +1578,8 @@ router.post('/GetUsersLogin', function (req, res, next) {
                                 return res.json(resdata1);
                             }
                         })
-                    } else if (data1[0].role == 'Student') {
-                        let resdata2 = [];
-                        db.executeSql("select * from studentlist where uid=" + data1[0].userid, function (data4, err) {
-                            if (err) {
-                                console.log(err);
-                            } else {
-                                resdata2.push(data4[0]);
-                                resdata2[0].token = token;
-                                resdata2[0].role = data1[0].role;
-                                resdata2[0].last_login = data1[0].out_time;
-                                resdata2[0].last_inTime = data1[0].in_time;
-                                db.executeSql("UPDATE  `users` SET status=true,in_time=CURRENT_TIMESTAMP WHERE userid=" + data1[0].userid, function (msg, err) {
-                                    if (err) {
-                                        console.log("Error in store.js", err);
-                                    } else { }
-                                });
-                                return res.json(resdata2);
-                            }
-                        })
-                    } else if (data1[0].role == 'Visitor') {
-                        let resdata3 = [];
-                        db.executeSql("select * from visitorreg where uid=" + data1[0].userid, function (data5, err) {
-                            if (err) {
-                                console.log(err);
-                            } else {
-                                resdata3.push(data5[0]);
-                                resdata3[0].token = token;
-                                resdata3[0].role = data1[0].role;
-                                resdata3[0].last_login = data1[0].out_time;
-                                resdata3[0].last_inTime = data1[0].in_time;
-                                db.executeSql("UPDATE  `users` SET status=true,in_time=CURRENT_TIMESTAMP WHERE userid=" + data1[0].userid, function (msg, err) {
-                                    if (err) {
-                                        console.log("Error in store.js", err);
-                                    } else { }
-                                });
-                                return res.json(resdata3);
-                            }
-                        })
-                    } else if (data1[0].role == 'Parents') {
-                        let resdata4 = [];
-                        db.executeSql("select * from parentsinfo where uid=" + data1[0].userid, function (data6, err) {
-                            if (err) {
-                                console.log(err);
-                            } else {
-                                resdata4.push(data6[0]);
-                                resdata4[0].token = token;
-                                resdata4[0].role = data1[0].role;
-                                resdata4[0].last_login = data1[0].out_time;
-                                resdata4[0].last_inTime = data1[0].in_time;
-                                db.executeSql("UPDATE  `users` SET status=true,in_time=CURRENT_TIMESTAMP WHERE userid=" + data1[0].userid, function (msg, err) {
-                                    if (err) {
-                                        console.log("Error in store.js", err);
-                                    } else { }
-                                });
-                                return res.json(resdata4);
-                            }
-                        })
-                    } else if (data1[0].role == 'Sub-Admin') {
+                    }
+                    else if (data1[0].role == 'Sub-Admin') {
                         let resdata5 = [];
                         db.executeSql("select * from admin where uid=" + data1[0].userid, function (data7, err) {
                             if (err) {
@@ -1646,6 +1600,65 @@ router.post('/GetUsersLogin', function (req, res, next) {
                         })
 
                     }
+                    // else if (data1[0].role == 'Student') {
+                    //     let resdata2 = [];
+                    //     db.executeSql("select * from studentlist where uid=" + data1[0].userid, function (data4, err) {
+                    //         if (err) {
+                    //             console.log(err);
+                    //         } else {
+                    //             resdata2.push(data4[0]);
+                    //             resdata2[0].token = token;
+                    //             resdata2[0].role = data1[0].role;
+                    //             resdata2[0].last_login = data1[0].out_time;
+                    //             resdata2[0].last_inTime = data1[0].in_time;
+                    //             db.executeSql("UPDATE  `users` SET status=true,in_time=CURRENT_TIMESTAMP WHERE userid=" + data1[0].userid, function (msg, err) {
+                    //                 if (err) {
+                    //                     console.log("Error in store.js", err);
+                    //                 } else { }
+                    //             });
+                    //             return res.json(resdata2);
+                    //         }
+                    //     })
+                    // } else if (data1[0].role == 'Visitor') {
+                    //     let resdata3 = [];
+                    //     db.executeSql("select * from visitorreg where uid=" + data1[0].userid, function (data5, err) {
+                    //         if (err) {
+                    //             console.log(err);
+                    //         } else {
+                    //             resdata3.push(data5[0]);
+                    //             resdata3[0].token = token;
+                    //             resdata3[0].role = data1[0].role;
+                    //             resdata3[0].last_login = data1[0].out_time;
+                    //             resdata3[0].last_inTime = data1[0].in_time;
+                    //             db.executeSql("UPDATE  `users` SET status=true,in_time=CURRENT_TIMESTAMP WHERE userid=" + data1[0].userid, function (msg, err) {
+                    //                 if (err) {
+                    //                     console.log("Error in store.js", err);
+                    //                 } else { }
+                    //             });
+                    //             return res.json(resdata3);
+                    //         }
+                    //     })
+                    // } else if (data1[0].role == 'Parents') {
+                    //     let resdata4 = [];
+                    //     db.executeSql("select * from parentsinfo where uid=" + data1[0].userid, function (data6, err) {
+                    //         if (err) {
+                    //             console.log(err);
+                    //         } else {
+                    //             resdata4.push(data6[0]);
+                    //             resdata4[0].token = token;
+                    //             resdata4[0].role = data1[0].role;
+                    //             resdata4[0].last_login = data1[0].out_time;
+                    //             resdata4[0].last_inTime = data1[0].in_time;
+                    //             db.executeSql("UPDATE  `users` SET status=true,in_time=CURRENT_TIMESTAMP WHERE userid=" + data1[0].userid, function (msg, err) {
+                    //                 if (err) {
+                    //                     console.log("Error in store.js", err);
+                    //                 } else { }
+                    //             });
+                    //             return res.json(resdata4);
+                    //         }
+                    //     })
+                    // } 
+                   
 
 
                 } else {
