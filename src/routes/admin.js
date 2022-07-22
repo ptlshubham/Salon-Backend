@@ -339,8 +339,6 @@ router.post("/SaveAppointmentList", (req, res, next) => {
    
     if (checkdate == undefined) {
         if(req.body.offerId !=undefined){
-            console.log("hddududuududu111111111111");
-          
             db.executeSql("INSERT INTO `appointment`(`custid`, `empname`, `totalprice`, `totalpoint`, `totaltime`, `isactive`, `createddate`,`updatedate`,`ispayment`,`appointmentdate`)VALUES(" + req.body.custid + ",'" + req.body.emp + "','" + req.body.totalprice + "','" + req.body.totalpoint + "','" + req.body.totaltime + "'," + req.body.isactive + ",CURRENT_TIMESTAMP,CURRENT_TIMESTAMP,false,'" + req.body.selectdate + "');", function(data, err) {
                 if (err) {
                     console.log(err)
@@ -353,8 +351,6 @@ router.post("/SaveAppointmentList", (req, res, next) => {
                         });
                     }
                     if (req.body.tCustPoint == 0) {
-                        console.log('undefined');
-    
                         db.executeSql("INSERT INTO `point`( `custid`, `totalcustpoint`)VALUES(" + req.body.custid + "," + req.body.lessPoints + ");", function(data2, err) {
                             if (err) {
                                 console.log(err);
@@ -390,8 +386,6 @@ router.post("/SaveAppointmentList", (req, res, next) => {
                         });
                     }
                     if (req.body.tCustPoint == 0) {
-                        console.log('undefined');
-    
                         db.executeSql("INSERT INTO `point`( `custid`, `totalcustpoint`)VALUES(" + req.body.custid + "," + req.body.lessPoints + ");", function(data, err) {
                             if (err) {
                                 console.log(err);
@@ -400,8 +394,6 @@ router.post("/SaveAppointmentList", (req, res, next) => {
                             }
                         });
                     } else {
-                        console.log('defined')
-                        console.log(req.body)
                         db.executeSql("UPDATE `point` SET totalcustpoint=" + req.body.lessPoints + " WHERE custid=" + req.body.custid + ";", function(data, err) {
                             if (err) {
                                 console.log(err);
@@ -414,8 +406,7 @@ router.post("/SaveAppointmentList", (req, res, next) => {
                 }
                 return res.json('success');
             });
-        }
-        
+        }  
     }
     else {
         db.executeSql("INSERT INTO `appointment`(`custid`, `empname`, `totalprice`, `totalpoint`, `totaltime`, `isactive`, `createddate`,`updatedate`,`ispayment`,`appointmentdate`)VALUES(" + req.body.custid + ",'" + req.body.emp + "','" + req.body.totalprice + "','" + req.body.totalpoint + "','" + req.body.totaltime + "'," + req.body.isactive + ",CURRENT_TIMESTAMP,CURRENT_TIMESTAMP,false,'" + req.body.selectdate + "');", function(data, err) {
@@ -430,8 +421,6 @@ router.post("/SaveAppointmentList", (req, res, next) => {
                     });
                 }
                 if (req.body.tCustPoint == 0) {
-                    console.log('undefined');
-
                     db.executeSql("INSERT INTO `point`( `custid`, `totalcustpoint`)VALUES(" + req.body.custid + "," + req.body.lessPoints + ");", function(data, err) {
                         if (err) {
                             console.log(err);
@@ -440,8 +429,6 @@ router.post("/SaveAppointmentList", (req, res, next) => {
                         }
                     });
                 } else {
-                    console.log('defined')
-                    console.log(req.body)
                     db.executeSql("UPDATE `point` SET totalcustpoint=" + req.body.lessPoints + " WHERE custid=" + req.body.custid + ";", function(data, err) {
                         if (err) {
                             console.log(err);
@@ -450,7 +437,6 @@ router.post("/SaveAppointmentList", (req, res, next) => {
                         }
                     });
                 }
-
             }
             return res.json('success');
         });
