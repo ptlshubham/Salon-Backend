@@ -97,11 +97,10 @@ router.post("/SaveEmployeeList", (req, res, next) => {
         if (err) {
             console.log(err)
         } else {
-            console.log(data)
             console.log(req.body.service.length)
             for (let i = 0; i < req.body.service.length; i++) {
                 console.log(req.body.service[i]);
-                db.executeSql("INSERT INTO `empservices`(`servicesid`,`servicesname`,`empid`) VALUES(" + req.body.service[i].servicesId + ",'" + req.body.service[i].servicesName + "'," + data.insertId + ");", function (data1, err) {
+                db.executeSql("INSERT INTO `empservices`(`servicesid`,`servicesname`,`empid`) VALUES(" + req.body.service[i].id + ",'" + req.body.service[i].name + "'," + data.insertId + ");", function (data1, err) {
                     if (err) {
                         console.log(err);
 
@@ -167,9 +166,53 @@ router.post("/GetAllSalaryList", (req, res, next) => {
         }
     })
 });
+router.get("/GetAllOrderList", (req, res, next) => {
+    db.executeSql("select o.id,o.userid,o.totalprice,o.isactive,o.orderdate,c.fname,c.lname,c.email,c.contact,c.whatsapp,c.gender,c.address,c.uid,c.vip,c.ismembership from orderlist o join customer c on o.userid=c.uid", function (data, err) {
+        if (err) {
+            console.log(err);
+        } else {
+            return res.json(data);
+        }
+    })
+});
+router.get("/GetAllProductOrderList/:id", (req, res, next) => {
+    db.executeSql("select o.id,o.oid,o.uid,o.pid,o.oquant,p.id as Pid,p.name,p.image,p.category,p.price,p.quantity,p.vendorname,p.vendorcontact,p.descripition,p.isactive from orderdetails o join products p on o.pid=p.id where oid=" + req.params.id + "", function (data, err) {
+        if (err) {
+            console.log(err);
+        } else {
+            return res.json(data);
+        }
+    })
+})
 
+router.get("/RemoveCustomerOrder/:id", (req, res, next) => {
+    db.executeSql("DELETE FROM `orderlist` WHERE id=" + req.params.id + "", function (data, err) {
+        if (err) {
+            console.log(err);
+        } else {
+            db.executeSql("DELETE FROM `orderdetails` WHERE oid=" + req.params.id + "", function (data, err) {
+                if (err) {
+                    console.log(err);
+                } else {
+
+                }
+            })
+        }
+        return res.json('success');
+    })
+})
 router.post("/UpdateEmployeeList", (req, res, next) => {
     db.executeSql("UPDATE `employee` SET fname='" + req.body.fname + "',lname='" + req.body.lname + "',contact='" + req.body.contact + "',whatsapp='" + req.body.whatsapp + "',address='" + req.body.address + "',city='" + req.body.city + "',gender='" + req.body.gender + "',updateddate=CURRENT_TIMESTAMP WHERE id=" + req.body.id + ";", function (data, err) {
+        if (err) {
+            console.log("Error in store.js", err);
+        } else {
+            return res.json(data);
+        }
+    });
+})
+
+router.post("/UpdateWorkingStatus", (req, res, next) => {
+    db.executeSql("UPDATE `employee` SET isworking=" + req.body.isworking + " WHERE id=" + req.body.id + ";", function (data, err) {
         if (err) {
             console.log("Error in store.js", err);
         } else {
@@ -248,6 +291,16 @@ router.post("/GetUsedServicesByOffer", (req, res, next) => {
         }
     });
 })
+router.post("/SaveAcceptUserOrder", (req, res, next) => {
+
+    db.executeSql("UPDATE `orderlist` SET isactive=false,updateddate=CURRENT_TIMESTAMP WHERE id = " + req.body.id + "", function (data, err) {
+        if (err) {
+            console.log("Error in store.js", err);
+        } else {
+            return res.json(data);
+        }
+    });
+})
 router.get("/removeOfferDetails/:id", (req, res, next) => {
 
     db.executeSql("Delete from offer where id=" + req.params.id, function (data, err) {
@@ -258,6 +311,7 @@ router.get("/removeOfferDetails/:id", (req, res, next) => {
         }
     });
 })
+
 router.get("/GetActiveOffer", (req, res, next) => {
     db.executeSql("select * from offer where status=true", function (data, err) {
         if (err) {
@@ -573,8 +627,8 @@ function mail(filename, data, toemail, subj, mailname) {
         service: "gmail",
         host: 'smtp.gmail.com',
         auth: {
-            user: 'parthmangukiya1208@gmail.com',
-            pass: 'agdxstnosmksfiky'
+            user: 'ptlshubham@gmail.com',
+            pass: 'hvcukfxtadulqrnb'
         },
     });
     const filePath = 'src/assets/emailtemplets/' + filename;
@@ -584,7 +638,7 @@ function mail(filename, data, toemail, subj, mailname) {
     const htmlToSend = template(replacements);
 
     const mailOptions = {
-        from: `"parthmangukiya1208@gmail.com"`,
+        from: `"ptlshubham@gmail.com"`,
         subject: subj,
         to: toemail,
         Name: mailname,
@@ -672,6 +726,7 @@ router.post("/ForgotPassword", (req, res, next) => {
                 } else {
                     const replacements = {
                         votp: otp,
+                        email: req.body.email
                     };
                     mail('verification.html', replacements, req.body.email, "Password resetting", " ")
                     res.json(data);
@@ -795,7 +850,15 @@ router.post("/GetCustomerById", (req, res, next) => {
     })
 
 })
-
+router.post("/SaveRatingsDetails", (req, res, next) => {
+    db.executeSql("UPDATE `appointment` SET ratings=" + req.body.ratings + " WHERE id=" + req.body.id + "", function (data, err) {
+        if (err) {
+            console.log("Error in store.js", err);
+        } else {
+            return res.json('success');
+        }
+    });
+})
 router.post("/GetUsedServicesByCustomer", (req, res, next) => {
 
     db.executeSql("select s.servicesid,s.servicesname,s.custid,s.appointmentid,s.employeename,s.empid,sl.id as slId,sl.price,sl.time,sl.point from custservices s join serviceslist sl on s.servicesid=sl.id where s.appointmentid = " + req.body.id + "", function (data, err) {
@@ -943,7 +1006,7 @@ router.post("/saveCartList", (req, res, next) => {
     });
 });
 router.post("/SavePlaceOrderList", (req, res, next) => {
-    db.executeSql("INSERT INTO `order`(`userid`,`totalprice`,`isactive`,`orderdate`,`createddate`) VALUES (" + req.body.uid + "," + req.body.totalprice + ",true,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP);", function (data, err) {
+    db.executeSql("INSERT INTO `orderlist`(`userid`,`totalprice`,`isactive`,`orderdate`,`createddate`) VALUES (" + req.body.uid + "," + req.body.totalprice + ",true,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP);", function (data, err) {
         if (err) {
             console.log(err)
         } else {
@@ -952,7 +1015,17 @@ router.post("/SavePlaceOrderList", (req, res, next) => {
                 db.executeSql("INSERT INTO `orderdetails`(`oid`, `uid`, `pid`, `oquant`, `createddate`) VALUES(" + data.insertId + "," + req.body.productlist[i].userid + "," + req.body.productlist[i].Pid + "," + req.body.productlist[i].quantity + ",CURRENT_TIMESTAMP);", function (data1, err) {
                     if (err) {
                         console.log("Error in store.js", err);
-                    } else { }
+                    } else {
+                        for (let i = 0; i < req.body.productlist.length; i++) {
+                            db.executeSql("DELETE FROM `cartlist` WHERE id=" + req.body.productlist[i].id + "", function (data3, err) {
+                                if (err) {
+                                    console.log("Error in store.js", err);
+                                } else {
+
+                                }
+                            });
+                        }
+                    }
                 });
             }
         }
@@ -960,28 +1033,26 @@ router.post("/SavePlaceOrderList", (req, res, next) => {
     });
 });
 router.post("/SavePurchaseServiceList", (req, res, next) => {
-    for (let i = 0; i < req.body.services.length; i++) {
-        db.executeSql("INSERT INTO `purchasedmembership`(`cid`, `memid`, `serid`, `sname`, `quntity`, `tprice`, `discount`, `dprice`, `isactive`, `createddate`) VALUES (" + req.body.cid + "," + req.body.memid + "," + req.body.services[i].serviceid + ",'" + req.body.services[i].servicesname + "'," + req.body.services[i].quantity + "," + req.body.tprice + "," + req.body.discount + "," + req.body.dprice + "," + req.body.isactive + ",CURRENT_TIMESTAMP);", function (data1, err) {
-            if (err) {
-                console.log("Error in store.js", err);
-            } else {
-                if (i == req.body.services.length - 1) {
-                    console.log("prnv")
-                    res.json(data1);
-                }
-            }
-        });
-    }
-});
-router.get("/GetAllOrderList", (req, res, next) => {
-    db.executeSql("SELECT * FROM `order` WHERE isactive=true", function (data, err) {
+    db.executeSql("UPDATE `customer` SET ismembership=true WHERE id=" + req.body.cid + "", function (data, err) {
         if (err) {
             console.log(err);
         } else {
-            return res.json(data);
+            for (let i = 0; i < req.body.services.length; i++) {
+                db.executeSql("INSERT INTO `purchasedmembership`(`cid`, `memid`, `serid`, `sname`, `quntity`, `tprice`, `discount`, `dprice`, `isactive`, `createddate`) VALUES (" + req.body.cid + "," + req.body.memid + "," + req.body.services[i].serviceid + ",'" + req.body.services[i].servicesname + "'," + req.body.services[i].quantity + "," + req.body.tprice + "," + req.body.discount + "," + req.body.dprice + "," + req.body.isactive + ",CURRENT_TIMESTAMP);", function (data1, err) {
+                    if (err) {
+                        console.log("Error in store.js", err);
+                    } else {
+                        if (i == req.body.services.length - 1) {
+                            res.json(data1);
+                        }
+                    }
+                });
+            }
         }
     })
-})
+
+});
+
 router.get("/GetAllMembershipPurchased", (req, res, next) => {
     db.executeSql("SELECT * FROM purchasedmembership,membership,customer where purchasedmembership.memid=membership.id AND purchasedmembership.cid=customer.id GROUP BY cid,memid;", function (data, err) {
         if (err) {
@@ -993,6 +1064,16 @@ router.get("/GetAllMembershipPurchased", (req, res, next) => {
 })
 router.post("/GetMembershipPurchasedByID", (req, res, next) => {
     db.executeSql("SELECT * FROM purchasedmembership where cid=" + req.body.cid + " AND memid=" + req.body.memid + "", function (data, err) {
+        if (err) {
+            console.log(err);
+        } else {
+            return res.json(data);
+        }
+    })
+})
+
+router.post("/GetActivatedMembership", (req, res, next) => {
+    db.executeSql("SELECT * FROM purchasedmembership where cid=" + req.body.id + " AND isactive=true", function (data, err) {
         if (err) {
             console.log(err);
         } else {
@@ -1213,44 +1294,14 @@ router.post("/Verification", (req, res, next) => {
         if (err) {
             console.log(err);
         } else {
-            const transporter = nodemailer.createTransport({
-                service: 'gmail',
-                host: "smtp.gmail.com",
-                port: 465,
-                secure: false, // true for 465, false for other ports
-                auth: {
-                    user: 'ptlshubham@gmail.com', // generated ethereal user
-                    pass: 'qrrimzmxjcpabunj', // generated ethereal password
-                },
-            });
-            const output = `
-                        <h3>One Time Password</h3>
-                        <p>To authenticate, please use the following One Time Password(OTP):<h3>` + otp + `</h3></p>
-                        <p>OTP valid for only 2 Minutes.</P>
-                        <p>Don't share this OTP with anyone.</p>
-`;
-            const mailOptions = {
-                from: '"KerYar" <ptlshubham@gmail.com>',
-                subject: "Password resetting",
-                to: req.body.email,
-                Name: '',
-                html: output
-
+            const replacements = {
+                votp: otp,
+                email: req.body.email
             };
-            transporter.sendMail(mailOptions, function (error, info) {
-                console.log('fgfjfj')
-                if (error) {
-                    console.log(error);
-                    res.json("Error");
-                } else {
-                    console.log('Email sent: ' + info.response);
-                    data1.otp = otp;
-                    res.json(data1);
-                }
-            });
+            mail('verification.html', replacements, req.body.email, "Verify a New Account", " ")
+            res.json(data1);
         }
     })
-    console.log(req.body)
 });
 
 router.post("/GetRegisterOtp", (req, res, next) => {
@@ -1274,7 +1325,7 @@ router.post("/SaveUserCustomerList", (req, res, next) => {
         if (err) {
             console.log(err)
         } else {
-            db.executeSql("INSERT INTO `customer`(`fname`,`lname`,`email`,`contact`,`gender`,`createddate`,`uid`,`ismembership`)VALUES('" + req.body.fname + "','" + req.body.lname + "','" + req.body.email + "','" + req.body.contact + "','" + req.body.gender + "',CURRENT_TIMESTAMP," + data.insertId + "," + req.body.isMembership + ");", function (data, err) {
+            db.executeSql("INSERT INTO `customer`(`fname`,`lname`,`email`,`contact`,`whatsapp`,`gender`,`createddate`,`uid`,`ismembership`)VALUES('" + req.body.fname + "','" + req.body.lname + "','" + req.body.email + "','" + req.body.contact + "','" + req.body.contact + "','" + req.body.gender + "',CURRENT_TIMESTAMP," + data.insertId + "," + req.body.isMembership + ");", function (data, err) {
                 if (err) {
                     console.log(err)
                 } else {
@@ -1658,7 +1709,7 @@ router.post('/GetUsersLogin', function (req, res, next) {
                     //         }
                     //     })
                     // } 
-                   
+
 
 
                 } else {
