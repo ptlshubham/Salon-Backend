@@ -390,7 +390,7 @@ router.post("/SaveAppointmentList", (req, res, next) => {
 
     if (checkdate == undefined) {
         if (req.body.offerId != undefined) {
-            db.executeSql("INSERT INTO `appointment`(`custid`, `empname`, `totalprice`, `totalpoint`, `totaltime`, `isactive`, `createddate`,`updatedate`,`ispayment`,`appointmentdate`)VALUES(" + req.body.custid + ",'" + req.body.emp + "','" + req.body.totalprice + "','" + req.body.totalpoint + "','" + req.body.totaltime + "'," + req.body.isactive + ",CURRENT_TIMESTAMP,CURRENT_TIMESTAMP,false,'" + req.body.selectdate + "');", function (data, err) {
+            db.executeSql("INSERT INTO `appointment`(`custid`, `totalprice`, `totalpoint`, `totaltime`, `isactive`, `createddate`,`updatedate`,`ispayment`,`appointmentdate`,`timeslot`)VALUES(" + req.body.custid + ",'" + req.body.totalprice + "','" + req.body.totalpoint + "','" + req.body.totaltime + "'," + req.body.isactive + ",CURRENT_TIMESTAMP,CURRENT_TIMESTAMP,false,'" + req.body.bookingdate + "','" + req.body.timeSlot + "');", function (data, err) {
                 if (err) {
                     console.log(err)
                 } else {
@@ -425,7 +425,7 @@ router.post("/SaveAppointmentList", (req, res, next) => {
                 return res.json(data);
             });
         } else {
-            db.executeSql("INSERT INTO `appointment`(`custid`, `empname`, `totalprice`, `totalpoint`, `totaltime`, `isactive`, `createddate`,`updatedate`,`ispayment`,`appointmentdate`)VALUES(" + req.body.custid + ",'" + req.body.emp + "','" + req.body.totalprice + "','" + req.body.totalpoint + "','" + req.body.totaltime + "'," + req.body.isactive + ",CURRENT_TIMESTAMP,CURRENT_TIMESTAMP,false,CURRENT_TIMESTAMP    );", function (data, err) {
+            db.executeSql("INSERT INTO `appointment`(`custid`, `totalprice`, `totalpoint`, `totaltime`, `isactive`, `createddate`,`updatedate`,`ispayment`,`appointmentdate`,`timeslot`)VALUES(" + req.body.custid + ",'" + req.body.totalprice + "','" + req.body.totalpoint + "','" + req.body.totaltime + "'," + req.body.isactive + ",CURRENT_TIMESTAMP,CURRENT_TIMESTAMP,false,'" + req.body.bookingdate + "','" + req.body.timeSlot + "');", function (data, err) {
                 if (err) {
                     console.log(err)
                 } else {
@@ -460,7 +460,7 @@ router.post("/SaveAppointmentList", (req, res, next) => {
         }
     }
     else {
-        db.executeSql("INSERT INTO `appointment`(`custid`, `empname`, `totalprice`, `totalpoint`, `totaltime`, `isactive`, `createddate`,`updatedate`,`ispayment`,`appointmentdate`)VALUES(" + req.body.custid + ",'" + req.body.emp + "','" + req.body.totalprice + "','" + req.body.totalpoint + "','" + req.body.totaltime + "'," + req.body.isactive + ",CURRENT_TIMESTAMP,CURRENT_TIMESTAMP,false,'" + req.body.selectdate + "');", function (data, err) {
+        db.executeSql("INSERT INTO `appointment`(`custid`, `totalprice`, `totalpoint`, `totaltime`, `isactive`, `createddate`,`updatedate`,`ispayment`,`appointmentdate`,`timeslot`)VALUES(" + req.body.custid + ",'" + req.body.totalprice + "','" + req.body.totalpoint + "','" + req.body.totaltime + "'," + req.body.isactive + ",CURRENT_TIMESTAMP,CURRENT_TIMESTAMP,false,'" + req.body.bookingdate + "','" + req.body.timeSlot + "');", function (data, err) {
             if (err) {
                 console.log(err)
             } else {
@@ -506,7 +506,7 @@ router.post("/saveOfferPurchase", (req, res, next) => {
 
 
 router.get("/GetAllAppointment", (req, res, next) => {
-    db.executeSql("select a.id,a.custid,a.empname,a.totalprice,a.totalpoint,a.totaltime,a.isactive,a.createddate,a.updatedate,c.id as cId,c.fname,c.lname,c.email,c.contact,c.whatsapp,c.gender from appointment a join customer c on a.custid=c.id where isactive=true", function (data, err) {
+    db.executeSql("select a.id,a.custid,a.totalprice,a.totalpoint,a.totaltime,a.isactive,a.createddate,a.updatedate,a.ispayment,a.appointmentdate,a.ratings,a.timeslot,c.id as cId,c.fname,c.lname,c.email,c.contact,c.whatsapp,c.gender from appointment a join customer c on a.custid=c.id where isactive=true ORDER BY a.appointmentdate", function (data, err) {
         if (err) {
             console.log(err);
         } else {
@@ -545,7 +545,7 @@ router.post("/ChackForPassword", (req, res, next) => {
 
 
 router.get("/GetAllEnquiryList", (req, res, next) => {
-    db.executeSql("select * from enquiry", function (data, err) {
+    db.executeSql("select * from appointment WHERE isactive=true", function (data, err) {
         if (err) {
             console.log(err);
         } else {
@@ -878,7 +878,7 @@ var yyyy = today.getFullYear();
 today = yyyy + '-' + mm + '-' + dd;
 
 router.get("/GetAllCompletedServices", (req, res, next) => {
-    db.executeSql("select a.id,a.custid,a.empname,a.totalprice,a.totalpoint,a.totaltime,a.isactive,a.createddate,a.updatedate,c.id as cId,c.fname,c.lname,c.email,c.contact,c.whatsapp,c.gender from appointment a join customer c on a.custid=c.id where a.isactive=false and a.createddate='" + today + "'", function (data, err) {
+    db.executeSql("select a.id,a.custid,a.totalprice,a.totalpoint,a.totaltime,a.isactive,a.createddate,a.updatedate,c.id as cId,c.fname,c.lname,c.email,c.contact,c.whatsapp,c.gender from appointment a join customer c on a.custid=c.id where a.isactive=false and a.createddate='" + today + "'", function (data, err) {
         if (err) {
             console.log(err);
         } else {
