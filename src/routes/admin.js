@@ -27,7 +27,7 @@ const job = schedule.scheduleJob('0 0 * * *', function () {
 });
 
 
-router.post("/SaveServicesList", (req, res, next) => {
+router.post("/SaveServicesList",midway.checkToken, midway.checkToken,(req, res, next) => {
     db.executeSql("INSERT INTO `serviceslist`(`name`, `price`, `time`, `point`, `isactive`, `createdate`,`epoint`)VALUES('" + req.body.name + "'," + req.body.price + "," + req.body.time + "," + req.body.point + ",true,CURRENT_TIMESTAMP," + req.body.epoint + ");", function (data, err) {
         if (err) {
             res.json("error");
@@ -37,7 +37,7 @@ router.post("/SaveServicesList", (req, res, next) => {
         }
     });
 });
-router.post("/SaveSalaryList", (req, res, next) => {
+router.post("/SaveSalaryList",midway.checkToken, midway.checkToken,(req, res, next) => {
     db.executeSql("INSERT INTO `salary`(`salary`, `desc`, `paiddate`, `empid`)VALUES(" + req.body.salary + " , '" + req.body.desc + "' , '" + req.body.paiddate + "' ," + req.body.empid + ");", function (data, err) {
         if (err) {
             res.json("error");
@@ -48,7 +48,7 @@ router.post("/SaveSalaryList", (req, res, next) => {
     });
 });
 
-router.get("/GetAllServices", (req, res, next) => {
+router.get("/GetAllServices",midway.checkToken, midway.checkToken,(req, res, next) => {
     db.executeSql("select * from serviceslist", function (data, err) {
         if (err) {
             console.log(err);
@@ -59,7 +59,7 @@ router.get("/GetAllServices", (req, res, next) => {
 });
 
 
-router.post("/UpdateServicesList", (req, res, next) => {
+router.post("/UpdateServicesList",midway.checkToken, midway.checkToken,(req, res, next) => {
     db.executeSql("UPDATE  `serviceslist` SET name='" + req.body.name + "',price=" + req.body.price + ",time=" + req.body.time + ",point=" + req.body.point + ",epoint=" + req.body.epoint + ",updateddate=CURRENT_TIMESTAMP WHERE id=" + req.body.id + ";", function (data, err) {
         if (err) {
             console.log("Error in store.js", err);
@@ -69,7 +69,7 @@ router.post("/UpdateServicesList", (req, res, next) => {
     });
 });
 
-router.post("/UpdateSalaryList", (req, res, next) => {
+router.post("/UpdateSalaryList",midway.checkToken, midway.checkToken,(req, res, next) => {
     db.executeSql("UPDATE `salary` SET `salary`= " + req.body.salary + " ,`desc`='" + req.body.desc + "',`paiddate`='" + req.body.paiddate + "' WHERE id= " + req.body.id + ";", function (data, err) {
         if (err) {
             console.log("Error in store.js", err);
@@ -79,7 +79,7 @@ router.post("/UpdateSalaryList", (req, res, next) => {
     });
 });
 
-router.post("/RemoveSalaryList", (req, res, next) => {
+router.post("/RemoveSalaryList",midway.checkToken, midway.checkToken,(req, res, next) => {
 
     console.log(req.body);
     db.executeSql("Delete from salary where id=" + req.body.id, function (data, err) {
@@ -91,7 +91,7 @@ router.post("/RemoveSalaryList", (req, res, next) => {
     });
 })
 
-router.post("/SaveEmployeeList", (req, res, next) => {
+router.post("/SaveEmployeeList",midway.checkToken, midway.checkToken,(req, res, next) => {
     console.log(req.body)
     db.executeSql("INSERT INTO `employee`(`fname`,`lname`,`contact`,`whatsapp`,`address`,`city`,`pincode`,`gender`,`isactive`,`createddate`)VALUES('" + req.body.fname + "','" + req.body.lname + "','" + req.body.contact + "','" + req.body.whatsapp + "','" + req.body.address + "','" + req.body.city + "'," + req.body.pincode + ",'" + req.body.gender + "'," + req.body.isactive + ",CURRENT_TIMESTAMP);", function (data, err) {
         if (err) {
@@ -115,7 +115,7 @@ router.post("/SaveEmployeeList", (req, res, next) => {
     });
 });
 
-// router.get("/GetAllEmployee", (req, res, next) => {
+// router.get("/GetAllEmployee", midway.checkToken,(req, res, next) => {
 //     db.executeSql("select e.id,e.fname,e.lname,e.contact,e.whatsapp,e.address,e.city,e.pincode,e.gender,e.isactive,e.createddate,e.updateddate,s.servicesid,s.servicesname from employee e join empservices s on e.id=s.empid", function (data, err) {
 //         if (err) {
 //             console.log(err);
@@ -124,7 +124,8 @@ router.post("/SaveEmployeeList", (req, res, next) => {
 //         }
 //     })
 // });
-router.get("/GetAllEmployee", (req, res, next) => {
+router.get("/GetAllEmployee", midway.checkToken,(req, res, next) => {
+    console.log("im herehfjhxjhjhfdjhfd")
     db.executeSql("select * from employee where isactive=true", function (data, err) {
         if (err) {
             console.log(err);
@@ -134,7 +135,7 @@ router.get("/GetAllEmployee", (req, res, next) => {
     })
 });
 
-router.get("/GetEmployeeService", (req, res, next) => {
+router.get("/GetEmployeeService", midway.checkToken,(req, res, next) => {
     db.executeSql("select * from empservices", function (data, err) {
         if (err) {
             console.log(err);
@@ -144,7 +145,7 @@ router.get("/GetEmployeeService", (req, res, next) => {
     })
 });
 
-router.post("/RemoveEmployeeList", (req, res, next) => {
+router.post("/RemoveEmployeeList",midway.checkToken, midway.checkToken,(req, res, next) => {
 
     console.log(req.body);
     db.executeSql("update `employee` set isactive='0' where id=" + req.body.id, function (data, err) {
@@ -156,7 +157,7 @@ router.post("/RemoveEmployeeList", (req, res, next) => {
     });
 })
 
-router.post("/GetAllSalaryList", (req, res, next) => {
+router.post("/GetAllSalaryList",midway.checkToken, midway.checkToken,(req, res, next) => {
     console.log(req.body);
     db.executeSql("select s.id,s.salary,s.desc,s.paiddate,s.empid,e.id as eId,e.fname,e.lname,e.contact,e.whatsapp,e.address,e.city,e.pincode,e.gender from salary s join employee e on s.empid=e.id where s.empid=" + req.body.id, function (data, err) {
         if (err) {
@@ -166,7 +167,7 @@ router.post("/GetAllSalaryList", (req, res, next) => {
         }
     })
 });
-router.get("/GetAllOrderList", (req, res, next) => {
+router.get("/GetAllOrderList",midway.checkToken, midway.checkToken,(req, res, next) => {
     db.executeSql("select o.id,o.userid,o.totalprice,o.isactive,o.orderdate,c.fname,c.lname,c.email,c.contact,c.whatsapp,c.gender,c.address,c.uid,c.vip,c.ismembership from orderlist o join customer c on o.userid=c.uid", function (data, err) {
         if (err) {
             console.log(err);
@@ -175,7 +176,7 @@ router.get("/GetAllOrderList", (req, res, next) => {
         }
     })
 });
-router.get("/GetAllProductOrderList/:id", (req, res, next) => {
+router.get("/GetAllProductOrderList/:id", midway.checkToken,(req, res, next) => {
     db.executeSql("select o.id,o.oid,o.uid,o.pid,o.oquant,p.id as Pid,p.name,p.image,p.category,p.price,p.quantity,p.vendorname,p.vendorcontact,p.descripition,p.isactive from orderdetails o join products p on o.pid=p.id where oid=" + req.params.id + "", function (data, err) {
         if (err) {
             console.log(err);
@@ -185,7 +186,7 @@ router.get("/GetAllProductOrderList/:id", (req, res, next) => {
     })
 })
 
-router.get("/RemoveCustomerOrder/:id", (req, res, next) => {
+router.get("/RemoveCustomerOrder/:id",midway.checkToken, midway.checkToken,(req, res, next) => {
     db.executeSql("DELETE FROM `orderlist` WHERE id=" + req.params.id + "", function (data, err) {
         if (err) {
             console.log(err);
@@ -201,7 +202,7 @@ router.get("/RemoveCustomerOrder/:id", (req, res, next) => {
         return res.json('success');
     })
 })
-router.post("/UpdateEmployeeList", (req, res, next) => {
+router.post("/UpdateEmployeeList",midway.checkToken, midway.checkToken,(req, res, next) => {
     db.executeSql("UPDATE `employee` SET fname='" + req.body.fname + "',lname='" + req.body.lname + "',contact='" + req.body.contact + "',whatsapp='" + req.body.whatsapp + "',address='" + req.body.address + "',city='" + req.body.city + "',gender='" + req.body.gender + "',updateddate=CURRENT_TIMESTAMP WHERE id=" + req.body.id + ";", function (data, err) {
         if (err) {
             console.log("Error in store.js", err);
@@ -211,7 +212,7 @@ router.post("/UpdateEmployeeList", (req, res, next) => {
     });
 })
 
-router.post("/UpdateWorkingStatus", (req, res, next) => {
+router.post("/UpdateWorkingStatus",midway.checkToken, midway.checkToken,(req, res, next) => {
     db.executeSql("UPDATE `employee` SET isworking=" + req.body.isworking + " WHERE id=" + req.body.id + ";", function (data, err) {
         if (err) {
             console.log("Error in store.js", err);
@@ -221,7 +222,7 @@ router.post("/UpdateWorkingStatus", (req, res, next) => {
     });
 })
 
-router.post("/SaveCustomerList", (req, res, next) => {
+router.post("/SaveCustomerList",midway.checkToken, midway.checkToken,(req, res, next) => {
     console.log(req.body)
     db.executeSql("INSERT INTO `customer`(`fname`,`lname`,`email`,`contact`,`whatsapp`,`gender`,`createddate`,`address`,`vip`)VALUES('" + req.body.fname + "','" + req.body.lname + "','" + req.body.email + "','" + req.body.contact + "','" + req.body.whatsapp + "','" + req.body.gender + "',CURRENT_TIMESTAMP,'" + req.body.address + "'," + req.body.vip + ");", function (data, err) {
         if (err) {
@@ -233,7 +234,7 @@ router.post("/SaveCustomerList", (req, res, next) => {
 });
 
 
-router.get("/GetAllCustomer", (req, res, next) => {
+router.get("/GetAllCustomer",midway.checkToken, midway.checkToken,(req, res, next) => {
     db.executeSql("select * from customer", function (data, err) {
         if (err) {
             console.log(err);
@@ -243,7 +244,7 @@ router.get("/GetAllCustomer", (req, res, next) => {
     })
 });
 
-router.get("/GetAllOffer", (req, res, next) => {
+router.get("/GetAllOffer",midway.checkToken, midway.checkToken,(req, res, next) => {
     db.executeSql("select * from offer", function (data, err) {
         if (err) {
             console.log(err);
@@ -252,36 +253,48 @@ router.get("/GetAllOffer", (req, res, next) => {
         }
     })
 });
-router.post("/SaveOfferList", (req, res, next) => {
+router.post("/SaveOfferList",midway.checkToken, midway.checkToken,(req, res, next) => {
     console.log(req.body)
-
-    db.executeSql("INSERT INTO `offer`(`offername`,`totalprice`,`offerprice`,`percentage`,`status`)VALUES('" + req.body.offername + "'," + req.body.totalprice + "," + req.body.offerprice + "," + req.body.percentage + ",true);", function (data, err) {
-        if (err) {
-            console.log(err)
-        } else {
-            for (let i = 0; i < req.body.services.length; i++) {
-                db.executeSql("INSERT INTO `offerservices`(`offerid`,`servicesname`,`totalprice`,`offername`,`offerprice`) VALUES(" + data.insertId + ",'" + req.body.services[i].selectedServ + "'," + req.body.totalprice + ",'" + req.body.offername + "'," + req.body.offerprice + ");", function (data1, err) {
-                    if (err) {
-                        console.log(err);
-                    } else { }
-                });
+    if(req.body.id != null && req.body.id != undefined){
+        db.executeSql("delete from offer where id="+req.body.id,function(data1,err){
+            db.executeSql("INSERT INTO `offer`(`offername`,`totalprice`,`offerprice`,`percentage`,`status`)VALUES('" + req.body.offername + "'," + req.body.totalprice + "," + req.body.offerprice + "," + req.body.percentage + ",true);", function (data, err) {
+                if (err) {
+                    console.log(err)
+                } else {
+                    for (let i = 0; i < req.body.services.length; i++) {
+                        db.executeSql("INSERT INTO `offerservices`(`offerid`,`serviceId`,`servicesname`,`totalprice`,`offername`,`offerprice`) VALUES(" + data.insertId + ","+req.body.services[i].selectedServid+",'" + req.body.services[i].selectedServ + "'," + req.body.totalprice + ",'" + req.body.offername + "'," + req.body.offerprice + ");", function (data1, err) {
+                            if (err) {
+                                console.log(err);
+                            } else { }
+                        });
+                    }
+                }
+                return res.json('success');
+            });
+        })
+      
+    }else{
+        db.executeSql("INSERT INTO `offer`(`offername`,`totalprice`,`offerprice`,`percentage`,`status`)VALUES('" + req.body.offername + "'," + req.body.totalprice + "," + req.body.offerprice + "," + req.body.percentage + ",true);", function (data, err) {
+            if (err) {
+                console.log(err)
+            } else {
+                for (let i = 0; i < req.body.services.length; i++) {
+                    db.executeSql("INSERT INTO `offerservices`(`offerid`,`serviceId`,`servicesname`,`totalprice`,`offername`,`offerprice`) VALUES(" + data.insertId + ","+req.body.services[i].selectedServid+",'" + req.body.services[i].selectedServ + "'," + req.body.totalprice + ",'" + req.body.offername + "'," + req.body.offerprice + ");", function (data1, err) {
+                        if (err) {
+                            console.log(err);
+                        } else { }
+                    });
+                }
             }
-        }
-        return res.json('success');
-    });
+            return res.json('success');
+        });
+    }
+
+    
 
 });
-// router.post("/GetUsedServicesByOffer", (req, res, next) => {
 
-//     db.executeSql("select s.offerid,s.servicesname,s.offername,s.,s.offerprice,sl.id as slId,sl.totalprice,sl.time,sl.point from offerservices s join serviceslist sl on s.servicesid=sl.id where s.appointmentid = " + req.body.id + "", function (data, err) {
-//         if (err) {
-//             console.log("Error in store.js", err);
-//         } else {
-//             return res.json(data);
-//         }
-//     });
-// })
-router.post("/GetUsedServicesByOffer", (req, res, next) => {
+router.post("/GetUsedServicesByOffer",midway.checkToken, midway.checkToken,(req, res, next) => {
 
     db.executeSql("select s.offerid,s.servicesname,s.offername,s.offerprice,sl.id as slId,sl.offerid,sl.servicesname,sl.offername,sl.offerprice from offerservices s join serviceslist sl on s.servicesid=sl.id where s.offerappointmentid = " + req.body.id + "", function (data, err) {
         if (err) {
@@ -291,7 +304,7 @@ router.post("/GetUsedServicesByOffer", (req, res, next) => {
         }
     });
 })
-router.post("/SaveAcceptUserOrder", (req, res, next) => {
+router.post("/SaveAcceptUserOrder",midway.checkToken, midway.checkToken,(req, res, next) => {
 
     db.executeSql("UPDATE `orderlist` SET isactive=false,updateddate=CURRENT_TIMESTAMP WHERE id = " + req.body.id + "", function (data, err) {
         if (err) {
@@ -301,7 +314,7 @@ router.post("/SaveAcceptUserOrder", (req, res, next) => {
         }
     });
 })
-router.get("/removeOfferDetails/:id", (req, res, next) => {
+router.get("/removeOfferDetails/:id", midway.checkToken,(req, res, next) => {
 
     db.executeSql("Delete from offer where id=" + req.params.id, function (data, err) {
         if (err) {
@@ -312,7 +325,7 @@ router.get("/removeOfferDetails/:id", (req, res, next) => {
     });
 })
 
-router.get("/GetActiveOffer", (req, res, next) => {
+router.get("/GetActiveOffer",midway.checkToken, midway.checkToken,(req, res, next) => {
     db.executeSql("select * from offer where status=true", function (data, err) {
         if (err) {
             console.log(err);
@@ -321,7 +334,7 @@ router.get("/GetActiveOffer", (req, res, next) => {
         }
     })
 });
-router.post("/getAllOfferDataList", (req, res, next) => {
+router.post("/getAllOfferDataList",midway.checkToken, midway.checkToken,(req, res, next) => {
 
     db.executeSql("select * from offerservices where offerid = " + req.body.id + "", function (data, err) {
         if (err) {
@@ -331,7 +344,7 @@ router.post("/getAllOfferDataList", (req, res, next) => {
         }
     });
 })
-router.post("/SaveMembershipList", (req, res, next) => {
+router.post("/SaveMembershipList",midway.checkToken, midway.checkToken,(req, res, next) => {
     console.log(req.body)
 
     db.executeSql("INSERT INTO `membership`(`membershipname`,`membershipdiscount`,`totalprice`,`membershipprice`,`status`)VALUES('" + req.body.membershipname + "'," + req.body.membershipdiscount + "," + req.body.totalprice + "," + req.body.membershipprice + ",true);", function (data, err) {
@@ -355,7 +368,7 @@ router.post("/SaveMembershipList", (req, res, next) => {
 
     });
 });
-router.post("/GetUsedServicesByMembership", (req, res, next) => {
+router.post("/GetUsedServicesByMembership", midway.checkToken,(req, res, next) => {
 
     db.executeSql("SELECT * FROM `membershipservices` WHERE membershipid=" + req.body.id + "", function (data, err) {
         if (err) {
@@ -365,7 +378,7 @@ router.post("/GetUsedServicesByMembership", (req, res, next) => {
         }
     });
 })
-router.get("/removeMembershipDetails/:id", (req, res, next) => {
+router.get("/removeMembershipDetails/:id",midway.checkToken, midway.checkToken,(req, res, next) => {
 
     db.executeSql("Delete from membership where id=" + req.params.id, function (data, err) {
         if (err) {
@@ -375,7 +388,7 @@ router.get("/removeMembershipDetails/:id", (req, res, next) => {
         }
     });
 })
-router.get("/GetAllMembership", (req, res, next) => {
+router.get("/GetAllMembership", midway.checkToken,(req, res, next) => {
     db.executeSql("select * from membership", function (data, err) {
         if (err) {
             console.log(err);
@@ -384,7 +397,7 @@ router.get("/GetAllMembership", (req, res, next) => {
         }
     })
 });
-router.post("/SaveAppointmentList", (req, res, next) => {
+router.post("/SaveAppointmentList", midway.checkToken,(req, res, next) => {
     console.log(req.body)
     var checkdate = req.body.selectdate;
 
@@ -494,7 +507,7 @@ router.post("/SaveAppointmentList", (req, res, next) => {
     }
 });
 
-router.post("/saveOfferPurchase", (req, res, next) => {
+router.post("/saveOfferPurchase", midway.checkToken,(req, res, next) => {
     db.executeSql("INSERT INTO `purchasedoffer`( `custid`, `employeeid`, `offerid`,`appointmentId`, `payment`, `offerprice`, `createddate`, `updateddate`) VALUES (" + req.body.custid + "," + req.body.empId + "," + req.body.offerId + "," + req.body.appointmentId + "," + false + "," + req.body.offerprice + ",CURRENT_TIMESTAMP,null);", function (data, err) {
         if (err) {
             console.log(err);
@@ -505,7 +518,7 @@ router.post("/saveOfferPurchase", (req, res, next) => {
 })
 
 
-router.get("/GetAllAppointment", (req, res, next) => {
+router.get("/GetAllAppointment", midway.checkToken,(req, res, next) => {
     db.executeSql("select a.id,a.custid,a.totalprice,a.totalpoint,a.totaltime,a.isactive,a.createddate,a.updatedate,a.ispayment,a.appointmentdate,a.ratings,a.timeslot,c.id as cId,c.fname,c.lname,c.email,c.contact,c.whatsapp,c.gender from appointment a join customer c on a.custid=c.id where isactive=true ORDER BY a.appointmentdate", function (data, err) {
         if (err) {
             console.log(err);
@@ -514,7 +527,7 @@ router.get("/GetAllAppointment", (req, res, next) => {
         }
     })
 });
-router.post("/ChackForPassword", (req, res, next) => {
+router.post("/ChackForPassword", midway.checkToken,(req, res, next) => {
     var salt = '7fa73b47df808d36c5fe328546ddef8b9011b2c6';
     var repass = salt + '' + req.body.pass;
     var encPassword = crypto.createHash('sha1').update(repass).digest('hex');
@@ -527,7 +540,7 @@ router.post("/ChackForPassword", (req, res, next) => {
     })
 })
 
-// router.post("/updatePasswordAccordingRole", (req, res, next) => {
+// router.post("/updatePasswordAccordingRole", midway.checkToken,(req, res, next) => {
 //     console.log(req.body)
 //     var salt = '7fa73b47df808d36c5fe328546ddef8b9011b2c6';
 //     var repass = salt + '' + req.body.password;
@@ -544,7 +557,7 @@ router.post("/ChackForPassword", (req, res, next) => {
 // });
 
 
-router.get("/GetAllEnquiryList", (req, res, next) => {
+router.get("/GetAllEnquiryList", midway.checkToken,(req, res, next) => {
     db.executeSql("select * from appointment WHERE isactive=true", function (data, err) {
         if (err) {
             console.log(err);
@@ -554,7 +567,7 @@ router.get("/GetAllEnquiryList", (req, res, next) => {
     })
 });
 
-router.post("/UpdateSalaryStatus", (req, res, next) => {
+router.post("/UpdateSalaryStatus", midway.checkToken,(req, res, next) => {
     db.executeSql("UPDATE  `salary` SET status=" + req.body.status + " WHERE id=" + req.body.id + ";", function (data, err) {
         if (err) {
             console.log("Error in store.js", err);
@@ -566,7 +579,7 @@ router.post("/UpdateSalaryStatus", (req, res, next) => {
 
 var nowDate = new Date();
 date = nowDate.getFullYear() + '-' + (nowDate.getMonth() + 1) + '-' + nowDate.getDate();
-router.get("/GetDailyTotal", (req, res, next) => {
+router.get("/GetDailyTotal", midway.checkToken,(req, res, next) => {
     db.executeSql("select * from appointment where createddate='" + date + "' and ispayment=true", function (data, err) {
         if (err) {
             console.log(err);
@@ -577,7 +590,7 @@ router.get("/GetDailyTotal", (req, res, next) => {
     })
 });
 
-router.get("/GetMonthlyTotal", (req, res, next) => {
+router.get("/GetMonthlyTotal", midway.checkToken,(req, res, next) => {
     db.executeSql("select * from appointment where  DATE_FORMAT(createddate, '%m') = DATE_FORMAT(CURRENT_TIMESTAMP, '%m') and ispayment=true", function (data, err) {
         if (err) {
             console.log(err);
@@ -588,7 +601,7 @@ router.get("/GetMonthlyTotal", (req, res, next) => {
 });
 
 
-router.post("/UpdateCustomerList", (req, res, next) => {
+router.post("/UpdateCustomerList", midway.checkToken,(req, res, next) => {
     db.executeSql("UPDATE  `customer` SET fname='" + req.body.fname + "',lname='" + req.body.lname + "',email='" + req.body.email + "',contact='" + req.body.contact + "',whatsapp='" + req.body.whatsapp + "',gender='" + req.body.gender + "',vip=" + req.body.vip + ",updateddate=CURRENT_TIMESTAMP,address='" + req.body.address + "' WHERE id=" + req.body.id + ";", function (data, err) {
         if (err) {
             console.log("Error in store.js", err);
@@ -600,7 +613,7 @@ router.post("/UpdateCustomerList", (req, res, next) => {
 
 
 
-router.get("/removeCustomerDetails/:id", (req, res, next) => {
+router.get("/removeCustomerDetails/:id", midway.checkToken,(req, res, next) => {
 
     db.executeSql("Delete from customer where id=" + req.params.id, function (data, err) {
         if (err) {
@@ -611,7 +624,7 @@ router.get("/removeCustomerDetails/:id", (req, res, next) => {
     });
 })
 
-router.get("/RemoveServicesList/:id", (req, res, next) => {
+router.get("/RemoveServicesList/:id", midway.checkToken,(req, res, next) => {
 
     db.executeSql("Delete from serviceslist where id=" + req.params.id, function (data, err) {
         if (err) {
@@ -711,7 +724,7 @@ function mail(filename, data, toemail, subj, mailname) {
 }
 
 
-router.post("/ForgotPassword", (req, res, next) => {
+router.post("/ForgotPassword", midway.checkToken,(req, res, next) => {
     let otp = Math.floor(100000 + Math.random() * 900000);
     console.log(req.body);
     db.executeSql("select * from users where email='" + req.body.email + "';", function (data, err) {
@@ -737,7 +750,7 @@ router.post("/ForgotPassword", (req, res, next) => {
     });
 });
 
-router.post("/GetOneTimePassword", (req, res, next) => {
+router.post("/GetOneTimePassword", midway.checkToken,(req, res, next) => {
     console.log(req.body)
     db.executeSql("select * from otp where userid = '" + req.body.id + "' " + " and otp =' " + req.body.otp + "' ", function (data, err) {
         if (err) {
@@ -747,7 +760,7 @@ router.post("/GetOneTimePassword", (req, res, next) => {
         }
     });
 });
-// router.post("/ChackForPassword", midway.checkToken, (req, res, next) => {
+// router.post("/ChackForPassword", midway.checkToken, midway.checkToken,(req, res, next) => {
 //     var salt = '7fa73b47df808d36c5fe328546ddef8b9011b2c6';
 //     var repass = salt + '' + req.body.pass;
 //     var encPassword = crypto.createHash('sha1').update(repass).digest('hex');
@@ -760,7 +773,7 @@ router.post("/GetOneTimePassword", (req, res, next) => {
 //     })
 // })
 
-router.post("/UpdatePassword", (req, res, next) => {
+router.post("/UpdatePassword", midway.checkToken,(req, res, next) => {
     console.log(req.body);
     var salt = '7fa73b47df808d36c5fe328546ddef8b9011b2c6';
     var repass = salt + '' + req.body.password;
@@ -776,7 +789,7 @@ router.post("/UpdatePassword", (req, res, next) => {
 });
 
 
-router.post("/UpdateActiveStatus", (req, res, next) => {
+router.post("/UpdateActiveStatus", midway.checkToken,(req, res, next) => {
     db.executeSql("UPDATE  `appointment` SET isactive=" + req.body.isactive + ", updatedate=CURRENT_TIMESTAMP,ispayment=true WHERE id=" + req.body.id + ";", function (data, err) {
         if (err) {
             console.log("Error in store.js", err);
@@ -786,7 +799,7 @@ router.post("/UpdateActiveStatus", (req, res, next) => {
     });
 })
 
-router.post("/GetViewAppointment", (req, res, next) => {
+router.post("/GetViewAppointment", midway.checkToken,(req, res, next) => {
     db.executeSql("select * from appointment where custid = " + req.body.id + "", function (data, err) {
         if (err) {
             console.log("Error in store.js", err);
@@ -796,7 +809,7 @@ router.post("/GetViewAppointment", (req, res, next) => {
     });
 })
 
-router.post("/UpdateEnquiryStatus", (req, res, next) => {
+router.post("/UpdateEnquiryStatus", midway.checkToken,(req, res, next) => {
     db.executeSql("UPDATE  `enquiry` SET isactive=" + req.body.isactive + " WHERE id=" + req.body.id + ";", function (data, err) {
         if (err) {
             console.log("Error in store.js", err);
@@ -807,7 +820,7 @@ router.post("/UpdateEnquiryStatus", (req, res, next) => {
 })
 
 
-router.post("/GetCustomerTotalPoints", (req, res, next) => {
+router.post("/GetCustomerTotalPoints", midway.checkToken,(req, res, next) => {
     db.executeSql("select * from point where custid = " + req.body.id + "", function (data, err) {
         if (err) {
             console.log("Error in store.js", err);
@@ -817,7 +830,7 @@ router.post("/GetCustomerTotalPoints", (req, res, next) => {
     });
 })
 
-router.post("/GetAllCustomerDataList", (req, res, next) => {
+router.post("/GetAllCustomerDataList", midway.checkToken,(req, res, next) => {
 
     db.executeSql("select * from appointment where custid = " + req.body.id + "", function (data, err) {
         if (err) {
@@ -828,7 +841,7 @@ router.post("/GetAllCustomerDataList", (req, res, next) => {
     });
 })
 
-router.post("/GetCustomerById", (req, res, next) => {
+router.post("/GetCustomerById", midway.checkToken,(req, res, next) => {
     db.executeSql("select * from customer where uid=" + req.body.id + "", function (data, err) {
         if (err) {
             console.log(err);
@@ -850,7 +863,7 @@ router.post("/GetCustomerById", (req, res, next) => {
     })
 
 })
-router.post("/SaveRatingsDetails", (req, res, next) => {
+router.post("/SaveRatingsDetails", midway.checkToken,(req, res, next) => {
     db.executeSql("UPDATE `appointment` SET ratings=" + req.body.ratings + " WHERE id=" + req.body.id + "", function (data, err) {
         if (err) {
             console.log("Error in store.js", err);
@@ -859,7 +872,7 @@ router.post("/SaveRatingsDetails", (req, res, next) => {
         }
     });
 })
-router.post("/GetUsedServicesByCustomer", (req, res, next) => {
+router.post("/GetUsedServicesByCustomer", midway.checkToken,(req, res, next) => {
 
     db.executeSql("select s.servicesid,s.servicesname,s.custid,s.appointmentid,s.employeename,s.empid,sl.id as slId,sl.price,sl.time,sl.point from custservices s join serviceslist sl on s.servicesid=sl.id where s.appointmentid = " + req.body.id + "", function (data, err) {
         if (err) {
@@ -877,7 +890,7 @@ var yyyy = today.getFullYear();
 
 today = yyyy + '-' + mm + '-' + dd;
 
-router.get("/GetAllCompletedServices", (req, res, next) => {
+router.get("/GetAllCompletedServices", midway.checkToken,(req, res, next) => {
     db.executeSql("select a.id,a.custid,a.totalprice,a.totalpoint,a.totaltime,a.isactive,a.createddate,a.updatedate,c.id as cId,c.fname,c.lname,c.email,c.contact,c.whatsapp,c.gender from appointment a join customer c on a.custid=c.id where a.isactive=false and a.createddate='" + today + "'", function (data, err) {
         if (err) {
             console.log(err);
@@ -887,7 +900,7 @@ router.get("/GetAllCompletedServices", (req, res, next) => {
     })
 });
 
-router.post("/SaveModeOfPayment", (req, res, next) => {
+router.post("/SaveModeOfPayment", midway.checkToken,(req, res, next) => {
     db.executeSql("INSERT INTO `payment`(`cid`, `appointmentid`, `cname`, `modeofpayment`, `tprice`, `tpoint`, `pdate`,`createddate`) VALUES (" + req.body.cid + "," + req.body.appointmentid + ",'" + req.body.cname + "','" + req.body.modeofpayment + "'," + req.body.tprice + "," + req.body.tpoint + ",CURRENT_TIMESTAMP,CURRENT_TIMESTAMP);", function (data, err) {
         if (err) {
             res.json("error");
@@ -898,7 +911,7 @@ router.post("/SaveModeOfPayment", (req, res, next) => {
     });
 });
 
-router.get("/GetAllModeOfPayment", (req, res, next) => {
+router.get("/GetAllModeOfPayment", midway.checkToken,(req, res, next) => {
     db.executeSql("select * from payment where pdate ='" + today + "' ", function (data, err) {
         if (err) {
             console.log("Error in store.js", err);
@@ -908,7 +921,7 @@ router.get("/GetAllModeOfPayment", (req, res, next) => {
     });
 })
 
-router.get("/GetMonthlyPayment", (req, res, next) => {
+router.get("/GetMonthlyPayment", midway.checkToken,(req, res, next) => {
     db.executeSql("select * from payment ", function (data, err) {
         if (err) {
             console.log("Error in store.js", err);
@@ -919,7 +932,7 @@ router.get("/GetMonthlyPayment", (req, res, next) => {
 })
 
 
-router.post("/SaveExpensesList", (req, res, next) => {
+router.post("/SaveExpensesList", midway.checkToken,(req, res, next) => {
     db.executeSql("INSERT INTO expenses (expensesdate, expensesname, expensesprices, employeename, paymenttype) VALUES ('" + req.body.expensesdate + "','" + req.body.expensesname + "','" + req.body.expensesprices + "','" + req.body.employeename + "','" + req.body.paymenttype + "');", function (data, err) {
         console.log(req.body.expensesdate, " , ", req.body.expensesdate);
         if (err) {
@@ -931,7 +944,7 @@ router.post("/SaveExpensesList", (req, res, next) => {
     });
 });
 
-router.get("/GetAllExpenses", (req, res, next) => {
+router.get("/GetAllExpenses", midway.checkToken,(req, res, next) => {
     db.executeSql("select * from expenses", function (data, err) {
         if (err) {
             console.log(err);
@@ -941,7 +954,7 @@ router.get("/GetAllExpenses", (req, res, next) => {
     })
 });
 
-router.post("/RemoveExpensesDetails", (req, res, next) => {
+router.post("/RemoveExpensesDetails", midway.checkToken,(req, res, next) => {
     db.executeSql("Delete from expenses where id=" + req.body.id, function (data, err) {
         if (err) {
             console.log("Error in store.js", err);
@@ -951,7 +964,7 @@ router.post("/RemoveExpensesDetails", (req, res, next) => {
     });
 })
 
-router.post("/UpdateExpensesDetails", (req, res, next) => {
+router.post("/UpdateExpensesDetails", midway.checkToken,(req, res, next) => {
     var newdate = new Date(req.body.expensesdate).getDate() + 1;
     var newMonth = new Date(req.body.expensesdate).getMonth();
     var newyear = new Date(req.body.expensesdate).getFullYear();
@@ -965,7 +978,7 @@ router.post("/UpdateExpensesDetails", (req, res, next) => {
     });
 })
 
-router.get("/getMonthlyExpensesList", (req, res, next) => {
+router.get("/getMonthlyExpensesList", midway.checkToken,(req, res, next) => {
     db.executeSql("select * from expenses where  DATE_FORMAT(expensesdate, '%m') = DATE_FORMAT(CURRENT_TIMESTAMP, '%m')", function (data, err) {
         if (err) {
             console.log(err);
@@ -975,7 +988,7 @@ router.get("/getMonthlyExpensesList", (req, res, next) => {
     })
 });
 
-router.post("/UpdateCategoryList", (req, res, next) => {
+router.post("/UpdateCategoryList", midway.checkToken,(req, res, next) => {
     console.log(req.body)
     db.executeSql("UPDATE `category` SET name='" + req.body.name + "' where id=" + req.body.id + ";", function (data, err) {
         if (err) {
@@ -985,7 +998,7 @@ router.post("/UpdateCategoryList", (req, res, next) => {
         }
     });
 })
-router.post("/SaveCategoryList", (req, res, next) => {
+router.post("/SaveCategoryList", midway.checkToken,(req, res, next) => {
     console.log(req.body)
     db.executeSql("INSERT INTO `category`( `name`, `isactive`, `createddate`) VALUES ('" + req.body.name + "',true,CURRENT_TIMESTAMP);", function (data, err) {
         if (err) {
@@ -995,7 +1008,7 @@ router.post("/SaveCategoryList", (req, res, next) => {
         }
     });
 });
-router.post("/saveCartList", (req, res, next) => {
+router.post("/saveCartList", midway.checkToken,(req, res, next) => {
     console.log(req.body)
     db.executeSql("INSERT INTO `cartlist`( `userid`, `productid`, `quantity`,`price`, `createddate`) VALUES ('" + req.body.uid + "','" + req.body.id + "','" + req.body.quant + "'," + req.body.price + ",CURRENT_TIMESTAMP);", function (data, err) {
         if (err) {
@@ -1005,7 +1018,7 @@ router.post("/saveCartList", (req, res, next) => {
         }
     });
 });
-router.post("/SavePlaceOrderList", (req, res, next) => {
+router.post("/SavePlaceOrderList", midway.checkToken,(req, res, next) => {
     db.executeSql("INSERT INTO `orderlist`(`userid`,`totalprice`,`isactive`,`orderdate`,`createddate`) VALUES (" + req.body.uid + "," + req.body.totalprice + ",true,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP);", function (data, err) {
         if (err) {
             console.log(err)
@@ -1032,7 +1045,7 @@ router.post("/SavePlaceOrderList", (req, res, next) => {
         return res.json('success');
     });
 });
-router.post("/SavePurchaseServiceList", (req, res, next) => {
+router.post("/SavePurchaseServiceList", midway.checkToken,(req, res, next) => {
     db.executeSql("UPDATE `customer` SET ismembership=true WHERE id=" + req.body.cid + "", function (data, err) {
         if (err) {
             console.log(err);
@@ -1053,7 +1066,7 @@ router.post("/SavePurchaseServiceList", (req, res, next) => {
 
 });
 
-router.get("/GetAllMembershipPurchased", (req, res, next) => {
+router.get("/GetAllMembershipPurchased", midway.checkToken,(req, res, next) => {
     db.executeSql("SELECT * FROM purchasedmembership,membership,customer where purchasedmembership.memid=membership.id AND purchasedmembership.cid=customer.id GROUP BY cid,memid;", function (data, err) {
         if (err) {
             console.log(err);
@@ -1062,7 +1075,7 @@ router.get("/GetAllMembershipPurchased", (req, res, next) => {
         }
     })
 })
-router.post("/GetMembershipPurchasedByID", (req, res, next) => {
+router.post("/GetMembershipPurchasedByID", midway.checkToken,(req, res, next) => {
     db.executeSql("SELECT * FROM purchasedmembership where cid=" + req.body.cid + " AND memid=" + req.body.memid + "", function (data, err) {
         if (err) {
             console.log(err);
@@ -1072,7 +1085,7 @@ router.post("/GetMembershipPurchasedByID", (req, res, next) => {
     })
 })
 
-router.post("/GetActivatedMembership", (req, res, next) => {
+router.post("/GetActivatedMembership", midway.checkToken,(req, res, next) => {
     db.executeSql("SELECT * FROM purchasedmembership where cid=" + req.body.id + " AND isactive=true", function (data, err) {
         if (err) {
             console.log(err);
@@ -1081,7 +1094,7 @@ router.post("/GetActivatedMembership", (req, res, next) => {
         }
     })
 })
-router.post("/updateCartList", (req, res, next) => {
+router.post("/updateCartList", midway.checkToken,(req, res, next) => {
     console.log(req.body)
     db.executeSql("UPDATE `cartlist` SET quantity=" + req.body.quantity + " where id=" + req.body.id + ";", function (data, err) {
         if (err) {
@@ -1091,7 +1104,7 @@ router.post("/updateCartList", (req, res, next) => {
         }
     });
 })
-router.get("/getAllCartList", (req, res, next) => {
+router.get("/getAllCartList", midway.checkToken,(req, res, next) => {
     db.executeSql("select * from products , cartlist WHERE products.id=cartlist.productid ", function (data, err) {
         if (err) {
             console.log(err);
@@ -1101,7 +1114,7 @@ router.get("/getAllCartList", (req, res, next) => {
     })
 });
 
-router.post("/removeCartDetails", (req, res, next) => {
+router.post("/removeCartDetails", midway.checkToken,(req, res, next) => {
     console.log(req.body);
     db.executeSql("Delete from cartlist where userid=" + req.body.userid + " AND id=" + req.body.id + "", function (data, err) {
         if (err) {
@@ -1111,7 +1124,7 @@ router.post("/removeCartDetails", (req, res, next) => {
         }
     });
 })
-router.get("/RemoveCategoryDetails/:id", (req, res, next) => {
+router.get("/RemoveCategoryDetails/:id", midway.checkToken,(req, res, next) => {
     console.log(req.params.id)
     db.executeSql("Delete from category where id=" + req.params.id, function (data, err) {
         if (err) {
@@ -1121,7 +1134,7 @@ router.get("/RemoveCategoryDetails/:id", (req, res, next) => {
         }
     });
 })
-router.get("/GetAllCategoryList", (req, res, next) => {
+router.get("/GetAllCategoryList", midway.checkToken,(req, res, next) => {
     db.executeSql("select * from category", function (data, err) {
         if (err) {
             console.log(err);
@@ -1130,7 +1143,7 @@ router.get("/GetAllCategoryList", (req, res, next) => {
         }
     })
 });
-router.post("/SaveProductsList", (req, res, next) => {
+router.post("/SaveProductsList", midway.checkToken,(req, res, next) => {
     console.log(req.body)
     db.executeSql("INSERT INTO `products`(`name`, `image`, `category`, `price`, `quantity`, `purchasedate`, `vendorname`, `vendorcontact`, `descripition`, `isactive`, `createddate`,`display`) VALUES ('" + req.body.name + "','" + req.body.image + "','" + req.body.category + "','" + req.body.price + "','" + req.body.quantity + "','" + req.body.purchasedate + "','" + req.body.vendorname + "','" + req.body.vendorcontact + "','" + req.body.descripition + "',true,CURRENT_TIMESTAMP," + req.body.display + ");", function (data, err) {
         if (err) {
@@ -1148,7 +1161,7 @@ router.post("/SaveProductsList", (req, res, next) => {
     return res.json('success');
 
 });
-router.get("/GetAllProductsList", (req, res, next) => {
+router.get("/GetAllProductsList", midway.checkToken,(req, res, next) => {
     db.executeSql("select * from products", function (data, err) {
         if (err) {
             console.log(err);
@@ -1157,7 +1170,7 @@ router.get("/GetAllProductsList", (req, res, next) => {
         }
     })
 });
-router.get("/GetActiveProducts", (req, res, next) => {
+router.get("/GetActiveProducts", midway.checkToken,(req, res, next) => {
     db.executeSql("select * from products where display=true", function (data, err) {
         if (err) {
             console.log(err);
@@ -1167,7 +1180,7 @@ router.get("/GetActiveProducts", (req, res, next) => {
     })
 });
 
-router.get("/RemoveProductDetails/:id", (req, res, next) => {
+router.get("/RemoveProductDetails/:id", midway.checkToken,(req, res, next) => {
 
     db.executeSql("Delete from products where id=" + req.params.id, function (data, err) {
         if (err) {
@@ -1177,7 +1190,7 @@ router.get("/RemoveProductDetails/:id", (req, res, next) => {
         }
     });
 })
-router.post("/UploadProductImage", (req, res, next) => {
+router.post("/UploadProductImage", midway.checkToken,(req, res, next) => {
     var imgname = generateUUID();
 
     const storage = multer.diskStorage({
@@ -1213,7 +1226,7 @@ router.post("/UploadProductImage", (req, res, next) => {
     });
 });
 
-router.post("/UploadMultiProductImage", (req, res, next) => {
+router.post("/UploadMultiProductImage", midway.checkToken,(req, res, next) => {
     var imgname = generateUUID();
 
     const storage = multer.diskStorage({
@@ -1248,7 +1261,7 @@ router.post("/UploadMultiProductImage", (req, res, next) => {
     });
 });
 
-router.get("/RemoveRecentUoloadImage", midway.checkToken, (req, res, next) => {
+router.get("/RemoveRecentUoloadImage", midway.checkToken, midway.checkToken,(req, res, next) => {
     console.log(req.body);
     db.executeSql("SELECT * FROM images ORDER BY createddate DESC LIMIT 1", function (data, err) {
         if (err) {
@@ -1259,7 +1272,7 @@ router.get("/RemoveRecentUoloadImage", midway.checkToken, (req, res, next) => {
     });
 })
 
-router.get("/CourosalImage/:id", (req, res, next) => {
+router.get("/CourosalImage/:id", midway.checkToken,(req, res, next) => {
     console.log(req.body);
     db.executeSql("SELECT * FROM images, products WHERE  images.productid = products.id AND productid=" + req.params.id, function (data, err) {
         if (err) {
@@ -1269,7 +1282,7 @@ router.get("/CourosalImage/:id", (req, res, next) => {
         }
     });
 })
-router.get("/GetCartDataByID/:id", (req, res, next) => {
+router.get("/GetCartDataByID/:id", midway.checkToken,(req, res, next) => {
     db.executeSql("select c.id,c.userid,c.productid,c.quantity,c.price,c.createddate,p.id as Pid,p.name,p.image,p.category,p.price,p.quantity as pquantity,p.vendorname,p.vendorcontact,p.descripition,p.isactive from cartlist c join products p on c.productid=p.id  WHERE c.productid=p.id AND c.userid=" + req.params.id, function (data, err) {
         if (err) {
             console.log("Error in store.js", err);
@@ -1278,7 +1291,7 @@ router.get("/GetCartDataByID/:id", (req, res, next) => {
         }
     });
 })
-router.post("/UpdateProductList", (req, res, next) => {
+router.post("/UpdateProductList", midway.checkToken,(req, res, next) => {
     console.log(req.body)
     db.executeSql("UPDATE `products` SET name='" + req.body.name + "',descripition='" + req.body.descripition + "',category='" + req.body.category + "',purchasedate='" + req.body.purchasedate + "',quantity=" + req.body.quantity + ",price=" + req.body.price + ",vendorname='" + req.body.vendorname + "',display=" + req.body.display + ",updateddate=CURRENT_TIMESTAMP where id=" + req.body.id + ";", function (data, err) {
         if (err) {
@@ -1288,7 +1301,7 @@ router.post("/UpdateProductList", (req, res, next) => {
         }
     });
 })
-router.post("/Verification", (req, res, next) => {
+router.post("/Verification", midway.checkToken,(req, res, next) => {
     let otp = Math.floor(100000 + Math.random() * 900000);
     db.executeSql("INSERT INTO `otp`(`otp`,`createddate`,`createdtime`,`role`,`isactive`,`email`) VALUES (" + otp + ",CURRENT_TIMESTAMP,CURRENT_TIMESTAMP,'" + req.body.role + "',true,'" + req.body.email + "')", function (data1, err) {
         if (err) {
@@ -1304,7 +1317,7 @@ router.post("/Verification", (req, res, next) => {
     })
 });
 
-router.post("/GetRegisterOtp", (req, res, next) => {
+router.post("/GetRegisterOtp",(req, res, next) => {
     console.log(req.body)
     db.executeSql("select * from otp where email = '" + req.body.email + "'", function (data, err) {
         if (err) {
@@ -1317,7 +1330,7 @@ router.post("/GetRegisterOtp", (req, res, next) => {
 
 });
 
-router.post("/SaveUserCustomerList", (req, res, next) => {
+router.post("/SaveUserCustomerList",(req, res, next) => {
     var salt = '7fa73b47df808d36c5fe328546ddef8b9011b2c6';
     var repass = salt + '' + req.body.password;
     var encPassword = crypto.createHash('sha1').update(repass).digest('hex');
@@ -1337,7 +1350,7 @@ router.post("/SaveUserCustomerList", (req, res, next) => {
     });
 });
 
-router.post("/SaveVendorList", (req, res, next) => {
+router.post("/SaveVendorList", midway.checkToken,(req, res, next) => {
     console.log(req.body)
     db.executeSql("INSERT INTO `vendor`( `fname`, `gst`, `contact`, `whatsapp`, `address`, `city`, `pincode`, `isactive`, `createdate`, `updatedate`) VALUES ('" + req.body.fname + "','" + req.body.gst + "','" + req.body.contact + "','" + req.body.whatsapp + "','" + req.body.address + "','" + req.body.city + "'," + req.body.pincode + ",true,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP);", function (data, err) {
         if (err) {
@@ -1348,7 +1361,7 @@ router.post("/SaveVendorList", (req, res, next) => {
         }
     });
 });
-router.get("/GetAllVendor", (req, res, next) => {
+router.get("/GetAllVendor", midway.checkToken,(req, res, next) => {
     db.executeSql("select * from vendor", function (data, err) {
         if (err) {
             console.log(err);
@@ -1358,7 +1371,7 @@ router.get("/GetAllVendor", (req, res, next) => {
     })
 });
 
-router.post("/RemoveVendorList", (req, res, next) => {
+router.post("/RemoveVendorList", midway.checkToken,(req, res, next) => {
 
     console.log(req.body);
     db.executeSql("Delete from vendor where id=" + req.body.id, function (data, err) {
@@ -1370,7 +1383,7 @@ router.post("/RemoveVendorList", (req, res, next) => {
     });
 })
 
-router.post("/UpdateVendorList", (req, res, next) => {
+router.post("/UpdateVendorList", midway.checkToken,(req, res, next) => {
     db.executeSql("UPDATE `vendor` SET fname='" + req.body.fname + "',gst='" + req.body.gst + "',contact='" + req.body.contact + "',whatsapp='" + req.body.whatsapp + "',address='" + req.body.address + "',city='" + req.body.city + "',updatedate=CURRENT_TIMESTAMP WHERE id=" + req.body.id + ";", function (data, err) {
         if (err) {
             console.log("Error in store.js", err);
@@ -1379,7 +1392,7 @@ router.post("/UpdateVendorList", (req, res, next) => {
         }
     });
 });
-router.get("/GetCustDetails", (req, res, next) => {
+router.get("/GetCustDetails", midway.checkToken,(req, res, next) => {
     db.executeSql("select c.fname,c.lname,c.contact,c.whatsapp,c.email,c.gender from customer c where custid = id" + req.body.id + "", function (data, err) {
         if (err) {
             console.log(err);
@@ -1389,7 +1402,7 @@ router.get("/GetCustDetails", (req, res, next) => {
     });
 })
 
-router.post("/GetCustomerDataById", (req, res, next) => {
+router.post("/GetCustomerDataById", midway.checkToken,(req, res, next) => {
     console.log(req.body)
     db.executeSql("select * from customer where id = " + req.body.id + "", function (data, err) {
         if (err) {
@@ -1399,7 +1412,7 @@ router.post("/GetCustomerDataById", (req, res, next) => {
         }
     });
 });
-// router.post("/GetCustomerTotalPoints", (req, res, next) => {
+// router.post("/GetCustomerTotalPoints", midway.checkToken,(req, res, next) => {
 //     db.executeSql("select * from point where custid = " + req.body.id + "", function (data, err) {
 //         if (err) {
 //             console.log("Error in store.js", err);
@@ -1410,7 +1423,7 @@ router.post("/GetCustomerDataById", (req, res, next) => {
 // })
 
 
-router.post("/UploadBannersImage", (req, res, next) => {
+router.post("/UploadBannersImage", midway.checkToken,(req, res, next) => {
     var imgname = generateUUID();
 
     const storage = multer.diskStorage({
@@ -1446,7 +1459,7 @@ router.post("/UploadBannersImage", (req, res, next) => {
     });
 });
 
-router.post("/SaveWebBanners", (req, res, next) => {
+router.post("/SaveWebBanners", midway.checkToken,(req, res, next) => {
     console.log(req.body);
     db.executeSql("INSERT INTO `webbanners`(`name`,`bannersimage`,`status`)VALUES('" + req.body.name + "','" + req.body.bannersimage + "'," + req.body.status + ");", function (data, err) {
         if (err) {
@@ -1457,7 +1470,7 @@ router.post("/SaveWebBanners", (req, res, next) => {
     });
 });
 
-router.get("/GetWebBanners", (req, res, next) => {
+router.get("/GetWebBanners", midway.checkToken,(req, res, next) => {
     console.log("call-4");
     console.log(req.body.id)
     db.executeSql("select * from webbanners ", function (data, err) {
@@ -1469,7 +1482,7 @@ router.get("/GetWebBanners", (req, res, next) => {
     });
 });
 
-router.post("/RemoveWebBanners", (req, res, next) => {
+router.post("/RemoveWebBanners", midway.checkToken,(req, res, next) => {
     console.log(req.id)
     db.executeSql("Delete from webbanners where id=" + req.body.id, function (data, err) {
         if (err) {
@@ -1480,7 +1493,7 @@ router.post("/RemoveWebBanners", (req, res, next) => {
     });
 });
 
-router.post("/UpdateActiveWebBanners", (req, res, next) => {
+router.post("/UpdateActiveWebBanners", midway.checkToken,(req, res, next) => {
     console.log(req.body)
     db.executeSql("UPDATE  `webbanners` SET status=" + req.body.status + " WHERE id=" + req.body.id + ";", function (data, err) {
         if (err) {
@@ -1490,7 +1503,7 @@ router.post("/UpdateActiveWebBanners", (req, res, next) => {
         }
     });
 });
-router.post("/UpdateActiveOffers", (req, res, next) => {
+router.post("/UpdateActiveOffers", midway.checkToken,(req, res, next) => {
     console.log(req.body)
     db.executeSql("UPDATE  `OFFER` SET status=" + req.body.status + " WHERE id=" + req.body.id + ";", function (data, err) {
         if (err) {
@@ -1500,7 +1513,7 @@ router.post("/UpdateActiveOffers", (req, res, next) => {
         }
     });
 });
-router.get("/GetWebBanner", (req, res, next) => {
+router.get("/GetWebBanner", midway.checkToken,(req, res, next) => {
     db.executeSql("select * from webbanners where status=1", function (data, err) {
         if (err) {
             console.log("Error in store.js", err);
@@ -1510,7 +1523,7 @@ router.get("/GetWebBanner", (req, res, next) => {
     });
 });
 // let secret = 'prnv';
-router.post('/login', function (req, res, next) {
+router.post('/login', (req, res, next)=> {
 
     const body = req.body;
     console.log(body);
@@ -1548,7 +1561,7 @@ router.post('/login', function (req, res, next) {
     });
 
 });
-router.post("/removeLastInsertedOTP", (req, res, next) => {
+router.post("/removeLastInsertedOTP", midway.checkToken,(req, res, next) => {
     console.log(req.body)
     db.executeSql("Delete from otp where email='" + req.body.email + "'", function (data, err) {
         if (err) {
@@ -1558,171 +1571,9 @@ router.post("/removeLastInsertedOTP", (req, res, next) => {
         }
     });
 })
-let secret = 'prnv';
-router.post('/GetUsersLogin', function (req, res, next) {
-    const body = req.body;
-    var salt = '7fa73b47df808d36c5fe328546ddef8b9011b2c6';
-    var repass = salt + '' + body.password;
-    var encPassword = crypto.createHash('sha1').update(repass).digest('hex');
-    db.executeSql("select * from users where email='" + req.body.email + "';", function (data, err) {
-        console.log(data);
-        if (data == null || data == undefined || data.length === 0) {
-            return res.json(1);
-        } else {
-            // var time = get_time_diff;
-            // console.log(time);
-            db.executeSql("select * from users where email='" + req.body.email + "' and password='" + encPassword + "';", function (data1, err) {
-                if (data1.length > 0) {
-                    module.exports.user1 = {
-                        username: data1[0].email,
-                        password: data1[0].password
-                    }
-                    let token = jwt.sign({ username: data1[0].email, password: data1[0].password },
-                        secret, {
-                        expiresIn: '1h' // expires in 24 hours
-                    }
-                    );
-                    console.log("token=", token);
 
 
-                    res.cookie('auth', token);
-                    if (data1[0].role == 'Admin') {
-                        let resdata = [];
-                        db.executeSql("select * from admin where uid=" + data1[0].userid, function (data2, err) {
-                            if (err) {
-                                console.log(err);
-                            } else {
-                                resdata.push(data2[0]);
-                                resdata[0].token = token;
-                                resdata[0].role = data1[0].role;
-                                resdata[0].last_login = data1[0].out_time;
-                                resdata[0].last_inTime = data1[0].in_time;
-                                db.executeSql("UPDATE  `users` SET status=true,in_time=CURRENT_TIMESTAMP WHERE userid=" + data1[0].userid, function (msg, err) {
-                                    if (err) {
-                                        console.log("Error in store.js", err);
-                                    } else { }
-                                });
-                                return res.json(resdata);
-                            }
-                        })
-
-                    } else if (data1[0].role == 'Customer') {
-                        console.log('helllllllll')
-                        let resdata1 = [];
-                        db.executeSql("select * from customer where uid=" + data1[0].userid, function (data3, err) {
-                            if (err) {
-                                console.log("data");
-                                console.log(err);
-                            } else {
-                                console.log(data1[0].userid)
-                                resdata1.push(data3[0]);
-                                resdata1[0].token = token;
-                                resdata1[0].role = data1[0].role;
-                                resdata1[0].last_login = data1[0].out_time;
-                                resdata1[0].last_inTime = data1[0].in_time;
-
-                                db.executeSql("UPDATE  `users` SET status=true,in_time=CURRENT_TIMESTAMP WHERE userid=" + data1[0].userid, function (msg, err) {
-                                    if (err) {
-                                        console.log("Error in store.js", err);
-                                    } else { }
-                                });
-                                return res.json(resdata1);
-                            }
-                        })
-                    }
-                    else if (data1[0].role == 'Sub-Admin') {
-                        let resdata5 = [];
-                        db.executeSql("select * from admin where uid=" + data1[0].userid, function (data7, err) {
-                            if (err) {
-                                console.log(err);
-                            } else {
-                                resdata5.push(data7[0]);
-                                resdata5[0].token = token;
-                                resdata5[0].role = data1[0].role;
-                                resdata5[0].last_login = data1[0].out_time;
-                                resdata5[0].last_inTime = data1[0].in_time;
-                                db.executeSql("UPDATE  `users` SET status=true,in_time=CURRENT_TIMESTAMP WHERE userid=" + data1[0].userid, function (msg, err) {
-                                    if (err) {
-                                        console.log("Error in store.js", err);
-                                    } else { }
-                                });
-                                return res.json(resdata5);
-                            }
-                        })
-
-                    }
-                    // else if (data1[0].role == 'Student') {
-                    //     let resdata2 = [];
-                    //     db.executeSql("select * from studentlist where uid=" + data1[0].userid, function (data4, err) {
-                    //         if (err) {
-                    //             console.log(err);
-                    //         } else {
-                    //             resdata2.push(data4[0]);
-                    //             resdata2[0].token = token;
-                    //             resdata2[0].role = data1[0].role;
-                    //             resdata2[0].last_login = data1[0].out_time;
-                    //             resdata2[0].last_inTime = data1[0].in_time;
-                    //             db.executeSql("UPDATE  `users` SET status=true,in_time=CURRENT_TIMESTAMP WHERE userid=" + data1[0].userid, function (msg, err) {
-                    //                 if (err) {
-                    //                     console.log("Error in store.js", err);
-                    //                 } else { }
-                    //             });
-                    //             return res.json(resdata2);
-                    //         }
-                    //     })
-                    // } else if (data1[0].role == 'Visitor') {
-                    //     let resdata3 = [];
-                    //     db.executeSql("select * from visitorreg where uid=" + data1[0].userid, function (data5, err) {
-                    //         if (err) {
-                    //             console.log(err);
-                    //         } else {
-                    //             resdata3.push(data5[0]);
-                    //             resdata3[0].token = token;
-                    //             resdata3[0].role = data1[0].role;
-                    //             resdata3[0].last_login = data1[0].out_time;
-                    //             resdata3[0].last_inTime = data1[0].in_time;
-                    //             db.executeSql("UPDATE  `users` SET status=true,in_time=CURRENT_TIMESTAMP WHERE userid=" + data1[0].userid, function (msg, err) {
-                    //                 if (err) {
-                    //                     console.log("Error in store.js", err);
-                    //                 } else { }
-                    //             });
-                    //             return res.json(resdata3);
-                    //         }
-                    //     })
-                    // } else if (data1[0].role == 'Parents') {
-                    //     let resdata4 = [];
-                    //     db.executeSql("select * from parentsinfo where uid=" + data1[0].userid, function (data6, err) {
-                    //         if (err) {
-                    //             console.log(err);
-                    //         } else {
-                    //             resdata4.push(data6[0]);
-                    //             resdata4[0].token = token;
-                    //             resdata4[0].role = data1[0].role;
-                    //             resdata4[0].last_login = data1[0].out_time;
-                    //             resdata4[0].last_inTime = data1[0].in_time;
-                    //             db.executeSql("UPDATE  `users` SET status=true,in_time=CURRENT_TIMESTAMP WHERE userid=" + data1[0].userid, function (msg, err) {
-                    //                 if (err) {
-                    //                     console.log("Error in store.js", err);
-                    //                 } else { }
-                    //             });
-                    //             return res.json(resdata4);
-                    //         }
-                    //     })
-                    // } 
-
-
-
-                } else {
-                    return res.json(2);
-                }
-            });
-        }
-
-    });
-
-});
-
-router.post("/UpdateLogoutDetails", (req, res, next) => {
+router.post("/UpdateLogoutDetails", midway.checkToken,(req, res, next) => {
     console.log(req.body)
     db.executeSql("UPDATE users SET status=false,out_time=CURRENT_TIMESTAMP WHERE userid=" + req.body.userid, function (msg, err) {
         if (err) {
