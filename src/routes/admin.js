@@ -27,7 +27,7 @@ const job = schedule.scheduleJob('0 0 * * *', function () {
 });
 
 
-router.post("/SaveServicesList",midway.checkToken, midway.checkToken,(req, res, next) => {
+router.post("/SaveServicesList",midway.checkToken,(req, res, next) => {
     db.executeSql("INSERT INTO `serviceslist`(`name`, `price`, `time`, `point`, `isactive`, `createdate`,`epoint`)VALUES('" + req.body.name + "'," + req.body.price + "," + req.body.time + "," + req.body.point + ",true,CURRENT_TIMESTAMP," + req.body.epoint + ");", function (data, err) {
         if (err) {
             res.json("error");
@@ -37,7 +37,7 @@ router.post("/SaveServicesList",midway.checkToken, midway.checkToken,(req, res, 
         }
     });
 });
-router.post("/SaveSalaryList",midway.checkToken, midway.checkToken,(req, res, next) => {
+router.post("/SaveSalaryList",midway.checkToken,(req, res, next) => {
     db.executeSql("INSERT INTO `salary`(`salary`, `desc`, `paiddate`, `empid`)VALUES(" + req.body.salary + " , '" + req.body.desc + "' , '" + req.body.paiddate + "' ," + req.body.empid + ");", function (data, err) {
         if (err) {
             res.json("error");
@@ -48,7 +48,7 @@ router.post("/SaveSalaryList",midway.checkToken, midway.checkToken,(req, res, ne
     });
 });
 
-router.get("/GetAllServices",midway.checkToken, midway.checkToken,(req, res, next) => {
+router.get("/GetAllServices",midway.checkToken,(req, res, next) => {
     db.executeSql("select * from serviceslist", function (data, err) {
         if (err) {
             console.log(err);
@@ -59,7 +59,7 @@ router.get("/GetAllServices",midway.checkToken, midway.checkToken,(req, res, nex
 });
 
 
-router.post("/UpdateServicesList",midway.checkToken, midway.checkToken,(req, res, next) => {
+router.post("/UpdateServicesList",midway.checkToken,(req, res, next) => {
     db.executeSql("UPDATE  `serviceslist` SET name='" + req.body.name + "',price=" + req.body.price + ",time=" + req.body.time + ",point=" + req.body.point + ",epoint=" + req.body.epoint + ",updateddate=CURRENT_TIMESTAMP WHERE id=" + req.body.id + ";", function (data, err) {
         if (err) {
             console.log("Error in store.js", err);
@@ -69,7 +69,7 @@ router.post("/UpdateServicesList",midway.checkToken, midway.checkToken,(req, res
     });
 });
 
-router.post("/UpdateSalaryList",midway.checkToken, midway.checkToken,(req, res, next) => {
+router.post("/UpdateSalaryList",midway.checkToken,(req, res, next) => {
     db.executeSql("UPDATE `salary` SET `salary`= " + req.body.salary + " ,`desc`='" + req.body.desc + "',`paiddate`='" + req.body.paiddate + "' WHERE id= " + req.body.id + ";", function (data, err) {
         if (err) {
             console.log("Error in store.js", err);
@@ -79,7 +79,7 @@ router.post("/UpdateSalaryList",midway.checkToken, midway.checkToken,(req, res, 
     });
 });
 
-router.post("/RemoveSalaryList",midway.checkToken, midway.checkToken,(req, res, next) => {
+router.post("/RemoveSalaryList",midway.checkToken,(req, res, next) => {
 
     console.log(req.body);
     db.executeSql("Delete from salary where id=" + req.body.id, function (data, err) {
@@ -91,7 +91,7 @@ router.post("/RemoveSalaryList",midway.checkToken, midway.checkToken,(req, res, 
     });
 })
 
-router.post("/SaveEmployeeList",midway.checkToken, midway.checkToken,(req, res, next) => {
+router.post("/SaveEmployeeList",midway.checkToken,(req, res, next) => {
     console.log(req.body)
     db.executeSql("INSERT INTO `employee`(`fname`,`lname`,`contact`,`whatsapp`,`address`,`city`,`pincode`,`gender`,`isactive`,`createddate`)VALUES('" + req.body.fname + "','" + req.body.lname + "','" + req.body.contact + "','" + req.body.whatsapp + "','" + req.body.address + "','" + req.body.city + "'," + req.body.pincode + ",'" + req.body.gender + "'," + req.body.isactive + ",CURRENT_TIMESTAMP);", function (data, err) {
         if (err) {
@@ -145,7 +145,7 @@ router.get("/GetEmployeeService", midway.checkToken,(req, res, next) => {
     })
 });
 
-router.post("/RemoveEmployeeList",midway.checkToken, midway.checkToken,(req, res, next) => {
+router.post("/RemoveEmployeeList",midway.checkToken,(req, res, next) => {
 
     console.log(req.body);
     db.executeSql("update `employee` set isactive='0' where id=" + req.body.id, function (data, err) {
@@ -157,7 +157,7 @@ router.post("/RemoveEmployeeList",midway.checkToken, midway.checkToken,(req, res
     });
 })
 
-router.post("/GetAllSalaryList",midway.checkToken, midway.checkToken,(req, res, next) => {
+router.post("/GetAllSalaryList",midway.checkToken,(req, res, next) => {
     console.log(req.body);
     db.executeSql("select s.id,s.salary,s.desc,s.paiddate,s.empid,e.id as eId,e.fname,e.lname,e.contact,e.whatsapp,e.address,e.city,e.pincode,e.gender from salary s join employee e on s.empid=e.id where s.empid=" + req.body.id, function (data, err) {
         if (err) {
@@ -167,7 +167,7 @@ router.post("/GetAllSalaryList",midway.checkToken, midway.checkToken,(req, res, 
         }
     })
 });
-router.get("/GetAllOrderList",midway.checkToken, midway.checkToken,(req, res, next) => {
+router.get("/GetAllOrderList",midway.checkToken,(req, res, next) => {
     db.executeSql("select o.id,o.userid,o.totalprice,o.isactive,o.orderdate,c.fname,c.lname,c.email,c.contact,c.whatsapp,c.gender,c.address,c.uid,c.vip,c.ismembership from orderlist o join customer c on o.userid=c.uid", function (data, err) {
         if (err) {
             console.log(err);
@@ -186,7 +186,7 @@ router.get("/GetAllProductOrderList/:id", midway.checkToken,(req, res, next) => 
     })
 })
 
-router.get("/RemoveCustomerOrder/:id",midway.checkToken, midway.checkToken,(req, res, next) => {
+router.get("/RemoveCustomerOrder/:id",midway.checkToken,(req, res, next) => {
     db.executeSql("DELETE FROM `orderlist` WHERE id=" + req.params.id + "", function (data, err) {
         if (err) {
             console.log(err);
@@ -202,7 +202,7 @@ router.get("/RemoveCustomerOrder/:id",midway.checkToken, midway.checkToken,(req,
         return res.json('success');
     })
 })
-router.post("/UpdateEmployeeList",midway.checkToken, midway.checkToken,(req, res, next) => {
+router.post("/UpdateEmployeeList",midway.checkToken,(req, res, next) => {
     db.executeSql("UPDATE `employee` SET fname='" + req.body.fname + "',lname='" + req.body.lname + "',contact='" + req.body.contact + "',whatsapp='" + req.body.whatsapp + "',address='" + req.body.address + "',city='" + req.body.city + "',gender='" + req.body.gender + "',updateddate=CURRENT_TIMESTAMP WHERE id=" + req.body.id + ";", function (data, err) {
         if (err) {
             console.log("Error in store.js", err);
@@ -212,7 +212,7 @@ router.post("/UpdateEmployeeList",midway.checkToken, midway.checkToken,(req, res
     });
 })
 
-router.post("/UpdateWorkingStatus",midway.checkToken, midway.checkToken,(req, res, next) => {
+router.post("/UpdateWorkingStatus",midway.checkToken,(req, res, next) => {
     db.executeSql("UPDATE `employee` SET isworking=" + req.body.isworking + " WHERE id=" + req.body.id + ";", function (data, err) {
         if (err) {
             console.log("Error in store.js", err);
@@ -222,9 +222,9 @@ router.post("/UpdateWorkingStatus",midway.checkToken, midway.checkToken,(req, re
     });
 })
 
-router.post("/SaveCustomerList",midway.checkToken, midway.checkToken,(req, res, next) => {
+router.post("/SaveCustomerList",midway.checkToken,(req, res, next) => {
     console.log(req.body)
-    db.executeSql("INSERT INTO `customer`(`fname`,`lname`,`email`,`contact`,`whatsapp`,`gender`,`createddate`,`address`,`vip`)VALUES('" + req.body.fname + "','" + req.body.lname + "','" + req.body.email + "','" + req.body.contact + "','" + req.body.whatsapp + "','" + req.body.gender + "',CURRENT_TIMESTAMP,'" + req.body.address + "'," + req.body.vip + ");", function (data, err) {
+    db.executeSql("INSERT INTO `customer`(`fname`,`lname`,`email`,`contact`,`whatsapp`,`gender`,`createddate`,`address`,`uid`,`vip`)VALUES('" + req.body.fname + "','" + req.body.lname + "','" + req.body.email + "','" + req.body.contact + "','" + req.body.whatsapp + "','" + req.body.gender + "',CURRENT_TIMESTAMP,'" + req.body.address + "',"+req.body.uid+"," + req.body.vip + ");", function (data, err) {
         if (err) {
             console.log(err)
         } else {
@@ -234,7 +234,7 @@ router.post("/SaveCustomerList",midway.checkToken, midway.checkToken,(req, res, 
 });
 
 
-router.get("/GetAllCustomer",midway.checkToken, midway.checkToken,(req, res, next) => {
+router.get("/GetAllCustomer",midway.checkToken,(req, res, next) => {
     db.executeSql("select * from customer", function (data, err) {
         if (err) {
             console.log(err);
@@ -244,7 +244,7 @@ router.get("/GetAllCustomer",midway.checkToken, midway.checkToken,(req, res, nex
     })
 });
 
-router.get("/GetAllOffer",midway.checkToken, midway.checkToken,(req, res, next) => {
+router.get("/GetAllOffer",midway.checkToken,(req, res, next) => {
     db.executeSql("select * from offer", function (data, err) {
         if (err) {
             console.log(err);
@@ -253,7 +253,7 @@ router.get("/GetAllOffer",midway.checkToken, midway.checkToken,(req, res, next) 
         }
     })
 });
-router.post("/SaveOfferList",midway.checkToken, midway.checkToken,(req, res, next) => {
+router.post("/SaveOfferList",midway.checkToken,(req, res, next) => {
     console.log(req.body)
     if(req.body.id != null && req.body.id != undefined){
         db.executeSql("delete from offer where id="+req.body.id,function(data1,err){
@@ -294,7 +294,7 @@ router.post("/SaveOfferList",midway.checkToken, midway.checkToken,(req, res, nex
 
 });
 
-router.post("/GetUsedServicesByOffer",midway.checkToken, midway.checkToken,(req, res, next) => {
+router.post("/GetUsedServicesByOffer",midway.checkToken,(req, res, next) => {
 
     db.executeSql("select s.offerid,s.servicesname,s.offername,s.offerprice,sl.id as slId,sl.offerid,sl.servicesname,sl.offername,sl.offerprice from offerservices s join serviceslist sl on s.servicesid=sl.id where s.offerappointmentid = " + req.body.id + "", function (data, err) {
         if (err) {
@@ -304,7 +304,7 @@ router.post("/GetUsedServicesByOffer",midway.checkToken, midway.checkToken,(req,
         }
     });
 })
-router.post("/SaveAcceptUserOrder",midway.checkToken, midway.checkToken,(req, res, next) => {
+router.post("/SaveAcceptUserOrder",midway.checkToken,(req, res, next) => {
 
     db.executeSql("UPDATE `orderlist` SET isactive=false,updateddate=CURRENT_TIMESTAMP WHERE id = " + req.body.id + "", function (data, err) {
         if (err) {
@@ -325,7 +325,7 @@ router.get("/removeOfferDetails/:id", midway.checkToken,(req, res, next) => {
     });
 })
 
-router.get("/GetActiveOffer",midway.checkToken, midway.checkToken,(req, res, next) => {
+router.get("/GetActiveOffer",midway.checkToken,(req, res, next) => {
     db.executeSql("select * from offer where status=true", function (data, err) {
         if (err) {
             console.log(err);
@@ -334,7 +334,7 @@ router.get("/GetActiveOffer",midway.checkToken, midway.checkToken,(req, res, nex
         }
     })
 });
-router.post("/getAllOfferDataList",midway.checkToken, midway.checkToken,(req, res, next) => {
+router.post("/getAllOfferDataList",midway.checkToken,(req, res, next) => {
 
     db.executeSql("select * from offerservices where offerid = " + req.body.id + "", function (data, err) {
         if (err) {
@@ -344,7 +344,7 @@ router.post("/getAllOfferDataList",midway.checkToken, midway.checkToken,(req, re
         }
     });
 })
-router.post("/SaveMembershipList",midway.checkToken, midway.checkToken,(req, res, next) => {
+router.post("/SaveMembershipList",midway.checkToken,(req, res, next) => {
     console.log(req.body)
 
     db.executeSql("INSERT INTO `membership`(`membershipname`,`membershipdiscount`,`totalprice`,`membershipprice`,`status`)VALUES('" + req.body.membershipname + "'," + req.body.membershipdiscount + "," + req.body.totalprice + "," + req.body.membershipprice + ",true);", function (data, err) {
@@ -378,7 +378,7 @@ router.post("/GetUsedServicesByMembership", midway.checkToken,(req, res, next) =
         }
     });
 })
-router.get("/removeMembershipDetails/:id",midway.checkToken, midway.checkToken,(req, res, next) => {
+router.get("/removeMembershipDetails/:id",midway.checkToken,(req, res, next) => {
 
     db.executeSql("Delete from membership where id=" + req.params.id, function (data, err) {
         if (err) {
@@ -398,6 +398,7 @@ router.get("/GetAllMembership", midway.checkToken,(req, res, next) => {
     })
 });
 router.post("/SaveAppointmentList", midway.checkToken,(req, res, next) => {
+    console.log('save appt');
     console.log(req.body)
     var checkdate = req.body.selectdate;
 
@@ -408,7 +409,7 @@ router.post("/SaveAppointmentList", midway.checkToken,(req, res, next) => {
                     console.log(err)
                 } else {
                     for (let i = 0; i < req.body.selectedService.length; i++) {
-                        db.executeSql("INSERT INTO `custservices`(`servicesid`,`servicesname`,`custid`,`appointmentid`,`employeename`,`empid`) VALUES(" + req.body.selectedService[i].selectedServid + ",'" + req.body.selectedService[i].servicesname + "'," + req.body.custid + "," + data.insertId + ",'" + req.body.selectedService[i].employeename + "'," + req.body.selectedService[i].selectedEmpid + ");", function (data1, err) {
+                        db.executeSql("INSERT INTO `custservices`(`servicesid`,`servicesname`,`custid`,`appointmentid`,`employeename`,`empid`) VALUES(" + req.body.selectedService[i].selectedServid + ",'" + req.body.selectedService[i].selectedServ + "'," + req.body.custid + "," + data.insertId + ",'" + req.body.selectedService[i].selectedEmp + "'," + req.body.selectedService[i].selectedEmpid + ");", function (data1, err) {
                             if (err) {
                                 console.log(err);
                             } else { }
@@ -443,7 +444,7 @@ router.post("/SaveAppointmentList", midway.checkToken,(req, res, next) => {
                     console.log(err)
                 } else {
                     for (let i = 0; i < req.body.selectedService.length; i++) {
-                        db.executeSql("INSERT INTO `custservices`(`servicesid`,`servicesname`,`custid`,`appointmentid`,`employeename`,`empid`) VALUES(" + req.body.selectedService[i].selectedServid + ",'" + req.body.selectedService[i].servicesname + "'," + req.body.custid + "," + data.insertId + ",'" + req.body.selectedService[i].employeename + "'," + req.body.selectedService[i].selectedEmpid + ");", function (data1, err) {
+                        db.executeSql("INSERT INTO `custservices`(`servicesid`,`servicesname`,`custid`,`appointmentid`,`employeename`,`empid`) VALUES(" + req.body.selectedService[i].selectedServid + ",'" + req.body.selectedService[i].selectedServ + "'," + req.body.custid + "," + data.insertId + ",'" + req.body.selectedService[i].selectedEmp + "'," + req.body.selectedService[i].selectedEmpid + ");", function (data1, err) {
                             if (err) {
                                 console.log(err);
                             } else { }
@@ -478,7 +479,7 @@ router.post("/SaveAppointmentList", midway.checkToken,(req, res, next) => {
                 console.log(err)
             } else {
                 for (let i = 0; i < req.body.selectedService.length; i++) {
-                    db.executeSql("INSERT INTO `custservices`(`servicesid`,`servicesname`,`custid`,`appointmentid`,`employeename`,`empid`) VALUES(" + req.body.selectedService[i].selectedServid + ",'" + req.body.selectedService[i].servicesname + "'," + req.body.custid + "," + data.insertId + ",'" + req.body.selectedService[i].employeename + "'," + req.body.selectedService[i].selectedEmpid + ");", function (data1, err) {
+                    db.executeSql("INSERT INTO `custservices`(`servicesid`,`servicesname`,`custid`,`appointmentid`,`employeename`,`empid`) VALUES(" + req.body.selectedService[i].selectedServid + ",'" + req.body.selectedService[i].selectedServ + "'," + req.body.custid + "," + data.insertId + ",'" + req.body.selectedService[i].selectedEmp + "'," + req.body.selectedService[i].selectedEmpid + ");", function (data1, err) {
                         if (err) {
                             console.log(err);
                         } else { }
@@ -842,18 +843,23 @@ router.post("/GetAllCustomerDataList", midway.checkToken,(req, res, next) => {
 })
 
 router.post("/GetCustomerById", midway.checkToken,(req, res, next) => {
-    db.executeSql("select * from customer where uid=" + req.body.id + "", function (data, err) {
+    console.log("testing");
+    console.log(req.body.id);
+    db.executeSql("select * from customer where id=" + req.body.id + "", function (data, err) {
         if (err) {
             console.log(err);
         } else {
+            console.log('tesing get cust');
+            console.log(data);
             if (data.length > 0) {
                 db.executeSql("select * from appointment where custid = " + data[0].id + "", function (data1, err) {
                     if (err) {
                         console.log("Error in store.js", err);
                     } else {
-
+                        console.log(data1);
+                        return res.json(data1);
                     }
-                    return res.json(data1);
+                    
                 });
             } else {
                 res.json('customer not found');
@@ -873,7 +879,7 @@ router.post("/SaveRatingsDetails", midway.checkToken,(req, res, next) => {
     });
 })
 router.post("/GetUsedServicesByCustomer", midway.checkToken,(req, res, next) => {
-
+    console.log(req.body);
     db.executeSql("select s.servicesid,s.servicesname,s.custid,s.appointmentid,s.employeename,s.empid,sl.id as slId,sl.price,sl.time,sl.point from custservices s join serviceslist sl on s.servicesid=sl.id where s.appointmentid = " + req.body.id + "", function (data, err) {
         if (err) {
             console.log("Error in store.js", err);
