@@ -3,7 +3,6 @@ let jwt = require('jsonwebtoken');
 let user = require('./authenticate');
 const db = require("../db/db");
 
-//To check buyer and seller authentication token
 let checkToken = (req, res, next) => {
   let token = req.headers['x-access-token'] || req.headers['authorization'];
   if (token) {
@@ -17,8 +16,9 @@ let checkToken = (req, res, next) => {
       else {
         if (user.user != undefined) {
           if ((user.user.username == decoded.username) && (user.user.password == decoded.password)) {
-              console.log("asasasa");
               req.decoded = decoded;
+              console.log("token checked");
+
               next();
           }
           else {

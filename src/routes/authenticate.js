@@ -9,8 +9,9 @@ router.post('/GetUsersLogin',(req, res, next)=> {
     console.log(req.body);
     const body = req.body;
     var salt = '7fa73b47df808d36c5fe328546ddef8b9011b2c6';
-    var repass = salt + '' + body.password;
+    var repass = salt + '' + req.body.password;
     var encPassword = crypto.createHash('sha1').update(repass).digest('hex');
+    console.log(encPassword)
     db.executeSql("select * from users where email='"+req.body.email+"';", function (data, err) {
         console.log(data);
         if(err){
