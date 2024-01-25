@@ -255,7 +255,6 @@ router.get("/GetAllOffer", midway.checkToken, (req, res, next) => {
     })
 });
 router.post("/SaveOfferList", midway.checkToken, (req, res, next) => {
-    console.log(req.body)
     if (req.body.id != null && req.body.id != undefined) {
         db.executeSql("delete from offer where id=" + req.body.id, function (data1, err) {
             db.executeSql("INSERT INTO `offer`(`offername`,`totalprice`,`offerprice`,`percentage`,`status`)VALUES('" + req.body.offername + "'," + req.body.totalprice + "," + req.body.offerprice + "," + req.body.percentage + ",true);", function (data, err) {
@@ -280,7 +279,7 @@ router.post("/SaveOfferList", midway.checkToken, (req, res, next) => {
                 console.log(err)
             } else {
                 for (let i = 0; i < req.body.services.length; i++) {
-                    db.executeSql("INSERT INTO `offerservices`(`offerid`,`serviceId`,`servicesname`,`totalprice`,`offername`,`offerprice`) VALUES(" + data.insertId + "," + req.body.services[i].selectedServid + ",'" + req.body.services[i].selectedServ + "'," + req.body.totalprice + ",'" + req.body.offername + "'," + req.body.offerprice + ");", function (data1, err) {
+                    db.executeSql("INSERT INTO `offerservices`(`offerid`,`serviceId`,`servicesname`,`totalprice`,`offername`,`offerprice`) VALUES(" + data.insertId + "," + req.body.services[i].selectedServid + ",'" + req.body.services[i].servicesname + "'," + req.body.totalprice + ",'" + req.body.offername + "'," + req.body.offerprice + ");", function (data1, err) {
                         if (err) {
                             console.log(err);
                         } else { }
@@ -290,9 +289,6 @@ router.post("/SaveOfferList", midway.checkToken, (req, res, next) => {
             return res.json('success');
         });
     }
-
-
-
 });
 
 router.post("/GetUsedServicesByOffer", midway.checkToken, (req, res, next) => {
