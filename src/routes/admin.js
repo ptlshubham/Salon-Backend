@@ -2396,6 +2396,45 @@ router.get("/GetWebBanner", midway.checkToken, (req, res, next) => {
     }
   );
 });
+
+router.post("/SaveRegistrationList", midway.checkToken, (req, res, next) => {
+  console.log(req.body, "saloonlist");
+  db.executeSql("INSERT INTO `saloonlist`(`sname`, `sconatct`, `semail`, `gst`, `address`, `landmark`, `state`, `city`, `pincode`, `oname`, `ocontact`, `oemail`, `gender`, `websitelink`, `subscription`, `status`, `createddate`) VALUES ('" + req.body.saloonname + "','" + req.body.saloonContact + "','" + req.body.saloonemail + "','" + req.body.gst + "','" + req.body.saloonAddress + "','" + req.body.landmark + "','" + req.body.selectState + "','" + req.body.city + "','" + req.body.pincode + "','" + req.body.ownername + "','" + req.body.contactOwner + "','" + req.body.ownerEmail + "','" + req.body.selectGender + "','" + req.body.webLink + "','" + req.body.selectSocialLink + "',true,CURRENT_TIMESTAMP);", function (data, err) {
+    if (err) {
+      res.json("error");
+    } else {
+      return res.json(data);
+    }
+  }
+  );
+});
+
+router.get("/GetAllRegistration", midway.checkToken, (req, res, next) => {
+  db.executeSql("select * from saloonlist", function (data, err) {
+    if (err) {
+      console.log(err);
+    } else {
+      return res.json(data);
+    }
+  });
+});
+
+
+router.get("/RemoveRegistrationDetails/:id", midway.checkToken, (req, res, next) => {
+  console.log(req.body);
+  db.executeSql(
+    "Delete from saloonlist where id=" + req.body.id,
+    function (data, err) {
+      if (err) {
+        console.log("Error in store.js", err);
+      } else {
+        return res.json(data);
+      }
+    }
+  );
+});
+
+
 // let secret = 'prnv';
 router.post("/login", (req, res, next) => {
   const body = req.body;
