@@ -562,19 +562,16 @@ router.post("/SaveMembershipList", midway.checkToken, (req, res, next) => {
   }
 
 });
-router.post(
-  "/GetUsedServicesByMembership",
-  midway.checkToken,
-  (req, res, next) => {
-    db.executeSql("SELECT * FROM `membershipservices` WHERE membershipid=" + req.body.id + "", function (data, err) {
-      if (err) {
-        console.log("Error in store.js", err);
-      } else {
-        return res.json(data);
-      }
+router.post("/GetUsedServicesByMembership", midway.checkToken, (req, res, next) => {
+  db.executeSql("SELECT * FROM `membershipservices` WHERE membershipid=" + req.body.id + "", function (data, err) {
+    if (err) {
+      console.log("Error in store.js", err);
+    } else {
+      return res.json(data);
     }
-    );
   }
+  );
+}
 );
 router.get(
   "/removeMembershipDetails/:id",
@@ -1668,38 +1665,18 @@ router.post("/SavePlaceOrderList", midway.checkToken, (req, res, next) => {
 });
 router.post("/SavePurchaseServiceList", midway.checkToken, (req, res, next) => {
   db.executeSql(
-    "UPDATE `customer` SET ismembership=true WHERE id=" + req.body.cid + "",
-    function (data, err) {
+    "UPDATE `customer` SET ismembership=true WHERE id=" + req.body.cid + "", function (data, err) {
       if (err) {
         console.log(err);
       } else {
         for (let i = 0; i < req.body.services.length; i++) {
           db.executeSql(
-            "INSERT INTO `purchasedmembership`(`cid`, `memid`, `serid`, `sname`, `quntity`, `tprice`, `discount`, `dprice`, `isactive`, `createddate`) VALUES (" +
-            req.body.cid +
-            "," +
-            req.body.memid +
-            "," +
-            req.body.services[i].serviceid +
-            ",'" +
-            req.body.services[i].servicesname +
-            "'," +
-            req.body.services[i].quantity +
-            "," +
-            req.body.tprice +
-            "," +
-            req.body.discount +
-            "," +
-            req.body.dprice +
-            "," +
-            req.body.isactive +
-            ",CURRENT_TIMESTAMP);",
-            function (data1, err) {
+            "INSERT INTO `purchasedmembership`(`cid`, `memid`, `serid`, `sname`, `quntity`, `tprice`, `discount`, `dprice`, `isactive`, `createddate`)VALUES(" + req.body.cid + "," + req.body.memid + "," + req.body.services[i].serviceid + ",'" + req.body.services[i].servicesname + "'," + req.body.services[i].quantity + "," + req.body.tprice + "," + req.body.discount + "," + req.body.dprice + "," + req.body.isactive + ",CURRENT_TIMESTAMP);", function (data1, err) {
               if (err) {
                 console.log("Error in store.js", err);
               } else {
                 if (i == req.body.services.length - 1) {
-                  res.json(data1);
+                  res.json("success");
                 }
               }
             }
@@ -1726,41 +1703,36 @@ router.get(
     );
   }
 );
-router.post(
-  "/GetMembershipPurchasedByID",
-  midway.checkToken,
-  (req, res, next) => {
-    db.executeSql(
-      "SELECT * FROM purchasedmembership where cid=" +
-      req.body.cid +
-      " AND memid=" +
-      req.body.memid +
-      "",
-      function (data, err) {
-        if (err) {
-          console.log(err);
-        } else {
-          return res.json(data);
-        }
-      }
-    );
-  }
-);
-
-router.post("/GetActivatedMembership", midway.checkToken, (req, res, next) => {
-  db.executeSql(
-    "SELECT * FROM purchasedmembership where cid=" +
-    req.body.id +
-    " AND isactive=true",
-    function (data, err) {
-      if (err) {
-        console.log(err);
-      } else {
-        return res.json(data);
-      }
+router.post("/GetMembershipPurchasedByID", midway.checkToken, (req, res, next) => {
+  db.executeSql("SELECT * FROM purchasedmembership where cid=" + req.body.cid + " AND memid=" + req.body.memid + "", function (data, err) {
+    if (err) {
+      console.log(err);
+    } else {
+      return res.json(data);
     }
-  );
+  });
 });
+
+router.get("/GetAllActiveMembership", midway.checkToken, (req, res, next) => {
+  db.executeSql("SELECT * FROM membership where status=true", function (data, err) {
+    if (err) {
+      console.log(err);
+    } else {
+      return res.json(data);
+    }
+  });
+});
+
+router.get("/GetActivatedMembership/:id", midway.checkToken, (req, res, next) => {
+  db.executeSql("SELECT * FROM purchasedmembership where cid=" + req.params.id + " AND isactive=true", function (data, err) {
+    if (err) {
+      console.log(err);
+    } else {
+      return res.json(data);
+    }
+  });
+});
+
 router.post("/updateCartList", midway.checkToken, (req, res, next) => {
   console.log(req.body);
   db.executeSql(
