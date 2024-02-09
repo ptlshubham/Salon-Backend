@@ -557,16 +557,19 @@ router.post("/SaveMembershipList", midway.checkToken, (req, res, next) => {
   }
 
 });
-router.post("/GetUsedServicesByMembership", midway.checkToken, (req, res, next) => {
-  db.executeSql("SELECT * FROM `membershipservices` WHERE membershipid=" + req.body.id + "", function (data, err) {
-    if (err) {
-      console.log("Error in store.js", err);
-    } else {
-      return res.json(data);
+router.post(
+  "/GetUsedServicesByMembership",
+  midway.checkToken,
+  (req, res, next) => {
+    db.executeSql("SELECT * FROM `membershipservices` WHERE membershipid=" + req.body.id + "", function (data, err) {
+      if (err) {
+        console.log("Error in store.js", err);
+      } else {
+        return res.json(data);
+      }
     }
+    );
   }
-  );
-}
 );
 router.get(
   "/removeMembershipDetails/:id",
@@ -1685,36 +1688,41 @@ router.get(
     );
   }
 );
-router.post("/GetMembershipPurchasedByID", midway.checkToken, (req, res, next) => {
-  db.executeSql("SELECT * FROM purchasedmembership where cid=" + req.body.cid + " AND memid=" + req.body.memid + "", function (data, err) {
-    if (err) {
-      console.log(err);
-    } else {
-      return res.json(data);
-    }
-  });
-});
+router.post(
+  "/GetMembershipPurchasedByID",
+  midway.checkToken,
+  (req, res, next) => {
+    db.executeSql(
+      "SELECT * FROM purchasedmembership where cid=" +
+      req.body.cid +
+      " AND memid=" +
+      req.body.memid +
+      "",
+      function (data, err) {
+        if (err) {
+          console.log(err);
+        } else {
+          return res.json(data);
+        }
+      }
+    );
+  }
+);
 
-router.get("/GetAllActiveMembership", midway.checkToken, (req, res, next) => {
-  db.executeSql("SELECT * FROM membership where status=true", function (data, err) {
-    if (err) {
-      console.log(err);
-    } else {
-      return res.json(data);
+router.post("/GetActivatedMembership", midway.checkToken, (req, res, next) => {
+  db.executeSql(
+    "SELECT * FROM purchasedmembership where cid=" +
+    req.body.id +
+    " AND isactive=true",
+    function (data, err) {
+      if (err) {
+        console.log(err);
+      } else {
+        return res.json(data);
+      }
     }
-  });
+  );
 });
-
-router.get("/GetActivatedMembership/:id", midway.checkToken, (req, res, next) => {
-  db.executeSql("SELECT * FROM purchasedmembership where cid=" + req.params.id + " AND isactive=true", function (data, err) {
-    if (err) {
-      console.log(err);
-    } else {
-      return res.json(data);
-    }
-  });
-});
-
 router.post("/updateCartList", midway.checkToken, (req, res, next) => {
   console.log(req.body);
   db.executeSql(
@@ -2163,14 +2171,7 @@ router.post("/RemoveVendorList", midway.checkToken, (req, res, next) => {
 
 router.post("/UpdateVendorList", midway.checkToken, (req, res, next) => {
   db.executeSql(
-    "UPDATE `vendor` SET fname='" +
-    req.body.fname +
-    "',gst='" +
-    req.body.gst +
-    "',contact='" +
-    req.body.contact +
-    "',whatsapp='" +
-    req.body.whatsapp +
+    "UPDATE `vendor` SET fname='" + req.body.fname + "',gst='" + req.body.gst + "',contact='" + req.body.contact + "',whatsapp='" + req.body.whatsapp +
     "',address='" +
     req.body.address +
     "',city='" +
@@ -2353,7 +2354,7 @@ router.get("/GetWebBanner", midway.checkToken, (req, res, next) => {
 
 router.post("/SaveRegistrationList", midway.checkToken, (req, res, next) => {
   console.log(req.body, "saloonlist");
-  db.executeSql("INSERT INTO `saloonlist`(`sname`, `sconatct`, `semail`, `gst`, `address`, `landmark`, `state`, `city`, `pincode`, `oname`, `ocontact`, `oemail`, `gender`, `websitelink`, `subscription`, `status`, `createddate`) VALUES ('" + req.body.saloonname + "','" + req.body.saloonContact + "','" + req.body.saloonemail + "','" + req.body.gst + "','" + req.body.saloonAddress + "','" + req.body.landmark + "','" + req.body.selectState + "','" + req.body.city + "','" + req.body.pincode + "','" + req.body.ownername + "','" + req.body.contactOwner + "','" + req.body.ownerEmail + "','" + req.body.selectGender + "','" + req.body.webLink + "','" + req.body.selectSocialLink + "',true,CURRENT_TIMESTAMP);", function (data, err) {
+  db.executeSql("INSERT INTO `saloonlist` (`sname`, `scontact`, `semail`, `gst`, `address`, `landmark`, `state`, `city`, `pincode`, `oname`, `ocontact`, `oemail`, `gender`, `websitelink`, `subscription`, `status`, `createddate`) VALUES ('" + req.body.sname + "','" + req.body.scontact + "','" + req.body.semail + "','" + req.body.gst + "','" + req.body.address + "','" + req.body.landmark + "','" + req.body.selectState + "','" + req.body.city + "','" + req.body.pincode + "','" + req.body.oname + "','" + req.body.ocontact + "','" + req.body.oemail + "','" + req.body.selectGender + "','" + req.body.websitelink + "','" + req.body.selectSupscription + "',true,CURRENT_TIMESTAMP);", function (data, err) {
     if (err) {
       res.json("error");
     } else {
@@ -2373,20 +2374,34 @@ router.get("/GetAllRegistration", midway.checkToken, (req, res, next) => {
   });
 });
 
-
-router.get("/RemoveRegistrationDetails/:id", midway.checkToken, (req, res, next) => {
-  console.log(req.body);
-  db.executeSql(
-    "Delete from saloonlist where id=" + req.body.id,
-    function (data, err) {
-      if (err) {
-        console.log("Error in store.js", err);
-      } else {
-        return res.json(data);
-      }
+router.post("/UpdateRegistrationList", midway.checkToken, (req, res, next) => {
+  console.log(req.body)
+  db.executeSql("UPDATE `saloonlist` SET sname='" + req.body.sname + "',scontact='" + req.body.scontact + "',semail='" + req.body.semail + "',gst='" + req.body.gst + "',address='" + req.body.address + "',`landmark`='" + req.body.landmark + "',`state`='" + req.body.selectState + "',`city`='" + req.body.city + "',`pincode`='" + req.body.pincode + "',oname='" + req.body.oname + "',ocontact='" + req.body.ocontact + "',oemail='" + req.body.oemail + "',`gender`='" + req.body.selectGender + "',websitelink='" + req.body.websitelink + "',subscription='" + req.body.selectSupscription + "',updateddate=CURRENT_TIMESTAMP WHERE id=" + req.body.id + ";", function (data, err) {
+    if (err) {
+      console.log("Error in store.js", err);
+    } else {
+      return res.json(data);
     }
-  );
+  });
 });
+
+
+router.get(
+  "/RemoveRegistrationDetails/:id",
+  midway.checkToken,
+  (req, res, next) => {
+    db.executeSql(
+      "Delete from saloonlist where id=" + req.params.id,
+      function (data, err) {
+        if (err) {
+          console.log(err);
+        } else {
+          return res.json(data);
+        }
+      }
+    );
+  }
+);
 
 
 // let secret = 'prnv';
