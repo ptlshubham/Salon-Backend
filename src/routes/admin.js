@@ -2298,22 +2298,44 @@ router.post("/UpdateRegistrationList", midway.checkToken, (req, res, next) => {
 });
 
 
-router.get(
-  "/RemoveRegistrationDetails/:id",
-  midway.checkToken,
-  (req, res, next) => {
-    db.executeSql(
-      "Delete from saloonlist where id=" + req.params.id,
-      function (data, err) {
-        if (err) {
-          console.log(err);
-        } else {
-          return res.json(data);
-        }
-      }
-    );
+
+router.get("/RemoveRegistrationDetails/:id", midway.checkToken, (req, res, next) => {
+  db.executeSql("Delete from saloonlist where id=" + req.params.id, function (data, err) {
+    if (err) {
+      console.log(err);
+    } else {
+      return res.json(data);
+    }
   }
+  );
+}
 );
+
+//----------
+
+router.post("/saveVendororderList", midway.checkToken, (req, res, next) => {
+  console.log(req.body, "dfggf");
+  db.executeSql("INSERT INTO `vendororder`(`vid`, `totalorderprice`, `totalquantity`, `orderdate`) VALUES (" + req.body.vid + "," + req.body.finalprice + "," + req.body.totalQuantity + ", CURRENT_TIMESTAMP);", function (data, err) {
+    if (err) {
+      console.log(err);
+    } else {
+      console.log(req.body.product.length);
+      for (let i = 0; i < req.body.product.length; i++) {
+        console.log(req.body.product[i]);
+        db.executeSql("INSERT INTO `vendorproduct`(`oid`,`pname`,`pquantity`,`pprice`,`createddate`) VALUES(" + data.insertId + ",'" + req.body.product[i].Productname + "','" + req.body.product[i].qty + "','" + req.body.product[i].productprice + "',CURRENT_TIMESTAMP );", function (data1, err) {
+          if (err) {
+            console.log(err);
+          } else {
+          }
+        }
+        );
+      }
+      return res.json("success");
+    }
+  }
+  );
+});
+
 
 
 // let secret = 'prnv';
