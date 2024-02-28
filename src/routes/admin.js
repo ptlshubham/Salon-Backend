@@ -110,48 +110,19 @@ router.post("/RemoveSalaryList", midway.checkToken, (req, res, next) => {
 router.post("/SaveEmployeeList", midway.checkToken, (req, res, next) => {
   console.log(req.body.fname, "dfggf");
   db.executeSql(
-    "INSERT INTO `employee`(`fname`,`lname`,`contact`,`whatsapp`,`address`,`landmark`,`state`,`city`,`pincode`,`gender`,`isactive`,`createddate`)VALUES('" +
-    req.body.fname +
-    "','" +
-    req.body.lname +
-    "','" +
-    req.body.contact +
-    "','" +
-    req.body.whatsapp +
-    "','" +
-    req.body.address +
-    "','" +
-    req.body.landmark +
-    "','" +
-    req.body.state +
-    "','" +
-    req.body.city +
-    "'," +
-    req.body.pincode +
-    ",'" +
-    req.body.gender +
-    "',true,CURRENT_TIMESTAMP);",
-    function (data, err) {
+    "INSERT INTO `employee`(`fname`,`lname`,`contact`,`whatsapp`,`address`,`landmark`,`state`,`city`,`pincode`,`gender`,`isactive`,`createddate`)VALUES('" + req.body.fname + "','" + req.body.lname + "','" + req.body.contact + "','" + req.body.whatsapp + "','" + req.body.address + "','" + req.body.landmark + "','" + req.body.state + "','" + req.body.city + "'," + req.body.pincode + ",'" + req.body.gender + "',true,CURRENT_TIMESTAMP);", function (data, err) {
       if (err) {
         console.log(err);
       } else {
         console.log(req.body.service.length);
         for (let i = 0; i < req.body.service.length; i++) {
           console.log(req.body.service[i]);
-          db.executeSql(
-            "INSERT INTO `empservices`(`servicesid`,`servicesname`,`empid`) VALUES(" +
-            req.body.service[i].id +
-            ",'" +
-            req.body.service[i].name +
-            "'," +
-            data.insertId +
-            ");",
-            function (data1, err) {
-              if (err) {
-                console.log(err);
-              } else {
-              }
+          db.executeSql("INSERT INTO `empservices`(`servicesid`,`servicesname`,`empid`) VALUES(" + req.body.service[i].id + ",'" + req.body.service[i].name + "'," + data.insertId + ");", function (data1, err) {
+            if (err) {
+              console.log(err);
+            } else {
             }
+          }
           );
         }
         return res.json("success");
@@ -2424,22 +2395,44 @@ router.post("/UpdateRegistrationList", midway.checkToken, (req, res, next) => {
 });
 
 
-router.get(
-  "/RemoveRegistrationDetails/:id",
-  midway.checkToken,
-  (req, res, next) => {
-    db.executeSql(
-      "Delete from saloonlist where id=" + req.params.id,
-      function (data, err) {
-        if (err) {
-          console.log(err);
-        } else {
-          return res.json(data);
-        }
-      }
-    );
+
+router.get("/RemoveRegistrationDetails/:id", midway.checkToken, (req, res, next) => {
+  db.executeSql("Delete from saloonlist where id=" + req.params.id, function (data, err) {
+    if (err) {
+      console.log(err);
+    } else {
+      return res.json(data);
+    }
   }
+  );
+}
 );
+
+//----------
+
+router.post("/saveVendororderList", midway.checkToken, (req, res, next) => {
+  console.log(req.body, "dfggf");
+  db.executeSql("INSERT INTO `vendororder`(`vid`, `totalorderprice`, `totalquantity`, `orderdate`) VALUES (" + req.body.vid + "," + req.body.finalprice + "," + req.body.totalQuantity + ", CURRENT_TIMESTAMP);", function (data, err) {
+    if (err) {
+      console.log(err);
+    } else {
+      console.log(req.body.product.length);
+      for (let i = 0; i < req.body.product.length; i++) {
+        console.log(req.body.product[i]);
+        db.executeSql("INSERT INTO `vendorproduct`(`oid`,`pname`,`pquantity`,`pprice`,`createddate`) VALUES(" + data.insertId + ",'" + req.body.product[i].Productname + "','" + req.body.product[i].qty + "','" + req.body.product[i].productprice + "',CURRENT_TIMESTAMP );", function (data1, err) {
+          if (err) {
+            console.log(err);
+          } else {
+          }
+        }
+        );
+      }
+      return res.json("success");
+    }
+  }
+  );
+});
+
 
 
 // let secret = 'prnv';
