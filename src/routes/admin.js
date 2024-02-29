@@ -2322,7 +2322,7 @@ router.post("/saveVendororderList", midway.checkToken, (req, res, next) => {
       console.log(req.body.product.length);
       for (let i = 0; i < req.body.product.length; i++) {
         console.log(req.body.product[i]);
-        db.executeSql("INSERT INTO `vendorproduct`(`oid`,`pname`,`pquantity`,`pprice`,`createddate`) VALUES(" + data.insertId + ",'" + req.body.product[i].Productname + "','" + req.body.product[i].qty + "','" + req.body.product[i].productprice + "',CURRENT_TIMESTAMP );", function (data1, err) {
+        db.executeSql("INSERT INTO `vendorproduct`(`oid`,`vid`,`pname`,`pquantity`,`pprice`,`createddate`) VALUES(" + data.insertId + "," + req.body.vid + ",'" + req.body.product[i].Productname + "','" + req.body.product[i].qty + "','" + req.body.product[i].productprice + "',CURRENT_TIMESTAMP );", function (data1, err) {
           if (err) {
             console.log(err);
           } else {
