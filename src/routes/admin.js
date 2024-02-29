@@ -733,7 +733,7 @@ router.post("/SaveBookingDetails", midway.checkToken, (req, res, next) => {
 
 
 function handleRegularService(body, appointmentId, index, callback) {
-  db.executeSql("INSERT INTO `custservices`(`servicetype`, `servicesid`, `servicesname`, `custid`, `appointmentid`, `employeename`, `empid`) VALUES('" + body.selectedService[index].servicetype + "'," + body.selectedService[index].selectedServid + ",'" + body.selectedService[index].servicesname + "'," + body.custid + "," + appointmentId + ",'" + body.selectedService[index].employeename + "'," + body.selectedService[index].selectedEmpid + ");", function (servdata, err) {
+  db.executeSql("INSERT INTO `custservices`(`servicetype`, `servicesid`, `servicesname`, `custid`, `appointmentid`) VALUES('" + body.selectedService[index].servicetype + "'," + body.selectedService[index].selectedServid + ",'" + body.selectedService[index].servicesname + "'," + body.custid + "," + appointmentId + ");", function (servdata, err) {
     if (err) {
       console.log(err);
     } else {
@@ -744,7 +744,7 @@ function handleRegularService(body, appointmentId, index, callback) {
 
 const processedComboIds = {};
 function handleComboService(body, appointmentId, index, callback) {
-  db.executeSql("INSERT INTO `custservices`(`servicetype`, `servicesid`, `servicesname`, `custid`, `appointmentid`, `employeename`, `empid`, `comboid`) VALUES('" + body.selectedService[index].servicetype + "'," + body.selectedService[index].selectedServid + ",'" + body.selectedService[index].servicesname + "'," + body.custid + "," + appointmentId + ",'" + body.selectedService[index].employeename + "'," + body.selectedService[index].selectedEmpid + "," + body.selectedService[index].comboId + ");", function (servdata, err) {
+  db.executeSql("INSERT INTO `custservices`(`servicetype`, `servicesid`, `servicesname`, `custid`, `appointmentid`, `comboid`) VALUES('" + body.selectedService[index].servicetype + "'," + body.selectedService[index].selectedServid + ",'" + body.selectedService[index].servicesname + "'," + body.custid + "," + appointmentId + "," + body.selectedService[index].comboId + ");", function (servdata, err) {
     if (err) {
       console.log(err);
       callback();
@@ -771,7 +771,7 @@ function handleComboService(body, appointmentId, index, callback) {
 
 function handleMembershipService(body, appointmentId, index, callback) {
   console.log(body);
-  db.executeSql("INSERT INTO `custservices`(`servicetype`, `servicesid`, `servicesname`, `custid`, `appointmentid`, `employeename`, `empid`) VALUES('" + body.selectedService[index].servicetype + "'," + body.selectedService[index].selectedServid + ",'" + body.selectedService[index].servicesname + "'," + body.custid + "," + appointmentId + ",'" + body.selectedService[index].employeename + "'," + body.selectedService[index].selectedEmpid + ");", function (servdata, err) {
+  db.executeSql("INSERT INTO `custservices`(`servicetype`, `servicesid`, `servicesname`, `custid`, `appointmentid`) VALUES('" + body.selectedService[index].servicetype + "'," + body.selectedService[index].selectedServid + ",'" + body.selectedService[index].servicesname + "'," + body.custid + "," + appointmentId + ");", function (servdata, err) {
     if (err) {
       console.log(err);
     } else {
@@ -1580,8 +1580,8 @@ router.post("/SavePlaceOrderList", midway.checkToken, (req, res, next) => {
   );
 });
 router.post("/SavePurchaseServiceList", midway.checkToken, (req, res, next) => {
-  db.executeSql(
-    "UPDATE `customer` SET ismembership=true WHERE id=" + req.body.cid + "", function (data, err) {
+  console.log(req.body,'data')
+  db.executeSql("UPDATE `customer` SET ismembership=true WHERE id=" + req.body.cid + "", function (data, err) {
       if (err) {
         console.log(err);
       } else {
