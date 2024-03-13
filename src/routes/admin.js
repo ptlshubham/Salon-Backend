@@ -108,55 +108,21 @@ router.post("/RemoveSalaryList", midway.checkToken, (req, res, next) => {
 });
 
 router.post("/SaveEmployeeList", midway.checkToken, (req, res, next) => {
-  console.log(req.body.fname, "dfggf");
-  db.executeSql(
-    "INSERT INTO `employee`(`fname`,`lname`,`contact`,`whatsapp`,`address`,`landmark`,`state`,`city`,`pincode`,`gender`,`isactive`,`createddate`)VALUES('" +
-    req.body.fname +
-    "','" +
-    req.body.lname +
-    "','" +
-    req.body.contact +
-    "','" +
-    req.body.whatsapp +
-    "','" +
-    req.body.address +
-    "','" +
-    req.body.landmark +
-    "','" +
-    req.body.state +
-    "','" +
-    req.body.city +
-    "'," +
-    req.body.pincode +
-    ",'" +
-    req.body.gender +
-    "',true,CURRENT_TIMESTAMP);",
-    function (data, err) {
-      if (err) {
-        console.log(err);
-      } else {
-        console.log(req.body.service.length);
-        for (let i = 0; i < req.body.service.length; i++) {
-          console.log(req.body.service[i]);
-          db.executeSql(
-            "INSERT INTO `empservices`(`servicesid`,`servicesname`,`empid`) VALUES(" +
-            req.body.service[i].id +
-            ",'" +
-            req.body.service[i].name +
-            "'," +
-            data.insertId +
-            ");",
-            function (data1, err) {
-              if (err) {
-                console.log(err);
-              } else {
-              }
-            }
-          );
-        }
-        return res.json("success");
+  db.executeSql("INSERT INTO `employee`(`fname`,`lname`,`contact`,`whatsapp`,`address`,`landmark`,`state`,`city`,`pincode`,`gender`,`isactive`,`createddate('" + req.body.fname + "','" + req.body.lname + "','" + req.body.contact + "','" + req.body.whatsapp + "','" + req.body.address + "','" + req.body.landmark + "','" + req.body.state + "','" + req.body.city + "'," + req.body.pincode + ",'" + req.body.gender + "',true,CURRENT_TIMESTAMP);", function (data, err) {
+    if (err) {
+      console.log(err);
+    } else {
+      for (let i = 0; i < req.body.service.length; i++) {
+        db.executeSql("INSERT INTO `empservices`(`servicesid`,`servicesname`,`empid`) VALUES(" + req.body.service[i].id + ",'" + req.body.service[i].name + "'," + data.insertId + ");", function (data1, err) {
+          if (err) {
+            console.log(err);
+          } else {
+          }
+        });
       }
+      return res.json("success");
     }
+  }
   );
 });
 
@@ -325,42 +291,25 @@ router.post("/UpdateWorkingStatus", midway.checkToken, (req, res, next) => {
 
 router.post("/SaveCustomerList", (req, res, next) => {
   console.log(req.body, "data");
-  db.executeSql(
-    "INSERT INTO `customer`(`fname`, `lname`, `email`, `contact`, `whatsapp`, `gender`, `address`, `landmark`, `state`, `city`, `pincode`, `uid`, `vip`) VALUES ('" +
-    req.body.fname +
-    "','" +
-    req.body.lname +
-    "','" +
-    req.body.email +
-    "','" +
-    req.body.contact +
-    "','" +
-    req.body.whatsapp +
-    "','" +
-    req.body.gender +
-    "','" +
-    req.body.address +
-    "','" +
-    req.body.landmark +
-    "','" +
-    req.body.state +
-    "','" +
-    req.body.city +
-    "','" +
-    req.body.pincode +
-    "','" +
-    req.body.uid +
-    "'," +
-    req.body.vip +
-    ");",
-    function (data, err) {
-      if (err) {
-        console.log(err);
-      } else {
-        return res.json("success");
+  db.executeSql("select * from customer WHERE contact='" + req.body.contact + "' OR whatsapp='" + req.body.whatsapp + "'", function (data, err) {
+    if (err) {
+      console.log(err);
+    } else {
+      if (data.length > 0) {
+        return res.json("error");
+      }
+      else {
+        db.executeSql("INSERT INTO `customer`(`fname`, `lname`, `email`, `contact`, `whatsapp`, `gender`, `address`, `landmark`, `state`, `city`, `pincode`, `uid`, `vip`, `notes`) VALUES ('" + req.body.fname + "','" + req.body.lname + "','" + req.body.email + "','" + req.body.contact + "','" + req.body.whatsapp + "','" + req.body.gender + "','" + req.body.address + "','" + req.body.landmark + "','" + req.body.state + "','" + req.body.city + "','" + req.body.pincode + "','" + req.body.uid + "'," + req.body.vip + ",'" + req.body.notes + "');", function (data, err) {
+          if (err) {
+            console.log(err);
+          } else {
+            return res.json("success");
+          }
+        });
       }
     }
-  );
+  });
+
 });
 
 router.get("/GetAllCustomer", midway.checkToken, (req, res, next) => {
@@ -450,18 +399,13 @@ router.post("/GetUsedServicesByOffer", midway.checkToken, (req, res, next) => {
   );
 });
 router.post("/SaveAcceptUserOrder", midway.checkToken, (req, res, next) => {
-  db.executeSql(
-    "UPDATE `orderlist` SET isactive=false,updateddate=CURRENT_TIMESTAMP WHERE id = " +
-    req.body.id +
-    "",
-    function (data, err) {
-      if (err) {
-        console.log("Error in store.js", err);
-      } else {
-        return res.json(data);
-      }
+  db.executeSql("UPDATE `orderlist` SET isactive=false,updateddate=CURRENT_TIMESTAMP WHERE id = " + req.body.id + "", function (data, err) {
+    if (err) {
+      console.log("Error in store.js", err);
+    } else {
+      return res.json(data);
     }
-  );
+  });
 });
 router.get("/removeOfferDetails/:id", midway.checkToken, (req, res, next) => {
   db.executeSql(
@@ -508,6 +452,7 @@ router.post("/getAllOfferDataList", midway.checkToken, (req, res, next) => {
 });
 router.post("/SaveMembershipList", midway.checkToken, (req, res, next) => {
   console.log(req.body);
+
   if (req.body.id != null && req.body.id != undefined) {
     db.executeSql("delete from membership where id=" + req.body.id, function (data1, err) {
       if (err) {
@@ -517,7 +462,7 @@ router.post("/SaveMembershipList", midway.checkToken, (req, res, next) => {
           if (err) {
             console.log(err);
           } else {
-            db.executeSql("INSERT INTO `membership`(`membershipname`,`membershipdiscount`,`totalprice`,`membershipprice`,`status`)VALUES('" + req.body.membershipname + "'," + req.body.membershipdiscount + "," + req.body.totalprice + "," + req.body.membershipprice + ",true);", function (data3, err) {
+            db.executeSql("INSERT INTO `membership`(`membershipname`, `membershipdiscount`, `totalprice`, `membershipprice`, `status`, `validity`, `validitydays`) VALUES('" + req.body.membershipname + "'," + req.body.membershipdiscount + "," + req.body.totalprice + "," + req.body.membershipprice + ",true,'" + req.body.validity + "','" + req.body.validitydays + "');", function (data3, err) {
               if (err) {
                 console.log(err);
               } else {
@@ -541,7 +486,7 @@ router.post("/SaveMembershipList", midway.checkToken, (req, res, next) => {
     });
   }
   else {
-    db.executeSql("INSERT INTO `membership`(`membershipname`,`membershipdiscount`,`totalprice`,`membershipprice`,`status`)VALUES('" + req.body.membershipname + "'," + req.body.membershipdiscount + "," + req.body.totalprice + "," + req.body.membershipprice + ",true);", function (data, err) {
+    db.executeSql("INSERT INTO `membership`(`membershipname`,`membershipdiscount`,`totalprice`,`membershipprice`,`status`, `validity`, `validitydays`)VALUES('" + req.body.membershipname + "'," + req.body.membershipdiscount + "," + req.body.totalprice + "," + req.body.membershipprice + ",true,'" + req.body.validity + "','" + req.body.validitydays + "');", function (data, err) {
       if (err) {
         console.log(err);
       } else {
@@ -598,6 +543,15 @@ router.get("/GetAllMembership", midway.checkToken, (req, res, next) => {
     }
   });
 });
+router.get("/GetAllActiveMembership", midway.checkToken, (req, res, next) => {
+  db.executeSql("select * from membership where status=true", function (data, err) {
+    if (err) {
+      console.log(err);
+    } else {
+      return res.json(data);
+    }
+  });
+});
 router.post("/UpdateActiveMemberShip", midway.checkToken, (req, res, next) => {
   console.log(req.body);
   db.executeSql("UPDATE  `membership` SET status=" + req.body.status + " WHERE id=" + req.body.id + ";", function (data, err) {
@@ -609,290 +563,319 @@ router.post("/UpdateActiveMemberShip", midway.checkToken, (req, res, next) => {
   }
   );
 });
-router.post("/SaveAppointmentList", midway.checkToken, (req, res, next) => {
-  console.log("save appt");
-  console.log(req.body);
-  var checkdate = req.body.selectdate;
-
-  if (checkdate == undefined) {
-    if (req.body.offerId != undefined) {
-      db.executeSql(
-        "INSERT INTO `appointment`(`custid`, `totalprice`, `totalpoint`, `totaltime`, `isactive`, `createddate`,`updatedate`,`ispayment`,`appointmentdate`,`timeslot`)VALUES(" +
-        req.body.custid +
-        ",'" +
-        req.body.totalprice +
-        "','" +
-        req.body.totalpoint +
-        "','" +
-        req.body.totaltime +
-        "'," +
-        req.body.isactive +
-        ",CURRENT_TIMESTAMP,CURRENT_TIMESTAMP,false,'" +
-        req.body.bookingdate +
-        "','" +
-        req.body.timeSlot +
-        "');",
-        function (data, err) {
-          if (err) {
-            console.log(err);
-          } else {
-            for (let i = 0; i < req.body.selectedService.length; i++) {
-              db.executeSql(
-                "INSERT INTO `custservices`(`servicesid`,`servicesname`,`custid`,`appointmentid`,`employeename`,`empid`) VALUES(" +
-                req.body.selectedService[i].selectedServid +
-                ",'" +
-                req.body.selectedService[i].selectedServ +
-                "'," +
-                req.body.custid +
-                "," +
-                data.insertId +
-                ",'" +
-                req.body.selectedService[i].selectedEmp +
-                "'," +
-                req.body.selectedService[i].selectedEmpid +
-                ");",
-                function (data1, err) {
-                  if (err) {
-                    console.log(err);
-                  } else {
-                  }
-                }
-              );
-            }
-            if (req.body.tCustPoint == 0) {
-              db.executeSql(
-                "INSERT INTO `point`( `custid`, `totalcustpoint`)VALUES(" +
-                req.body.custid +
-                "," +
-                req.body.lessPoints +
-                ");",
-                function (data2, err) {
-                  if (err) {
-                    console.log(err);
-                  } else {
-                    console.log(data);
-                  }
-                }
-              );
-            } else {
-              console.log("defined");
-              console.log(req.body);
-              db.executeSql(
-                "UPDATE `point` SET totalcustpoint=" +
-                req.body.lessPoints +
-                " WHERE custid=" +
-                req.body.custid +
-                ";",
-                function (data3, err) {
-                  if (err) {
-                    console.log(err);
-                  } else {
-                    console.log(data);
-                  }
-                }
-              );
-            }
-          }
-          return res.json(data);
-        }
-      );
+router.get("/UpdatePurchaseMembershipStatusURL/:id", midway.checkToken, (req, res, next) => {
+  db.executeSql("UPDATE `purchasedmembership` SET isactive=false WHERE memid=" + req.params.id + ";", function (data, err) {
+    if (err) {
+      console.log("Error in store.js", err);
     } else {
-      db.executeSql(
-        "INSERT INTO `appointment`(`custid`, `totalprice`, `totalpoint`, `totaltime`, `isactive`, `createddate`,`updatedate`,`ispayment`,`appointmentdate`,`timeslot`)VALUES(" +
-        req.body.custid +
-        ",'" +
-        req.body.totalprice +
-        "','" +
-        req.body.totalpoint +
-        "','" +
-        req.body.totaltime +
-        "'," +
-        req.body.isactive +
-        ",CURRENT_TIMESTAMP,CURRENT_TIMESTAMP,false,'" +
-        req.body.bookingdate +
-        "','" +
-        req.body.timeSlot +
-        "');",
-        function (data, err) {
-          if (err) {
-            console.log(err);
-          } else {
-            for (let i = 0; i < req.body.selectedService.length; i++) {
-              db.executeSql(
-                "INSERT INTO `custservices`(`servicesid`,`servicesname`,`custid`,`appointmentid`,`employeename`,`empid`) VALUES(" +
-                req.body.selectedService[i].selectedServid +
-                ",'" +
-                req.body.selectedService[i].selectedServ +
-                "'," +
-                req.body.custid +
-                "," +
-                data.insertId +
-                ",'" +
-                req.body.selectedService[i].selectedEmp +
-                "'," +
-                req.body.selectedService[i].selectedEmpid +
-                ");",
-                function (data1, err) {
-                  if (err) {
-                    console.log(err);
-                  } else {
-                  }
-                }
-              );
-            }
-            if (req.body.tCustPoint == 0) {
-              db.executeSql(
-                "INSERT INTO `point`( `custid`, `totalcustpoint`)VALUES(" +
-                req.body.custid +
-                "," +
-                req.body.lessPoints +
-                ");",
-                function (data, err) {
-                  if (err) {
-                    console.log(err);
-                  } else {
-                    console.log(data);
-                  }
-                }
-              );
-            } else {
-              db.executeSql(
-                "UPDATE `point` SET totalcustpoint=" +
-                req.body.lessPoints +
-                " WHERE custid=" +
-                req.body.custid +
-                ";",
-                function (data, err) {
-                  if (err) {
-                    console.log(err);
-                  } else {
-                    console.log(data);
-                  }
-                }
-              );
-            }
-          }
-          return res.json("success");
-        }
-      );
+      return res.json(data);
     }
-  } else {
-    db.executeSql(
-      "INSERT INTO `appointment`(`custid`, `totalprice`, `totalpoint`, `totaltime`, `isactive`, `createddate`,`updatedate`,`ispayment`,`appointmentdate`,`timeslot`)VALUES(" +
-      req.body.custid +
-      ",'" +
-      req.body.totalprice +
-      "','" +
-      req.body.totalpoint +
-      "','" +
-      req.body.totaltime +
-      "'," +
-      req.body.isactive +
-      ",CURRENT_TIMESTAMP,CURRENT_TIMESTAMP,false,'" +
-      req.body.bookingdate +
-      "','" +
-      req.body.timeSlot +
-      "');",
-      function (data, err) {
-        if (err) {
-          console.log(err);
-        } else {
-          for (let i = 0; i < req.body.selectedService.length; i++) {
-            db.executeSql(
-              "INSERT INTO `custservices`(`servicesid`,`servicesname`,`custid`,`appointmentid`,`employeename`,`empid`) VALUES(" +
-              req.body.selectedService[i].selectedServid +
-              ",'" +
-              req.body.selectedService[i].selectedServ +
-              "'," +
-              req.body.custid +
-              "," +
-              data.insertId +
-              ",'" +
-              req.body.selectedService[i].selectedEmp +
-              "'," +
-              req.body.selectedService[i].selectedEmpid +
-              ");",
-              function (data1, err) {
-                if (err) {
-                  console.log(err);
-                } else {
-                }
-              }
-            );
-          }
-          if (req.body.tCustPoint == 0) {
-            db.executeSql(
-              "INSERT INTO `point`( `custid`, `totalcustpoint`)VALUES(" +
-              req.body.custid +
-              "," +
-              req.body.lessPoints +
-              ");",
-              function (data, err) {
-                if (err) {
-                  console.log(err);
-                } else {
-                  console.log(data);
-                }
-              }
-            );
-          } else {
-            db.executeSql(
-              "UPDATE `point` SET totalcustpoint=" +
-              req.body.lessPoints +
-              " WHERE custid=" +
-              req.body.custid +
-              ";",
-              function (data, err) {
-                if (err) {
-                  console.log(err);
-                } else {
-                  console.log(data);
-                }
-              }
-            );
-          }
-        }
-        return res.json("success");
-      }
-    );
-  }
+  });
 });
 
-router.post("/saveOfferPurchase", midway.checkToken, (req, res, next) => {
-  db.executeSql(
-    "INSERT INTO `purchasedoffer`( `custid`, `employeeid`, `offerid`,`appointmentId`, `payment`, `offerprice`, `createddate`, `updateddate`) VALUES (" +
-    req.body.custid +
-    "," +
-    req.body.empId +
-    "," +
-    req.body.offerId +
-    "," +
-    req.body.appointmentId +
-    "," +
-    false +
-    "," +
-    req.body.offerprice +
-    ",CURRENT_TIMESTAMP,null);",
-    function (data, err) {
+// router.post("/SaveAppointmentList", midway.checkToken, (req, res, next) => {
+//   console.log("save appt");
+//   console.log(req.body);
+//   var checkdate = req.body.bookingDate;
+
+//   if (checkdate == undefined) {
+//     if (req.body.offerId != undefined) {
+//       db.executeSql("INSERT INTO `appointment`(`custid`, `totalprice`, `totalpoint`, `totaltime`, `isactive`, `createddate`,`updatedate`,`ispayment`,`appointmentdate`,`timeslot`)VALUES(" + req.body.custid + ",'" + req.body.totalprice + "','" + req.body.totalpoint + "','" + req.body.totaltime + "'," + req.body.isactive + ",CURRENT_TIMESTAMP,CURRENT_TIMESTAMP,false,'" + req.body.bookingdate + "','" + req.body.timeSlot + "');",
+//         function (data, err) {
+//           if (err) {
+//             console.log(err);
+//           } else {
+//             for (let i = 0; i < req.body.selectedService.length; i++) {
+//               db.executeSql("INSERT INTO `custservices`(`servicesid`,`servicesname`,`custid`,`appointmentid`,`employeename`,`empid`) VALUES(" + req.body.selectedService[i].selectedServid + ",'" + req.body.selectedService[i].selectedServ + "'," + req.body.custid + "," + data.insertId + ",'" + req.body.selectedService[i].selectedEmp + "'," + req.body.selectedService[i].selectedEmpid + ");",
+//                 function (data1, err) {
+//                   if (err) {
+//                     console.log(err);
+//                   } else {
+//                   }
+//                 }
+//               );
+//             }
+//             if (req.body.tCustPoint == 0) {
+//               db.executeSql("INSERT INTO `point`( `custid`, `totalcustpoint`)VALUES(" + req.body.custid + "," + req.body.lessPoints + ");", function (data2, err) {
+//                 if (err) {
+//                   console.log(err);
+//                 } else {
+//                   console.log(data);
+//                 }
+//               }
+//               );
+//             } else {
+//               console.log("defined");
+//               console.log(req.body);
+//               db.executeSql("UPDATE `point` SET totalcustpoint=" + req.body.lessPoints + " WHERE custid=" + req.body.custid + ";", function (data3, err) {
+//                 if (err) {
+//                   console.log(err);
+//                 } else {
+//                   console.log(data);
+//                 }
+//               }
+//               );
+//             }
+//           }
+//           return res.json(data);
+//         }
+//       );
+//     } else {
+//       db.executeSql("INSERT INTO `appointment`(`custid`, `totalprice`, `totalpoint`, `totaltime`, `isactive`, `createddate`,`updatedate`,`ispayment`,`appointmentdate`,`timeslot`)VALUES(" + req.body.custid + ",'" + req.body.totalprice + "','" + req.body.totalpoint + "','" + req.body.totaltime + "'," + req.body.isactive + ",CURRENT_TIMESTAMP,CURRENT_TIMESTAMP,false,'" + req.body.bookingdate + "','" + req.body.timeSlot + "');", function (data, err) {
+//         if (err) {
+//           console.log(err);
+//         } else {
+//           for (let i = 0; i < req.body.selectedService.length; i++) {
+//             db.executeSql("INSERT INTO `custservices`(`servicesid`,`servicesname`,`custid`,`appointmentid`,`employeename`,`empid`) VALUES(" + req.body.selectedService[i].selectedServid + ",'" + req.body.selectedService[i].selectedServ + "'," + req.body.custid + "," + data.insertId + ",'" + req.body.selectedService[i].selectedEmp + "'," + req.body.selectedService[i].selectedEmpid + ");", function (data1, err) {
+//               if (err) {
+//                 console.log(err);
+//               } else {
+//               }
+//             }
+//             );
+//           }
+//           if (req.body.tCustPoint == 0) {
+//             db.executeSql("INSERT INTO `point`( `custid`, `totalcustpoint`)VALUES(" + req.body.custid + "," + req.body.lessPoints + ");", function (data, err) {
+//               if (err) {
+//                 console.log(err);
+//               } else {
+//                 console.log(data);
+//               }
+//             }
+//             );
+//           } else {
+//             db.executeSql("UPDATE `point` SET totalcustpoint=" + req.body.lessPoints + " WHERE custid=" + req.body.custid + ";",
+//               function (data, err) {
+//                 if (err) {
+//                   console.log(err);
+//                 } else {
+//                   console.log(data);
+//                 }
+//               }
+//             );
+//           }
+//         }
+//         return res.json("success");
+//       }
+//       );
+//     }
+//   } else {
+//     db.executeSql("INSERT INTO `appointment`(`custid`, `totalprice`, `totalpoint`, `totaltime`, `isactive`, `createddate`,`updatedate`,`ispayment`,`appointmentdate`,`timeslot`)VALUES(" + req.body.custid + ",'" + req.body.totalprice + "','" + req.body.totalpoint + "','" + req.body.totaltime + "'," + req.body.isactive + ",CURRENT_TIMESTAMP,CURRENT_TIMESTAMP,false,'" + req.body.bookingdate + "','" + req.body.timeSlot + "');", function (data, err) {
+//       if (err) {
+//         console.log(err);
+//       } else {
+//         for (let i = 0; i < req.body.selectedService.length; i++) {
+//           db.executeSql("INSERT INTO `custservices`(`servicesid`,`servicesname`,`custid`,`appointmentid`,`employeename`,`empid`) VALUES(" + req.body.selectedService[i].selectedServid + ",'" + req.body.selectedService[i].selectedServ + "'," + req.body.custid + "," + data.insertId + ",'" + req.body.selectedService[i].selectedEmp + "'," + req.body.selectedService[i].selectedEmpid + ");", function (data1, err) {
+//             if (err) {
+//               console.log(err);
+//             } else {
+//             }
+//           }
+//           );
+//         }
+//         if (req.body.tCustPoint == 0) {
+//           db.executeSql("INSERT INTO `point`( `custid`, `totalcustpoint`)VALUES(" + req.body.custid + "," + req.body.lessPoints + ");", function (data, err) {
+//             if (err) {
+//               console.log(err);
+//             } else {
+//               console.log(data);
+//             }
+//           }
+//           );
+//         } else {
+//           db.executeSql("UPDATE `point` SET totalcustpoint=" + req.body.lessPoints + " WHERE custid=" + req.body.custid + ";", function (data, err) {
+//             if (err) {
+//               console.log(err);
+//             } else {
+//               console.log(data);
+//             }
+//           }
+//           );
+//         }
+//       }
+//       return res.json("success");
+//     }
+//     );
+//   }
+// });
+
+router.post("/SaveBookingDetails", midway.checkToken, (req, res, next) => {
+  console.log(req.body, 'save Booking');
+  db.executeSql("INSERT INTO `appointment`(`custid`, `bookingdate`, `bookingtime`, `totalprice`, `totalpoint`, `totaltime`, `ispayment`, `isactive`, `createddate`)VALUES(" + req.body.custid + ",'" + req.body.bookingDate + "','" + req.body.timeSlot + "','" + req.body.totalprice + "','" + req.body.totalpoint + "','" + req.body.totaltime + "',false," + req.body.isactive + ",CURRENT_TIMESTAMP);", function (data, err) {
+    if (err) {
+      console.log(err);
+      res.status(500).json({ error: "Failed to save booking details" });
+    } else {
+      let completedServices = 0;
+      for (let i = 0; i < req.body.selectedService.length; i++) {
+
+        if (req.body.selectedService[i].servicetype === 'Regular') {
+          handleRegularService(req.body, data.insertId, i, checkCompletion);
+        }
+        else if (req.body.selectedService[i].servicetype === 'Combo') {
+          handleComboService(req.body, data.insertId, i, checkCompletion);
+        }
+        else if (req.body.selectedService[i].servicetype === 'Membership') {
+          handleMembershipService(req.body, data.insertId, i, checkCompletion);
+        }
+
+      }
+      function checkCompletion() {
+        completedServices++;
+        if (completedServices === req.body.selectedService.length) {
+          handlePointAndHistory(req.body);
+          res.json({ message: "Booking details saved successfully" });
+        }
+      }
+    }
+  });
+});
+
+
+function handleRegularService(body, appointmentId, index, callback) {
+  db.executeSql("INSERT INTO `custservices`(`servicetype`, `servicesid`, `servicesname`, `custid`, `appointmentid`) VALUES('" + body.selectedService[index].servicetype + "'," + body.selectedService[index].selectedServid + ",'" + body.selectedService[index].servicesname + "'," + body.custid + "," + appointmentId + ");", function (servdata, err) {
+    if (err) {
+      console.log(err);
+    } else {
+      callback();
+    }
+  });
+}
+
+const processedComboIds = {};
+function handleComboService(body, appointmentId, index, callback) {
+  db.executeSql("INSERT INTO `custservices`(`servicetype`, `servicesid`, `servicesname`, `custid`, `appointmentid`, `comboid`) VALUES('" + body.selectedService[index].servicetype + "'," + body.selectedService[index].selectedServid + ",'" + body.selectedService[index].servicesname + "'," + body.custid + "," + appointmentId + "," + body.selectedService[index].comboId + ");", function (servdata, err) {
+    if (err) {
+      console.log(err);
+      callback();
+    } else {
+      if (body.selectedService[index].servicetype === 'Combo') {
+        const comboId = body.selectedService[index].comboId;
+        if (!processedComboIds[comboId]) {
+          processedComboIds[comboId] = true;
+          db.executeSql("INSERT INTO `purchasedoffer`( `custid`, `offerid`,`appointmentId`,`createddate`) VALUES (" + body.custid + "," + comboId + "," + appointmentId + ",CURRENT_TIMESTAMP);", function (data, err) {
+            if (err) {
+              console.log(err);
+            }
+            callback();
+          });
+        } else {
+          callback();
+        }
+      } else {
+        callback();
+      }
+    }
+  });
+}
+
+function handleMembershipService(body, appointmentId, index, callback) {
+  console.log(body);
+  db.executeSql("INSERT INTO `custservices`(`servicetype`, `servicesid`, `servicesname`, `custid`, `appointmentid`) VALUES('" + body.selectedService[index].servicetype + "'," + body.selectedService[index].selectedServid + ",'" + body.selectedService[index].servicesname + "'," + body.custid + "," + appointmentId + ");", function (servdata, err) {
+    if (err) {
+      console.log(err);
+    } else {
+      db.executeSql("SELECT remainingquantity FROM `purchasedmembership` WHERE cid = " + body.custid + " AND memid = " + body.selectedService[index].memid + " AND serid = " + body.selectedService[index].selectedServid, function (selectData, selectErr) {
+        if (selectErr) {
+          console.log("Error fetching remainingquantity:", selectErr);
+        } else {
+          const remainingquantity = selectData[0].remainingquantity;
+          if (remainingquantity > 0) {
+            db.executeSql("UPDATE `purchasedmembership` SET `remainingquantity` = remainingquantity - 1 WHERE cid = " + body.custid + " AND memid = " + body.selectedService[index].memid + " AND serid = " + body.selectedService[index].selectedServid, function (updateData, updateErr) {
+              if (updateErr) {
+                console.log("Error updating remainingquantity:", updateErr);
+              } else {
+                db.executeSql("INSERT INTO `membershiphistory`(`custid`, `memid`, `servid`, `usedquantity`, `remainingquantity`, `useddate`, `createddate`) VALUES(" + body.custid + "," + body.selectedService[index].memid + "," + body.selectedService[index].selectedServid + ",1," + (remainingquantity - 1) + ",CURRENT_TIMESTAMP,CURRENT_TIMESTAMP);", function (historyData, historyErr) {
+                  if (historyErr) {
+                    console.log("Error inserting into membershiphistory:", historyErr);
+                  } else {
+                    callback();
+                  }
+                });
+              }
+            });
+          } else {
+            console.log("Remaining quantity is not sufficient");
+            callback();
+          }
+        }
+      });
+    }
+  });
+}
+function handlePointAndHistory(body) {
+  if (body.tCustPoint == 0) {
+    db.executeSql("INSERT INTO `point`( `custid`, `totalcustpoint`)VALUES(" + body.custid + "," + body.totalpoint + ");", function (pointdata, err) {
       if (err) {
         console.log(err);
       } else {
-        res.json("success");
       }
+    });
+  } else {
+    if (body.lessPoints != null) {
+      db.executeSql("UPDATE `point` SET totalcustpoint=" + body.lessPoints + " WHERE custid=" + body.custid + ";", function (updatepointdata, err) {
+        if (err) {
+          console.log(err);
+        } else {
+          db.executeSql("INSERT INTO `pointhistory`(`custid`, `redeempoint`, `totalpoint`, `redeemdate`) VALUES(" + body.custid + "," + body.redeempoints + "," + body.tCustPoint + ",CURRENT_TIMESTAMP);", function (historydata, err) {
+            if (err) {
+              console.log(err);
+            } else {
+            }
+          });
+        }
+      });
     }
-  );
-});
+  }
+}
 
-router.get("/GetAllAppointment", midway.checkToken, (req, res, next) => {
-  db.executeSql(
-    "select a.id,a.custid,a.totalprice,a.totalpoint,a.totaltime,a.isactive,a.createddate,a.updatedate,a.ispayment,a.appointmentdate,a.ratings,a.timeslot,c.id as cId,c.fname,c.lname,c.email,c.contact,c.whatsapp,c.gender from appointment a join customer c on a.custid=c.id where isactive=true ORDER BY a.appointmentdate",
-    function (data, err) {
+router.post("/DeleteBookingDetails", midway.checkToken, (req, res, next) => {
+  console.log(req.body, 'Delete Booking');
+
+  if (req.body.servicetype === 'Regular') {
+    db.executeSql("Delete from custservices where servicesid=" + req.body.servicesid + " AND appointmentid=" + req.body.appointmentid + "", function (data, err) {
       if (err) {
-        console.log(err);
+        console.log("Error in store.js", err);
       } else {
         return res.json(data);
       }
     }
+    );
+  }
+  else if (req.body.servicetype === 'Combo') {
+    handleDeleteCombo(req.body, checkRemoveCompletion);
+  }
+  else if (req.body.servicetype === 'Membership') {
+    handleDeleteMembership(req.body, checkRemoveCompletion);
+  }
+
+  function checkRemoveCompletion() {
+    completedServices++;
+    if (completedServices === req.body.selectedService.length) {
+      handlePointAndHistory(req.body);
+      res.json({ message: "Booking details saved successfully" });
+    }
+  }
+
+});
+router.post("/saveOfferPurchase", midway.checkToken, (req, res, next) => {
+  db.executeSql("INSERT INTO `purchasedoffer`( `custid`, `employeeid`, `offerid`,`appointmentId`, `payment`, `offerprice`, `createddate`, `updateddate`) VALUES (" + req.body.custid + "," + req.body.empId + "," + req.body.offerId + "," + req.body.appointmentId + "," + false + "," + req.body.offerprice + ",CURRENT_TIMESTAMP,null);", function (data, err) {
+    if (err) {
+      console.log(err);
+    } else {
+      res.json("success");
+    }
+  });
+});
+
+router.get("/GetAllAppointment", midway.checkToken, (req, res, next) => {
+  db.executeSql("select a.id,a.custid,a.bookingdate,a.bookingtime,a.totalprice,a.totalpoint,a.totaltime,a.raitings,a.ispayment,a.isactive,a.createddate,a.updateddate,c.id as cId,c.fname,c.lname,c.email,c.contact,c.whatsapp,c.gender,c.vip,c.isMembership,c.notes,c.vouchernotes from appointment a join customer c on a.custid=c.id where isactive=true ORDER BY a.bookingdate", function (data, err) {
+    if (err) {
+      console.log(err);
+    } else {
+      return res.json(data);
+    }
+  }
   );
 });
 router.post("/ChackForPassword", midway.checkToken, (req, res, next) => {
@@ -997,59 +980,26 @@ router.get("/GetMonthlyTotal", midway.checkToken, (req, res, next) => {
 });
 
 router.post("/UpdateCustomerList", midway.checkToken, (req, res, next) => {
-  db.executeSql(
-    "UPDATE  `customer` SET fname='" +
-    req.body.fname +
-    "',lname='" +
-    req.body.lname +
-    "',email='" +
-    req.body.email +
-    "',contact='" +
-    req.body.contact +
-    "',whatsapp='" +
-    req.body.whatsapp +
-    "',gender='" +
-    req.body.gender +
-    "',vip=" +
-    req.body.vip +
-    ",updateddate=CURRENT_TIMESTAMP,address='" +
-    req.body.address +
-    "',`landmark`='" +
-    req.body.landmark +
-    "',`state`='" +
-    req.body.state +
-    "',`city`='" +
-    req.body.city +
-    "',`pincode`='" +
-    req.body.pincode +
-    "' WHERE id=" +
-    req.body.id +
-    ";",
-    function (data, err) {
-      if (err) {
-        console.log("Error in store.js", err);
-      } else {
-        return res.json(data);
-      }
+  db.executeSql("UPDATE `customer` SET fname='" + req.body.fname + "',lname='" + req.body.lname + "',email='" + req.body.email + "',contact='" + req.body.contact + "',whatsapp='" + req.body.whatsapp + "',gender='" + req.body.gender + "',vip=" + req.body.vip + ",updateddate=CURRENT_TIMESTAMP,address='" + req.body.address + "',`landmark`='" + req.body.landmark + "',`state`='" + req.body.state + "',`city`='" + req.body.city + "',`pincode`='" + req.body.pincode + "' WHERE id=" + req.body.id + ";", function (data, err) {
+    if (err) {
+      console.log("Error in store.js", err);
+    } else {
+      return res.json(data);
     }
+  }
   );
 });
 
-router.get(
-  "/removeCustomerDetails/:id",
-  midway.checkToken,
-  (req, res, next) => {
-    db.executeSql(
-      "Delete from customer where id=" + req.params.id,
-      function (data, err) {
-        if (err) {
-          console.log("Error in store.js", err);
-        } else {
-          return res.json(data);
-        }
-      }
-    );
+router.get("/removeCustomerDetails/:id", midway.checkToken, (req, res, next) => {
+  db.executeSql("Delete from customer where id=" + req.params.id, function (data, err) {
+    if (err) {
+      console.log("Error in store.js", err);
+    } else {
+      return res.json(data);
+    }
   }
+  );
+}
 );
 
 router.get("/RemoveServicesList/:id", midway.checkToken, (req, res, next) => {
@@ -1263,19 +1213,13 @@ router.post("/UpdatePassword", midway.checkToken, (req, res, next) => {
 });
 
 router.post("/UpdateActiveStatus", midway.checkToken, (req, res, next) => {
-  db.executeSql(
-    "UPDATE  `appointment` SET isactive=" +
-    req.body.isactive +
-    ", updatedate=CURRENT_TIMESTAMP,ispayment=true WHERE id=" +
-    req.body.id +
-    ";",
-    function (data, err) {
-      if (err) {
-        console.log("Error in store.js", err);
-      } else {
-        return res.json(data);
-      }
+  db.executeSql("UPDATE `appointment` SET isactive=" + req.body.isactive + ", updateddate=CURRENT_TIMESTAMP,ispayment=true WHERE id=" + req.body.id + ";", function (data, err) {
+    if (err) {
+      console.log("Error in store.js", err);
+    } else {
+      return res.json(data);
     }
+  }
   );
 });
 
@@ -1338,31 +1282,27 @@ router.post("/GetAllCustomerDataList", midway.checkToken, (req, res, next) => {
 router.post("/GetCustomerById", midway.checkToken, (req, res, next) => {
   console.log("testing");
   console.log(req.body.id);
-  db.executeSql(
-    "select * from customer where id=" + req.body.id + "",
-    function (data, err) {
-      if (err) {
-        console.log(err);
-      } else {
-        console.log("tesing get cust");
-        console.log(data);
-        if (data.length > 0) {
-          db.executeSql(
-            "select * from appointment where custid = " + data[0].id + "",
-            function (data1, err) {
-              if (err) {
-                console.log("Error in store.js", err);
-              } else {
-                console.log(data1);
-                return res.json(data1);
-              }
-            }
-          );
-        } else {
-          res.json("customer not found");
+  db.executeSql("select * from customer where id=" + req.body.id + "", function (data, err) {
+    if (err) {
+      console.log(err);
+    } else {
+      console.log("tesing get cust");
+      console.log(data);
+      if (data.length > 0) {
+        db.executeSql("select * from appointment where custid = " + data[0].id + "", function (data1, err) {
+          if (err) {
+            console.log("Error in store.js", err);
+          } else {
+            console.log(data1);
+            return res.json(data1);
+          }
         }
+        );
+      } else {
+        res.json("customer not found");
       }
     }
+  }
   );
 });
 router.post("/SaveRatingsDetails", midway.checkToken, (req, res, next) => {
@@ -1381,24 +1321,17 @@ router.post("/SaveRatingsDetails", midway.checkToken, (req, res, next) => {
     }
   );
 });
-router.post(
-  "/GetUsedServicesByCustomer",
-  midway.checkToken,
-  (req, res, next) => {
-    console.log(req.body);
-    db.executeSql(
-      "select s.servicesid,s.servicesname,s.custid,s.appointmentid,s.employeename,s.empid,sl.id as slId,sl.price,sl.time,sl.point from custservices s join serviceslist sl on s.servicesid=sl.id where s.appointmentid = " +
-      req.body.id +
-      "",
-      function (data, err) {
-        if (err) {
-          console.log("Error in store.js", err);
-        } else {
-          return res.json(data);
-        }
-      }
-    );
+router.post("/GetUsedServicesByCustomer", midway.checkToken, (req, res, next) => {
+  console.log(req.body);
+  db.executeSql("select s.servicetype,s.servicesid,s.servicesname,s.custid,s.appointmentid,s.employeename,s.empid,s.comboid,s.memid,sl.id as slId,sl.price,sl.time,sl.point,sl.epoint from custservices s join serviceslist sl on s.servicesid=sl.id where s.appointmentid = " + req.body.id + "", function (data, err) {
+    if (err) {
+      console.log("Error in store.js", err);
+    } else {
+      return res.json(data);
+    }
   }
+  );
+}
 );
 
 var today = new Date();
@@ -1409,36 +1342,19 @@ var yyyy = today.getFullYear();
 today = yyyy + "-" + mm + "-" + dd;
 
 router.get("/GetAllCompletedServices", midway.checkToken, (req, res, next) => {
-  db.executeSql(
-    "select a.id,a.custid,a.totalprice,a.totalpoint,a.totaltime,a.isactive,a.createddate,a.updatedate,c.id as cId,c.fname,c.lname,c.email,c.contact,c.whatsapp,c.gender from appointment a join customer c on a.custid=c.id where a.isactive=false and a.createddate='" +
-    today +
-    "'",
-    function (data, err) {
-      if (err) {
-        console.log(err);
-      } else {
-        return res.json(data);
-      }
+  console.log(today, 'date')
+  db.executeSql("select a.id,a.custid,a.bookingdate,a.bookingtime,a.totalprice,a.totalpoint,a.totaltime,a.raitings,a.ispayment,a.isactive,a.createddate,a.updateddate,c.id as cId,c.fname,c.lname,c.email,c.contact,c.whatsapp,c.gender,c.uid,c.vip,c.isMembership,c.notes from appointment a join customer c on a.custid=c.id where a.isactive=false and a.createddate='" + today + "'", function (data, err) {
+    if (err) {
+      console.log(err);
+    } else {
+      return res.json(data);
     }
-  );
+  });
 });
 
 router.post("/SaveModeOfPayment", midway.checkToken, (req, res, next) => {
   db.executeSql(
-    "INSERT INTO `payment`(`cid`, `appointmentid`, `cname`, `modeofpayment`, `tprice`, `tpoint`, `pdate`,`createddate`) VALUES (" +
-    req.body.cid +
-    "," +
-    req.body.appointmentid +
-    ",'" +
-    req.body.cname +
-    "','" +
-    req.body.modeofpayment +
-    "'," +
-    req.body.tprice +
-    "," +
-    req.body.tpoint +
-    ",CURRENT_TIMESTAMP,CURRENT_TIMESTAMP);",
-    function (data, err) {
+    "INSERT INTO `payment`(`cid`, `appointmentid`, `cname`, `modeofpayment`, `tprice`, `tpoint`, `pdate`,`createddate`) VALUES (" + req.body.cid + "," + req.body.appointmentid + ",'" + req.body.cname + "','" + req.body.modeofpayment + "'," + req.body.tprice + "," + req.body.tpoint + ",CURRENT_TIMESTAMP,CURRENT_TIMESTAMP);", function (data, err) {
       if (err) {
         res.json("error");
       } else {
@@ -1664,14 +1580,14 @@ router.post("/SavePlaceOrderList", midway.checkToken, (req, res, next) => {
   );
 });
 router.post("/SavePurchaseServiceList", midway.checkToken, (req, res, next) => {
-  db.executeSql(
-    "UPDATE `customer` SET ismembership=true WHERE id=" + req.body.cid + "", function (data, err) {
+  console.log(req.body,'data')
+  db.executeSql("UPDATE `customer` SET ismembership=true WHERE id=" + req.body.cid + "", function (data, err) {
       if (err) {
         console.log(err);
       } else {
         for (let i = 0; i < req.body.services.length; i++) {
           db.executeSql(
-            "INSERT INTO `purchasedmembership`(`cid`, `memid`, `serid`, `sname`, `quntity`, `tprice`, `discount`, `dprice`, `isactive`, `createddate`)VALUES(" + req.body.cid + "," + req.body.memid + "," + req.body.services[i].serviceid + ",'" + req.body.services[i].servicesname + "'," + req.body.services[i].quantity + "," + req.body.tprice + "," + req.body.discount + "," + req.body.dprice + "," + req.body.isactive + ",CURRENT_TIMESTAMP);", function (data1, err) {
+            "INSERT INTO `purchasedmembership`(`cid`, `memid`, `serid`, `sname`, `quntity`, `remainingquantity`, `tprice`, `discount`, `dprice`, `validitydate`, `isactive`, `createddate`)VALUES(" + req.body.cid + "," + req.body.memid + "," + req.body.services[i].serviceid + ",'" + req.body.services[i].servicesname + "'," + req.body.services[i].quantity + "," + req.body.services[i].quantity + "," + req.body.tprice + "," + req.body.discount + "," + req.body.dprice + ",'" + req.body.validitydate + "',true,CURRENT_TIMESTAMP);", function (data1, err) {
               if (err) {
                 console.log("Error in store.js", err);
               } else {
@@ -1687,34 +1603,19 @@ router.post("/SavePurchaseServiceList", midway.checkToken, (req, res, next) => {
   );
 });
 
-router.get(
-  "/GetAllMembershipPurchased",
-  midway.checkToken,
-  (req, res, next) => {
-    db.executeSql(
-      "SELECT * FROM purchasedmembership,membership,customer where purchasedmembership.memid=membership.id AND purchasedmembership.cid=customer.id GROUP BY cid,memid;",
-      function (data, err) {
-        if (err) {
-          console.log(err);
-        } else {
-          return res.json(data);
-        }
-      }
-    );
-  }
-);
-router.post("/GetMembershipPurchasedByID", midway.checkToken, (req, res, next) => {
-  db.executeSql("SELECT * FROM purchasedmembership where cid=" + req.body.cid + " AND memid=" + req.body.memid + "", function (data, err) {
+router.get("/GetAllMembershipPurchased", midway.checkToken, (req, res, next) => {
+  db.executeSql("SELECT * FROM purchasedmembership,membership,customer where purchasedmembership.memid=membership.id AND purchasedmembership.cid=customer.id GROUP BY cid,memid;", function (data, err) {
     if (err) {
       console.log(err);
     } else {
       return res.json(data);
     }
-  });
-});
-
-router.get("/GetAllActiveMembership", midway.checkToken, (req, res, next) => {
-  db.executeSql("SELECT * FROM membership where status=true", function (data, err) {
+  }
+  );
+}
+);
+router.post("/GetMembershipPurchasedByID", midway.checkToken, (req, res, next) => {
+  db.executeSql("SELECT * FROM purchasedmembership where cid=" + req.body.cid + " AND memid=" + req.body.memid + "", function (data, err) {
     if (err) {
       console.log(err);
     } else {
@@ -1730,7 +1631,8 @@ router.get("/GetActivatedMembership/:id", midway.checkToken, (req, res, next) =>
     } else {
       return res.json(data);
     }
-  });
+  }
+  );
 });
 
 router.post("/updateCartList", midway.checkToken, (req, res, next) => {
@@ -2181,14 +2083,7 @@ router.post("/RemoveVendorList", midway.checkToken, (req, res, next) => {
 
 router.post("/UpdateVendorList", midway.checkToken, (req, res, next) => {
   db.executeSql(
-    "UPDATE `vendor` SET fname='" +
-    req.body.fname +
-    "',gst='" +
-    req.body.gst +
-    "',contact='" +
-    req.body.contact +
-    "',whatsapp='" +
-    req.body.whatsapp +
+    "UPDATE `vendor` SET fname='" + req.body.fname + "',gst='" + req.body.gst + "',contact='" + req.body.contact + "',whatsapp='" + req.body.whatsapp +
     "',address='" +
     req.body.address +
     "',city='" +
@@ -2355,7 +2250,7 @@ router.get("/GetWebActiveBanner", midway.checkToken, (req, res, next) => {
 
 router.post("/SaveRegistrationList", midway.checkToken, (req, res, next) => {
   console.log(req.body, "saloonlist");
-  db.executeSql("INSERT INTO `saloonlist`(`sname`, `sconatct`, `semail`, `gst`, `address`, `landmark`, `state`, `city`, `pincode`, `oname`, `ocontact`, `oemail`, `gender`, `websitelink`, `subscription`, `status`, `createddate`) VALUES ('" + req.body.saloonname + "','" + req.body.saloonContact + "','" + req.body.saloonemail + "','" + req.body.gst + "','" + req.body.saloonAddress + "','" + req.body.landmark + "','" + req.body.selectState + "','" + req.body.city + "','" + req.body.pincode + "','" + req.body.ownername + "','" + req.body.contactOwner + "','" + req.body.ownerEmail + "','" + req.body.selectGender + "','" + req.body.webLink + "','" + req.body.selectSocialLink + "',true,CURRENT_TIMESTAMP);", function (data, err) {
+  db.executeSql("INSERT INTO `saloonlist` (`sname`, `scontact`, `semail`, `gst`, `address`, `landmark`, `state`, `city`, `pincode`, `oname`, `ocontact`, `oemail`, `gender`, `websitelink`, `subscription`, `status`, `createddate`) VALUES ('" + req.body.sname + "','" + req.body.scontact + "','" + req.body.semail + "','" + req.body.gst + "','" + req.body.address + "','" + req.body.landmark + "','" + req.body.selectState + "','" + req.body.city + "','" + req.body.pincode + "','" + req.body.oname + "','" + req.body.ocontact + "','" + req.body.oemail + "','" + req.body.selectGender + "','" + req.body.websitelink + "','" + req.body.selectSupscription + "',true,CURRENT_TIMESTAMP);", function (data, err) {
     if (err) {
       res.json("error");
     } else {
@@ -2375,22 +2270,77 @@ router.get("/GetAllRegistration", midway.checkToken, (req, res, next) => {
   });
 });
 
-
-router.get("/RemoveRegistrationDetails/:id", midway.checkToken, (req, res, next) => {
-  console.log(req.body);
-  db.executeSql(
-    "Delete from saloonlist where id=" + req.body.id,
-    function (data, err) {
-      if (err) {
-        console.log("Error in store.js", err);
-      } else {
-        return res.json(data);
-      }
+router.post("/UpdateRegistrationList", midway.checkToken, (req, res, next) => {
+  console.log(req.body)
+  db.executeSql("UPDATE `saloonlist` SET sname='" + req.body.sname + "',scontact='" + req.body.scontact + "',semail='" + req.body.semail + "',gst='" + req.body.gst + "',address='" + req.body.address + "',`landmark`='" + req.body.landmark + "',`state`='" + req.body.selectState + "',`city`='" + req.body.city + "',`pincode`='" + req.body.pincode + "',oname='" + req.body.oname + "',ocontact='" + req.body.ocontact + "',oemail='" + req.body.oemail + "',`gender`='" + req.body.selectGender + "',websitelink='" + req.body.websitelink + "',subscription='" + req.body.selectSupscription + "',updateddate=CURRENT_TIMESTAMP WHERE id=" + req.body.id + ";", function (data, err) {
+    if (err) {
+      console.log("Error in store.js", err);
+    } else {
+      return res.json(data);
     }
-  );
+  });
 });
 
 
+
+router.get("/RemoveRegistrationDetails/:id", midway.checkToken, (req, res, next) => {
+  db.executeSql("Delete from saloonlist where id=" + req.params.id, function (data, err) {
+    if (err) {
+      console.log(err);
+    } else {
+      return res.json(data);
+    }
+  }
+  );
+}
+);
+
+//----------
+
+router.post("/saveVendororderList", midway.checkToken, (req, res, next) => {
+  console.log(req.body, "dfggf");
+  db.executeSql("INSERT INTO `vendororder`(`vid`, `totalorderprice`, `totalquantity`, `orderdate`) VALUES (" + req.body.vid + "," + req.body.finalprice + "," + req.body.totalQuantity + ", CURRENT_TIMESTAMP);", function (data, err) {
+    if (err) {
+      console.log(err);
+    } else {
+      console.log(req.body.product.length);
+      for (let i = 0; i < req.body.product.length; i++) {
+        console.log(req.body.product[i]);
+        db.executeSql("INSERT INTO `vendorproduct`(`oid`,`vid`,`pname`,`pquantity`,`pprice`,`createddate`) VALUES(" + data.insertId + "," + req.body.vid + ",'" + req.body.product[i].Productname + "','" + req.body.product[i].qty + "','" + req.body.product[i].productprice + "',CURRENT_TIMESTAMP );", function (data1, err) {
+          if (err) {
+            console.log(err);
+          } else {
+          }
+        }
+        );
+      }
+      return res.json("success");
+    }
+  }
+  );
+});
+
+router.get("/GetVendorOrderList/:id", midway.checkToken, (req, res, next) => {
+  db.executeSql("select o.id,o.vid,o.totalorderprice,o.totalquantity,o.orderdate,v.id as vendorid,v.fname,v.gst,v.contact,v.whatsapp,v.address,v.city,v.pincode,v.isactive,v.createdate from vendororder o join vendor v on o.vid=v.id where o.vid = " + req.params.id + "", function (data, err) {
+    if (err) {
+      console.log(err);
+    } else {
+      return res.json(data);
+    }
+  });
+});
+
+router.get("/removeorderDetails/:id", midway.checkToken, (req, res, next) => {
+  db.executeSql("Delete from vendororder where id=" + req.params.id, function (data, err) {
+    if (err) {
+      console.log(err);
+    } else {
+      return res.json(data);
+    }
+  }
+  );
+}
+);
 // let secret = 'prnv';
 router.post("/login", (req, res, next) => {
   const body = req.body;
