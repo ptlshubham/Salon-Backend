@@ -2278,14 +2278,7 @@ router.post("/UploadBannersImage", midway.checkToken, (req, res, next) => {
 
 router.post("/SaveWebBanners", midway.checkToken, (req, res, next) => {
   console.log(req.body);
-  db.executeSql(
-    "INSERT INTO `webbanners`(`name`,`bannersimage`,`status`)VALUES('" +
-    req.body.name +
-    "','" +
-    req.body.bannersimage +
-    "'," +
-    req.body.status +
-    ");",
+  db.executeSql("INSERT INTO `webbanners`(`name`,`bannersimage`,`status`)VALUES('" + req.body.purpose + "','" + req.body.image + "'," + req.body.status + ");",
     function (data, err) {
       if (err) {
         res.json("error");
@@ -2297,9 +2290,7 @@ router.post("/SaveWebBanners", midway.checkToken, (req, res, next) => {
 });
 
 router.get("/GetWebBanners", midway.checkToken, (req, res, next) => {
-  console.log("call-4");
-  console.log(req.body.id);
-  db.executeSql("select * from webbanners ", function (data, err) {
+  db.executeSql("select * from webbanners", function (data, err) {
     if (err) {
       console.log("Error in store.js", err);
     } else {
@@ -2325,12 +2316,7 @@ router.post("/RemoveWebBanners", midway.checkToken, (req, res, next) => {
 router.post("/UpdateActiveWebBanners", midway.checkToken, (req, res, next) => {
   console.log(req.body);
   db.executeSql(
-    "UPDATE  `webbanners` SET status=" +
-    req.body.status +
-    " WHERE id=" +
-    req.body.id +
-    ";",
-    function (data, err) {
+    "UPDATE  `webbanners` SET status=" + req.body.status + " WHERE id=" + req.body.id + ";", function (data, err) {
       if (err) {
         console.log("Error in store.js", err);
       } else {
@@ -2356,16 +2342,14 @@ router.post("/UpdateActiveOffers", midway.checkToken, (req, res, next) => {
     }
   );
 });
-router.get("/GetWebBanner", midway.checkToken, (req, res, next) => {
-  db.executeSql(
-    "select * from webbanners where status=1",
-    function (data, err) {
-      if (err) {
-        console.log("Error in store.js", err);
-      } else {
-        return res.json(data);
-      }
+router.get("/GetWebActiveBanner", midway.checkToken, (req, res, next) => {
+  db.executeSql("select * from webbanners where status=1 AND name='slider'", function (data, err) {
+    if (err) {
+      console.log("Error in store.js", err);
+    } else {
+      return res.json(data);
     }
+  }
   );
 });
 
