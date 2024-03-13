@@ -2359,8 +2359,27 @@ router.post("/saveVendororderList", midway.checkToken, (req, res, next) => {
   );
 });
 
+router.get("/GetVendorOrderList/:id", midway.checkToken, (req, res, next) => {
+  db.executeSql("select o.id,o.vid,o.totalorderprice,o.totalquantity,o.orderdate,v.id as vendorid,v.fname,v.gst,v.contact,v.whatsapp,v.address,v.city,v.pincode,v.isactive,v.createdate from vendororder o join vendor v on o.vid=v.id where o.vid = " + req.params.id + "", function (data, err) {
+    if (err) {
+      console.log(err);
+    } else {
+      return res.json(data);
+    }
+  });
+});
 
-
+router.get("/removeorderDetails/:id", midway.checkToken, (req, res, next) => {
+  db.executeSql("Delete from vendororder where id=" + req.params.id, function (data, err) {
+    if (err) {
+      console.log(err);
+    } else {
+      return res.json(data);
+    }
+  }
+  );
+}
+);
 // let secret = 'prnv';
 router.post("/login", (req, res, next) => {
   const body = req.body;
