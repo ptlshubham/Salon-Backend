@@ -108,7 +108,7 @@ router.post("/RemoveSalaryList", midway.checkToken, (req, res, next) => {
 });
 
 router.post("/SaveEmployeeList", midway.checkToken, (req, res, next) => {
-  db.executeSql("INSERT INTO `employee`(`fname`,`lname`,`contact`,`whatsapp`,`address`,`landmark`,`state`,`city`,`pincode`,`gender`,`isactive`,`createddate('" + req.body.fname + "','" + req.body.lname + "','" + req.body.contact + "','" + req.body.whatsapp + "','" + req.body.address + "','" + req.body.landmark + "','" + req.body.state + "','" + req.body.city + "'," + req.body.pincode + ",'" + req.body.gender + "',true,CURRENT_TIMESTAMP);", function (data, err) {
+  db.executeSql("INSERT INTO `employee`(`fname`,`lname`,`contact`,`whatsapp`,`address`,`landmark`,`state`,`city`,`pincode`,`gender`,`isactive`,`createddate`) VALUES ('" + req.body.fname + "','" + req.body.lname + "','" + req.body.contact + "','" + req.body.whatsapp + "','" + req.body.address + "','" + req.body.landmark + "','" + req.body.state + "','" + req.body.city + "'," + req.body.pincode + ",'" + req.body.gender + "',true,CURRENT_TIMESTAMP);", function (data, err) {
     if (err) {
       console.log(err);
     } else {
@@ -850,7 +850,13 @@ router.post("/UpdateAppointementEmployeeDetails", midway.checkToken, (req, res, 
         if (err) {
           console.log(err);
         } else {
-          res.json("success");
+          db.executeSql("UPDATE `appointment` SET `isstatus`='" + req.body.isstatus + "' WHERE id=" + req.body.bookingId + ";", function (data, err) {
+            if (err) {
+              console.log(err);
+            } else {
+              res.json("success");
+            }
+          });
         }
       });
     }
@@ -867,7 +873,13 @@ router.post("/RemoveAppointementEmployeeData", midway.checkToken, (req, res, nex
         if (err) {
           console.log(err);
         } else {
-          res.json("success");
+          db.executeSql("UPDATE `appointment` SET `isstatus`='" + req.body.isstatus + "' WHERE id=" + req.body.bookingId + ";", function (data, err) {
+            if (err) {
+              console.log(err);
+            } else {
+              res.json("success");
+            }
+          });
         }
       });
     }
