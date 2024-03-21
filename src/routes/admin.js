@@ -285,22 +285,35 @@ router.post("/UpdateEmployeeList", midway.checkToken, (req, res, next) => {
 });
 
 router.post("/UpdateWorkingStatus", midway.checkToken, (req, res, next) => {
-  db.executeSql(
-    "UPDATE `employee` SET isworking=" +
-    req.body.isworking +
-    " WHERE id=" +
-    req.body.id +
-    ";",
-    function (data, err) {
-      if (err) {
-        console.log("Error in store.js", err);
-      } else {
-        return res.json(data);
-      }
+  db.executeSql("UPDATE `employee` SET isworking=" + req.body.isworking + " WHERE id=" + req.body.id + ";", function (data, err) {
+    if (err) {
+      console.log("Error in store.js", err);
+    } else {
+      return res.json(data);
     }
+  }
   );
 });
-
+router.post("/UpdateCompleteServices", midway.checkToken, (req, res, next) => {
+  db.executeSql("UPDATE `custservices` SET ifcomplete=true WHERE id=" + req.body.CSId + ";", function (data, err) {
+    if (err) {
+      console.log("Error in store.js", err);
+    } else {
+      return res.json(data);
+    }
+  }
+  );
+});
+router.post("/UpdateAppointmentServicesStatus", midway.checkToken, (req, res, next) => {
+  console.log(req.body);
+  db.executeSql("UPDATE `appointment` SET `isstatus`='" + req.body.isstatus + "' WHERE id=" + req.body.bookingId + ";", function (data, err) {
+    if (err) {
+      console.log(err);
+    } else {
+      res.json("success");
+    }
+  });
+});
 router.post("/SaveCustomerList", (req, res, next) => {
   console.log(req.body, "data");
   db.executeSql("select * from customer WHERE contact='" + req.body.contact + "' OR whatsapp='" + req.body.whatsapp + "'", function (data, err) {
@@ -783,7 +796,7 @@ function handleComboService(body, appointmentId, index, callback) {
 
 function handleMembershipService(body, appointmentId, index, callback) {
   console.log(body);
-  db.executeSql("INSERT INTO `custservices`(`servicetype`, `servicesid`, `servicesname`, `custid`, `appointmentid`,`memid`) VALUES('" + body.selectedService[index].servicetype + "'," + body.selectedService[index].selectedServid + ",'" + body.selectedService[index].servicesname + "'," + body.custid + "," + appointmentId + "," + body.memid + ");", function (servdata, err) {
+  db.executeSql("INSERT INTO `custservices`(`servicetype`, `servicesid`, `servicesname`, `custid`, `appointmentid`,`memid`) VALUES('" + body.selectedService[index].servicetype + "'," + body.selectedService[index].selectedServid + ",'" + body.selectedService[index].servicesname + "'," + body.custid + "," + appointmentId + "," +  body.selectedService[index].memid + ");", function (servdata, err) {
     if (err) {
       console.log(err);
     } else {
@@ -1358,7 +1371,7 @@ router.post("/SaveRatingsDetails", midway.checkToken, (req, res, next) => {
 });
 router.post("/GetUsedServicesByCustomer", midway.checkToken, (req, res, next) => {
   console.log(req.body);
-  db.executeSql("select s.id as CSId,s.servicetype,s.servicesid,s.servicesname,s.custid,s.appointmentid,s.employeename,s.empid,s.comboid,s.memid,sl.id as slId,sl.price,sl.time,sl.point,sl.epoint from custservices s join serviceslist sl on s.servicesid=sl.id where s.appointmentid = " + req.body.id + "", function (data, err) {
+  db.executeSql("select s.id as CSId,s.servicetype,s.servicesid,s.servicesname,s.custid,s.appointmentid,s.employeename,s.empid,s.comboid,s.memid,s.ifcomplete,sl.id as slId,sl.price,sl.time,sl.point,sl.epoint from custservices s join serviceslist sl on s.servicesid=sl.id where s.appointmentid = " + req.body.id + "", function (data, err) {
     if (err) {
       console.log("Error in store.js", err);
     } else {
