@@ -28,7 +28,7 @@ const job = schedule.scheduleJob("0 0 * * *", function () {
 
 router.post("/SaveServicesList", midway.checkToken, (req, res, next) => {
   console.log(req.body, "servecies");
-  db.executeSql("INSERT INTO `serviceslist`(`name`, `price`, `time`, `point`, `isactive`, `createdate`,`epoint`)VALUES('" + req.body.name + "'," + req.body.price + "," + req.body.time + "," + req.body.point + ",true,CURRENT_TIMESTAMP," + req.body.epoint + ");", function (data, err) {
+  db.executeSql("INSERT INTO `serviceslist`(`name`, `price`,`totalcost`, `time`, `point`, `isactive`, `createdate`,`epoint`)VALUES('" + req.body.name + "'," + req.body.price + ","+ req.body.totalcost + "," + req.body.time + "," + req.body.point + ",true,CURRENT_TIMESTAMP," + req.body.epoint + ");", function (data, err) {
     if (err) {
       res.json("error");
     } else {
@@ -62,7 +62,7 @@ router.get("/GetAllServices", midway.checkToken, (req, res, next) => {
 });
 
 router.post("/UpdateServicesList", midway.checkToken, (req, res, next) => {
-  db.executeSql("UPDATE  `serviceslist` SET name='" + req.body.name + "',price=" + req.body.price + ",time=" + req.body.time + ",point=" + req.body.point + ",epoint=" + req.body.epoint + ",updateddate=CURRENT_TIMESTAMP WHERE id=" + req.body.id + ";", function (data, err) {
+  db.executeSql("UPDATE  `serviceslist` SET name='" + req.body.name + "',price=" + req.body.price + ",totalcost =" + req.body.totalcost + ",time=" + req.body.time + ",point=" + req.body.point + ",epoint=" + req.body.epoint + ",updateddate=CURRENT_TIMESTAMP WHERE id=" + req.body.id + ";", function (data, err) {
     if (err) {
       console.log("Error in store.js", err);
     } else {
@@ -1371,7 +1371,7 @@ router.post("/SaveRatingsDetails", midway.checkToken, (req, res, next) => {
 });
 router.post("/GetUsedServicesByCustomer", midway.checkToken, (req, res, next) => {
   console.log(req.body);
-  db.executeSql("select s.id as CSId,s.servicetype,s.servicesid,s.servicesname,s.custid,s.appointmentid,s.employeename,s.empid,s.comboid,s.memid,s.ifcomplete,sl.id as slId,sl.price,sl.time,sl.point,sl.epoint from custservices s join serviceslist sl on s.servicesid=sl.id where s.appointmentid = " + req.body.id + "", function (data, err) {
+  db.executeSql("select s.id as CSId,s.servicetype,s.servicesid,s.servicesname,s.custid,s.appointmentid,s.employeename,s.empid,s.comboid,s.memid,s.ifcomplete,sl.id as slId,sl.price,sl.totalcost,sl.time,sl.point,sl.epoint from custservices s join serviceslist sl on s.servicesid=sl.id where s.appointmentid = " + req.body.id + "", function (data, err) {
     if (err) {
       console.log("Error in store.js", err);
     } else {
