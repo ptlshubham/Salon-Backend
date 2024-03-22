@@ -1100,7 +1100,7 @@ function mail(filename, data, toemail, subj, mailname) {
     host: "smtp.gmail.com",
     auth: {
       user: "ptlshubham@gmail.com",
-      pass: "hvcukfxtadulqrnb",
+      pass: "mmdovwldhqpjzgdg",
     },
   });
   const filePath = "src/assets/emailtemplets/" + filename;
@@ -1195,91 +1195,65 @@ function mail(filename, data, toemail, subj, mailname) {
   });
 }
 
-router.post("/ForgotPassword", midway.checkToken, (req, res, next) => {
+router.post("/ForgotPassword", (req, res, next) => {
   let otp = Math.floor(100000 + Math.random() * 900000);
   console.log(req.body);
-  db.executeSql(
-    "select * from users where email='" + req.body.email + "';",
-    function (data, err) {
-      if (err) {
-        console.log("Error in store.js", err);
-        return res.json("err");
-      } else {
-        console.log(data[0]);
-        db.executeSql(
-          "INSERT INTO `otp`(`userid`, `otp`, `createddate`, `createdtime`,`role`,`isactive`) VALUES (" +
-          data[0].userid +
-          "," +
-          otp +
-          ",CURRENT_TIMESTAMP,CURRENT_TIMESTAMP,'" +
-          data[0].role +
-          "',true)",
-          function (data1, err) {
-            if (err) {
-              console.log(err);
-            } else {
-              const replacements = {
-                votp: otp,
-                email: req.body.email,
-              };
-              mail(
-                "verification.html",
-                replacements,
-                req.body.email,
-                "Password resetting",
-                " "
-              );
-              res.json(data);
-            }
+  db.executeSql("select * from users where email='" + req.body.email + "';", function (data, err) {
+    if (err) {
+      console.log("Error in store.js", err);
+      return res.json("err");
+    } else {
+      console.log(data[0]);
+      db.executeSql(
+        "INSERT INTO `otp`(`userid`, `otp`, `createddate`, `createdtime`,`role`,`isactive`) VALUES (" +
+        data[0].userid +
+        "," +
+        otp +
+        ",CURRENT_TIMESTAMP,CURRENT_TIMESTAMP,'" +
+        data[0].role +
+        "',true)",
+        function (data1, err) {
+          if (err) {
+            console.log(err);
+          } else {
+            const replacements = {
+              votp: otp,
+              email: req.body.email,
+            };
+            mail(
+              "verification.html",
+              replacements,
+              req.body.email,
+              "Password resetting",
+              " "
+            );
+            res.json(data);
           }
-        );
-      }
+        }
+      );
     }
+  }
   );
 });
 
-router.post("/GetOneTimePassword", midway.checkToken, (req, res, next) => {
+router.post("/GetOneTimePassword", (req, res, next) => {
   console.log(req.body);
-  db.executeSql(
-    "select * from otp where userid = '" +
-    req.body.id +
-    "' " +
-    " and otp =' " +
-    req.body.otp +
-    "' ",
-    function (data, err) {
-      if (err) {
-        console.log("Error in store.js", err);
-      } else {
-        return res.json(data);
-      }
+  db.executeSql("select * from otp where userid = '" + req.body.id + "' " + " and otp =' " + req.body.otp + "' ", function (data, err) {
+    if (err) {
+      console.log("Error in store.js", err);
+    } else {
+      return res.json(data);
     }
+  }
   );
 });
-// router.post("/ChackForPassword", midway.checkToken, midway.checkToken,(req, res, next) => {
-//     var salt = '7fa73b47df808d36c5fe328546ddef8b9011b2c6';
-//     var repass = salt + '' + req.body.pass;
-//     var encPassword = crypto.createHash('sha1').update(repass).digest('hex');
-//     db.executeSql("select * from users where userid=" + req.body.id + " and password='" + encPassword + "'", function(data, err) {
-//         if (err) {
-//             console.log(err);
-//         } else {
-//             return res.json(data)
-//         }
-//     })
-// })
 
-router.post("/UpdatePassword", midway.checkToken, (req, res, next) => {
+router.post("/UpdatePassword", (req, res, next) => {
   console.log(req.body);
   var salt = "7fa73b47df808d36c5fe328546ddef8b9011b2c6";
   var repass = salt + "" + req.body.password;
   var encPassword = crypto.createHash("sha1").update(repass).digest("hex");
-  db.executeSql(
-    "UPDATE users SET password='" +
-    encPassword +
-    "' WHERE userid=" +
-    req.body.id +
-    ";",
+  db.executeSql("UPDATE users SET password='" + encPassword + "' WHERE userid=" + req.body.id + ";",
     function (data, err) {
       if (err) {
         console.log("Error in store.js", err);
