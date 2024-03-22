@@ -28,7 +28,7 @@ const job = schedule.scheduleJob("0 0 * * *", function () {
 
 router.post("/SaveServicesList", midway.checkToken, (req, res, next) => {
   console.log(req.body, "servecies");
-  db.executeSql("INSERT INTO `serviceslist`(`name`, `price`,`totalcost`, `time`, `point`, `isactive`, `createdate`,`epoint`)VALUES('" + req.body.name + "'," + req.body.price + ","+ req.body.totalcost + "," + req.body.time + "," + req.body.point + ",true,CURRENT_TIMESTAMP," + req.body.epoint + ");", function (data, err) {
+  db.executeSql("INSERT INTO `serviceslist`(`name`, `price`,`totalcost`, `time`, `point`, `isactive`, `createdate`,`epoint`)VALUES('" + req.body.name + "'," + req.body.price + "," + req.body.totalcost + "," + req.body.time + "," + req.body.point + ",true,CURRENT_TIMESTAMP," + req.body.epoint + ");", function (data, err) {
     if (err) {
       res.json("error");
     } else {
@@ -748,7 +748,7 @@ router.post("/SaveBookingDetails", midway.checkToken, (req, res, next) => {
       function checkCompletion() {
         completedServices++;
         if (completedServices === req.body.selectedService.length) {
-          handlePointAndHistory(req.body);
+          // handlePointAndHistory(req.body, data.insertId);
           res.json({ message: "Booking details saved successfully" });
         }
       }
@@ -796,7 +796,7 @@ function handleComboService(body, appointmentId, index, callback) {
 
 function handleMembershipService(body, appointmentId, index, callback) {
   console.log(body);
-  db.executeSql("INSERT INTO `custservices`(`servicetype`, `servicesid`, `servicesname`, `custid`, `appointmentid`,`memid`) VALUES('" + body.selectedService[index].servicetype + "'," + body.selectedService[index].selectedServid + ",'" + body.selectedService[index].servicesname + "'," + body.custid + "," + appointmentId + "," +  body.selectedService[index].memid + ");", function (servdata, err) {
+  db.executeSql("INSERT INTO `custservices`(`servicetype`, `servicesid`, `servicesname`, `custid`, `appointmentid`,`memid`) VALUES('" + body.selectedService[index].servicetype + "'," + body.selectedService[index].selectedServid + ",'" + body.selectedService[index].servicesname + "'," + body.custid + "," + appointmentId + "," + body.selectedService[index].memid + ");", function (servdata, err) {
     if (err) {
       console.log(err);
     } else {
@@ -810,7 +810,7 @@ function handleMembershipService(body, appointmentId, index, callback) {
               if (updateErr) {
                 console.log("Error updating remainingquantity:", updateErr);
               } else {
-                db.executeSql("INSERT INTO `membershiphistory`(`custid`, `memid`, `servid`, `usedquantity`, `remainingquantity`, `useddate`, `createddate`) VALUES(" + body.custid + "," + body.selectedService[index].memid + "," + body.selectedService[index].selectedServid + ",1," + (remainingquantity - 1) + ",CURRENT_TIMESTAMP,CURRENT_TIMESTAMP);", function (historyData, historyErr) {
+                db.executeSql("INSERT INTO `membershiphistory`(`custid`, `memid`, `servid`, `appointmentid`, `usedquantity`, `remainingquantity`, `useddate`, `createddate`) VALUES(" + body.custid + "," + body.selectedService[index].memid + "," + body.selectedService[index].selectedServid + "," + appointmentId + ",1," + (remainingquantity - 1) + ",CURRENT_TIMESTAMP,CURRENT_TIMESTAMP);", function (historyData, historyErr) {
                   if (historyErr) {
                     console.log("Error inserting into membershiphistory:", historyErr);
                   } else {
@@ -828,7 +828,7 @@ function handleMembershipService(body, appointmentId, index, callback) {
     }
   });
 }
-function handlePointAndHistory(body) {
+function handlePointAndHistory(body, appointmentId) {
   if (body.tCustPoint == 0) {
     db.executeSql("INSERT INTO `point`( `custid`, `totalcustpoint`)VALUES(" + body.custid + "," + body.totalpoint + ");", function (pointdata, err) {
       if (err) {
@@ -842,7 +842,7 @@ function handlePointAndHistory(body) {
         if (err) {
           console.log(err);
         } else {
-          db.executeSql("INSERT INTO `pointhistory`(`custid`, `redeempoint`, `totalpoint`, `redeemdate`) VALUES(" + body.custid + "," + body.redeempoints + "," + body.tCustPoint + ",CURRENT_TIMESTAMP);", function (historydata, err) {
+          db.executeSql("INSERT INTO `pointhistory`(`custid`, `appointmentid`, `redeempoint`, `totalpoint`, `redeemdate`) VALUES(" + body.custid + "," + appointmentId + "," + body.redeempoints + "," + body.tCustPoint + ",CURRENT_TIMESTAMP);", function (historydata, err) {
             if (err) {
               console.log(err);
             } else {
@@ -899,35 +899,56 @@ router.post("/RemoveAppointementEmployeeData", midway.checkToken, (req, res, nex
   });
 });
 
-router.post("/DeleteBookingDetails", midway.checkToken, (req, res, next) => {
-  console.log(req.body, 'Delete Booking');
-
-  if (req.body.servicetype === 'Regular') {
-    db.executeSql("Delete from custservices where servicesid=" + req.body.servicesid + " AND appointmentid=" + req.body.appointmentid + "", function (data, err) {
-      if (err) {
-        console.log("Error in store.js", err);
-      } else {
-        return res.json(data);
-      }
+router.post("/RemoveAppointmentDetails", midway.checkToken, (req, res, next) => {
+  db.executeSql("DELETE FROM `appointment` WHERE id=" + req.body.id, function (data, err) {
+    if (err) {
+      console.log(err);
+      res.status(500).json({ error: "Failed to save booking details" });
+    } else {
+      db.executeSql("DELETE FROM `custservices` WHERE appointmentid=" + req.body.id, function (result, err) {
+        if (err) {
+          console.log(err);
+        } else {
+          for (let i = 0; i < req.body.usedServices.length; i++) {
+            if (req.body.usedServices[i].servicetype === 'Combo') {
+              db.executeSql("DELETE FROM `purchasedoffer` WHERE appointmentId=" + req.body.id, function (result1, err) {
+                if (err) {
+                  console.log(err);
+                } else {
+                }
+              });
+            } else if (req.body.usedServices[i].servicetype === 'Membership') {
+              db.executeSql("UPDATE `purchasedmembership` SET `remainingquantity` = remainingquantity + 1 WHERE cid = " + req.body.custid + " AND memid = " + req.body.usedServices[i].memid + " AND serid = " + req.body.usedServices[i].servicesid, function (updateResult, err) {
+                if (err) {
+                  console.log("Error updating remainingquantity:", err);
+                } else {
+                  db.executeSql("DELETE FROM `membershiphistory` WHERE custid = " + req.body.custid + " AND memid = " + req.body.usedServices[i].memid + " AND servid = " + req.body.usedServices[i].servicesid + " AND appointmentid = " + req.body.id, function (historyResult, err) {
+                    if (err) {
+                      console.log("Error inserting into membershiphistory:", err);
+                    } else {
+                    }
+                  });
+                }
+              });
+            }
+            if (req.body.isstatus == 'Processing' && req.body.usedServices[i].empid != null && req.body.usedServices[i].ifcomplete == false) {
+              db.executeSql("UPDATE `employee` SET `isworking` = false WHERE id = " + req.body.usedServices[i].empid + ";", function (data, err) {
+                if (err) {
+                  console.log(err);
+                } else {
+                  console.log('Updated employee status to inactive');
+                }
+              });
+            }
+          }
+          res.status(200).json({ message: "Appointment details removed successfully" });
+        }
+      });
     }
-    );
-  }
-  else if (req.body.servicetype === 'Combo') {
-    handleDeleteCombo(req.body, checkRemoveCompletion);
-  }
-  else if (req.body.servicetype === 'Membership') {
-    handleDeleteMembership(req.body, checkRemoveCompletion);
-  }
-
-  function checkRemoveCompletion() {
-    completedServices++;
-    if (completedServices === req.body.selectedService.length) {
-      handlePointAndHistory(req.body);
-      res.json({ message: "Booking details saved successfully" });
-    }
-  }
-
+  });
 });
+
+
 router.post("/saveOfferPurchase", midway.checkToken, (req, res, next) => {
   db.executeSql("INSERT INTO `purchasedoffer`( `custid`, `employeeid`, `offerid`,`appointmentId`, `payment`, `offerprice`, `createddate`, `updateddate`) VALUES (" + req.body.custid + "," + req.body.empId + "," + req.body.offerId + "," + req.body.appointmentId + "," + false + "," + req.body.offerprice + ",CURRENT_TIMESTAMP,null);", function (data, err) {
     if (err) {
