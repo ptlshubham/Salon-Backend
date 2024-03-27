@@ -948,6 +948,74 @@ router.post("/RemoveAppointmentDetails", midway.checkToken, (req, res, next) => 
   });
 });
 
+router.post("/RemoveRegularItemsFromServices", midway.checkToken, (req, res, next) => {
+  console.log(req.body);
+  db.executeSql("DELETE FROM `custservices` WHERE id=" + req.body.CSId + ";", function (data, err) {
+    if (err) {
+      console.log(err);
+    } else {
+      db.executeSql("UPDATE appointment SET totalprice = totalprice - " + req.body.price + ",totalpoint = totalpoint -" + req.body.point + ",totaltime = totaltime - " + req.body.time + " WHERE id =" + req.body.appointmentid + ";", function (data, err) {
+        if (err) {
+          console.log(err);
+        } else {
+          res.json("success");
+        }
+      });
+    }
+  });
+});
+
+router.post("/RemoveMembershipItemsFromServices", midway.checkToken, (req, res, next) => {
+  console.log(req.body);
+  db.executeSql("DELETE FROM `custservices` WHERE id=" + req.body.CSId + ";", function (data, err) {
+    if (err) {
+      console.log(err);
+    } else {
+      db.executeSql("UPDATE `purchasedmembership` SET `remainingquantity`=remainingquantity + 1 WHERE cid =" + req.body.custid + " AND memid =" + req.body.memid + " AND serid =" + req.body.servicesid + ";", function (data, err) {
+        if (err) {
+          console.log(err);
+        } else {
+          db.executeSql("DELETE FROM `membershiphistory` WHERE custid =" + req.body.custid + " AND memid =" + req.body.memid + " AND servid =" + req.body.servicesid + " AND appointmentid ='" + req.body.appointmentid + "';", function (data, err) {
+            if (err) {
+              console.log(err);
+            } else {
+              db.executeSql("UPDATE appointment SET totalprice = totalprice - " + req.body.price + ",totalpoint = totalpoint -" + req.body.point + ",totaltime = totaltime - " + req.body.time + " WHERE id =" + req.body.appointmentid + ";", function (data, err) {
+                if (err) {
+                  console.log(err);
+                } else {
+                  res.json("success");
+                }
+              });
+            }
+          });
+        }
+      });
+    }
+  });
+});
+
+router.post("/RemoveComboItemsFromServices", midway.checkToken, (req, res, next) => {
+  console.log(req.body);
+  db.executeSql("DELETE FROM `custservices` WHERE custid=" + req.body.custid + " AND appointmentid=" + req.body.appointmentid + " AND servicetype='Combo';", function (data, err) {
+    if (err) {
+      console.log(err);
+    } else {
+      db.executeSql("DELETE FROM `purchasedoffer` WHERE custid =" + req.body.custid + " AND appointmentId =" + req.body.appointmentid + ";", function (data, err) {
+        if (err) {
+          console.log(err);
+        } else {
+          db.executeSql("UPDATE appointment SET totalprice = totalprice - " + req.body.removeprice + ",totalpoint = totalpoint -" + req.body.removepoint + ",totaltime = totaltime - " + req.body.removetime + " WHERE id =" + req.body.appointmentid + ";", function (data, err) {
+            if (err) {
+              console.log(err);
+            } else {
+              res.json("success");
+            }
+          });
+        }
+      });
+    }
+  });
+});
 
 router.post("/saveOfferPurchase", midway.checkToken, (req, res, next) => {
   db.executeSql("INSERT INTO `purchasedoffer`( `custid`, `employeeid`, `offerid`,`appointmentId`, `payment`, `offerprice`, `createddate`, `updateddate`) VALUES (" + req.body.custid + "," + req.body.empId + "," + req.body.offerId + "," + req.body.appointmentId + "," + false + "," + req.body.offerprice + ",CURRENT_TIMESTAMP,null);", function (data, err) {
@@ -973,19 +1041,13 @@ router.post("/ChackForPassword", midway.checkToken, (req, res, next) => {
   var salt = "7fa73b47df808d36c5fe328546ddef8b9011b2c6";
   var repass = salt + "" + req.body.pass;
   var encPassword = crypto.createHash("sha1").update(repass).digest("hex");
-  db.executeSql(
-    "select * from users where userid=" +
-    req.body.id +
-    " and password='" +
-    encPassword +
-    "'",
-    function (data, err) {
-      if (err) {
-        console.log(err);
-      } else {
-        return res.json(data);
-      }
+  db.executeSql("select * from users where userid=" + req.body.id + " and password='" + encPassword + "'", function (data, err) {
+    if (err) {
+      console.log(err);
+    } else {
+      return res.json(data);
     }
+  }
   );
 });
 
