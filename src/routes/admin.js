@@ -11,6 +11,7 @@ const nodemailer = require("nodemailer");
 var handlebars = require("handlebars");
 const fs = require("fs");
 const schedule = require("node-schedule");
+const { log } = require("console");
 let dates = new Date(new Date().setDate(new Date().getDate() - 60));
 
 console.log(dates.toISOString().slice(0, 10));
@@ -1041,15 +1042,20 @@ router.post("/ChackForPassword", midway.checkToken, (req, res, next) => {
   var salt = "7fa73b47df808d36c5fe328546ddef8b9011b2c6";
   var repass = salt + "" + req.body.pass;
   var encPassword = crypto.createHash("sha1").update(repass).digest("hex");
+
   db.executeSql("select * from users where userid=" + req.body.id + " and password='" + encPassword + "'", function (data, err) {
     if (err) {
-      console.log(err);
+      res.status(500).json({ error: "An internal server error occurred" });
     } else {
-      return res.json(data);
+      if (data.length > 0) {
+        res.json({ message: "success" });
+      } else {
+        res.json({ error: "Invalid credentials" });
+      }
     }
-  }
-  );
+  });
 });
+
 
 // router.post("/updatePasswordAccordingRole", midway.checkToken,(req, res, next) => {
 //     console.log(req.body)
@@ -1305,6 +1311,10 @@ router.post("/GetOneTimePassword", (req, res, next) => {
       console.log("Error in store.js", err);
     } else {
       return res.json(data);
+    }if (data.length > 0) {
+      res.json({ message: "success" });
+    } else {
+      res.json({ error: "Invalid credentials" });
     }
   }
   );
@@ -1314,14 +1324,17 @@ router.post("/UpdatePassword", (req, res, next) => {
   console.log(req.body);
   var salt = "7fa73b47df808d36c5fe328546ddef8b9011b2c6";
   var repass = salt + "" + req.body.password;
+  
   var encPassword = crypto.createHash("sha1").update(repass).digest("hex");
   db.executeSql("UPDATE users SET password='" + encPassword + "' WHERE userid=" + req.body.id + ";",
     function (data, err) {
+
       if (err) {
         console.log("Error in store.js", err);
       } else {
         console.log("shsyuhgsuygdyusgdyus", data);
         return res.json(data);
+        
       }
     }
   );
