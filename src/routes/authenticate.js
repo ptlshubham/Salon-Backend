@@ -112,7 +112,7 @@ router.post('/UnlockScreenLock',(req, res, next)=> {
     var repass = salt + '' + req.body.password;
     var encPassword = crypto.createHash('sha1').update(repass).digest('hex');
     console.log(encPassword)
-    db.executeSql("select * from users where id='"+req.body.id+"';", function (data, err) {
+    db.executeSql("select * from users where userid='"+req.body.id+"';", function (data, err) {
         console.log(data);
         if(err){
             console.log(err);
