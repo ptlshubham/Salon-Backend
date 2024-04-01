@@ -1311,7 +1311,7 @@ router.post("/GetOneTimePassword", (req, res, next) => {
       console.log("Error in store.js", err);
     } else {
       return res.json(data);
-    }if (data.length > 0) {
+    } if (data.length > 0) {
       res.json({ message: "success" });
     } else {
       res.json({ error: "Invalid credentials" });
@@ -1324,7 +1324,7 @@ router.post("/UpdatePassword", (req, res, next) => {
   console.log(req.body);
   var salt = "7fa73b47df808d36c5fe328546ddef8b9011b2c6";
   var repass = salt + "" + req.body.password;
-  
+
   var encPassword = crypto.createHash("sha1").update(repass).digest("hex");
   db.executeSql("UPDATE users SET password='" + encPassword + "' WHERE userid=" + req.body.id + ";",
     function (data, err) {
@@ -1334,7 +1334,7 @@ router.post("/UpdatePassword", (req, res, next) => {
       } else {
         console.log("shsyuhgsuygdyusgdyus", data);
         return res.json(data);
-        
+
       }
     }
   );
@@ -2547,6 +2547,17 @@ router.post("/UpdateLogoutDetails", (req, res, next) => {
       }
     }
   );
+});
+
+router.post("/SaveGeneralSalonDetails", midway.checkToken, (req, res, next) => {
+  console.log(req.body, "General Details");
+  db.executeSql("INSERT INTO `general`(`salonid`, `vipdiscount`, `maxdiscount`, `emppointsconvert`, `custpointsconvert`, `createddate`) VALUES (null," + req.body.vipdiscount + "," + req.body.maxdiscount + "," + req.body.emppointsconvert + "," + req.body.custpointsconvert + ",CURRENT_TIMESTAMP);", function (data, err) {
+    if (err) {
+      res.json("error");
+    } else {
+      return res.json(data);
+    }
+  });
 });
 
 function generateUUID() {
