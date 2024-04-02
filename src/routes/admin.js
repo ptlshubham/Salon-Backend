@@ -1380,15 +1380,13 @@ router.post("/UpdateEnquiryStatus", midway.checkToken, (req, res, next) => {
 });
 
 router.post("/GetCustomerTotalPoints", midway.checkToken, (req, res, next) => {
-  db.executeSql(
-    "select * from point where custid = " + req.body.id + "",
-    function (data, err) {
-      if (err) {
-        console.log("Error in store.js", err);
-      } else {
-        return res.json(data);
-      }
+  db.executeSql("select * from point where custid = " + req.body.id + "", function (data, err) {
+    if (err) {
+      console.log("Error in store.js", err);
+    } else {
+      return res.json(data);
     }
+  }
   );
 });
 
@@ -2560,8 +2558,8 @@ router.post("/SaveGeneralSalonDetails", midway.checkToken, (req, res, next) => {
   });
 });
 
-router.get("/GetAllGeneralSalonData", midway.checkToken, (req, res, next) => {
-  db.executeSql("SELECT * FROM `general`;", function (data, err) {
+router.get("/GetAllGeneralSalonData/:id", midway.checkToken, (req, res, next) => {
+  db.executeSql("SELECT * FROM `general` where salonid=" + req.params.id + ";", function (data, err) {
     if (err) {
       console.log(err);
     } else {
