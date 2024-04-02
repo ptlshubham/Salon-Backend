@@ -2551,9 +2551,30 @@ router.post("/UpdateLogoutDetails", (req, res, next) => {
 
 router.post("/SaveGeneralSalonDetails", midway.checkToken, (req, res, next) => {
   console.log(req.body, "General Details");
-  db.executeSql("INSERT INTO `general`(`salonid`, `vipdiscount`, `maxdiscount`, `emppointsconvert`, `custpointsconvert`, `createddate`) VALUES (null," + req.body.vipdiscount + "," + req.body.maxdiscount + "," + req.body.emppointsconvert + "," + req.body.custpointsconvert + ",CURRENT_TIMESTAMP);", function (data, err) {
+  db.executeSql("INSERT INTO `general`(`salonid`, `vipdiscount`, `maxdiscount`, `emppointsconvert`, `custpointsconvert`, `createddate`) VALUES (" + req.body.salonid + "," + req.body.vipdiscount + "," + req.body.maxdiscount + "," + req.body.emppointsconvert + "," + req.body.custpointsconvert + ",CURRENT_TIMESTAMP);", function (data, err) {
     if (err) {
       res.json("error");
+    } else {
+      return res.json(data);
+    }
+  });
+});
+
+router.get("/GetAllGeneralSalonData", midway.checkToken, (req, res, next) => {
+  db.executeSql("SELECT * FROM `general`;", function (data, err) {
+    if (err) {
+      console.log(err);
+    } else {
+      return res.json(data);
+    }
+  }
+  );
+});
+
+router.get("/GetUserDataById/:id", midway.checkToken, (req, res, next) => {
+  db.executeSql("SELECT * FROM `users` where userid=" + req.params.id + ";", function (data, err) {
+    if (err) {
+      console.log(err);
     } else {
       return res.json(data);
     }
