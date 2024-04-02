@@ -2581,6 +2581,16 @@ router.get("/GetUserDataById/:id", midway.checkToken, (req, res, next) => {
   });
 });
 
+router.get("/GetCustomerServices", midway.checkToken, (req, res, next) => {
+  db.executeSql("SELECT servicesid,servicesname, COUNT(*) AS service_count FROM `custservices` GROUP BY servicesid ORDER BY service_count DESC LIMIT 5", function (data, err) {
+    if (err) {
+      console.log(err);
+    } else {
+      return res.json(data);
+    }
+  });
+});
+
 function generateUUID() {
   var d = new Date().getTime();
   var uuid = "xxxxxxxx-xxxx-4xxx-yxxx".replace(/[xy]/g, function (c) {
