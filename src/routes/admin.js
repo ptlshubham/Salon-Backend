@@ -2370,10 +2370,24 @@ router.post("/SaveRegistrationList", midway.checkToken, (req, res, next) => {
     if (err) {
       res.json("error");
     } else {
-      return res.json(data);
+      var salt = "7fa73b47df808d36c5fe328546ddef8b9011b2c6";
+      var repass = salt + "" + body.adminpassword;
+      var encPassword = crypto.createHash("sha1").update(repass).digest("hex");
+      db.executeSql("INSERT INTO `users`(`salonid`, `email`, `password`, `role`, `isactive`) VALUES (" + data.insertId + ",'" + req.body.adminemail + "','" + encPassword + "','" + req.body.adminrole + "',true);", function (data1, err) {
+        if (err) {
+          res.json("error");
+        } else {
+          db.executeSql("INSERT INTO `admin`(`salonid`, `firstname`, `lastname`, `email`, `password`, `isactive`, `role`, `uid`) VALUES (" + data.insertId + ",'" + req.body.adminfname + "','" + req.body.adminlname + "','" + req.body.adminemail + "','" + encPassword + "','" + req.body.adminrole + "',true,'" + data1.insertId + "');", function (data2, err) {
+            if (err) {
+              res.json("error");
+            } else {
+              return res.json(data);
+            }
+          });
+        }
+      });
     }
-  }
-  );
+  });
 });
 
 router.get("/GetAllRegistration", midway.checkToken, (req, res, next) => {
