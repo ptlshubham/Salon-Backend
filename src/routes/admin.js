@@ -2460,14 +2460,14 @@ router.get("/GetWebActiveBanner", midway.checkToken, (req, res, next) => {
   );
 });
 
-router.post("/SaveRegistrationList", midway.checkToken, (req, res, next) => {
-  console.log(req.body, "saloonlist");
-  db.executeSql("INSERT INTO `saloonlist` (`sname`, `scontact`, `semail`, `gst`, `address`, `landmark`, `state`, `city`, `pincode`, `oname`, `ocontact`, `oemail`, `gender`, `websitelink`, `subscription`, `status`, `createddate`) VALUES ('" + req.body.sname + "','" + req.body.scontact + "','" + req.body.semail + "','" + req.body.gst + "','" + req.body.address + "','" + req.body.landmark + "','" + req.body.selectState + "','" + req.body.city + "','" + req.body.pincode + "','" + req.body.oname + "','" + req.body.ocontact + "','" + req.body.oemail + "','" + req.body.selectGender + "','" + req.body.websitelink + "','" + req.body.selectSupscription + "',true,CURRENT_TIMESTAMP);", function (data, err) {
+router.post("/SaveRegistrationList", (req, res, next) => {
+  console.log(req.body, "companys");
+  db.executeSql("INSERT INTO `companys`(`fname`, `lname`, `uemail`, `cname`, `cphone`, `caddress`, `cpincode`, `isactive`, `createddate`) VALUES ('" + req.body.fname + "','" + req.body.lname + "','" + req.body.email + "','" + req.body.cname + "','" + req.body.phoneno + "','" + req.body.addres + "','" + req.body.pincode + "',true,CURRENT_TIMESTAMP);", function (data, err) {
     if (err) {
       res.json("error");
     } else {
       var salt = "7fa73b47df808d36c5fe328546ddef8b9011b2c6";
-      var repass = salt + "" + body.adminpassword;
+      var repass = salt + "" + req.body.adminpassword;
       var encPassword = crypto.createHash("sha1").update(repass).digest("hex");
       db.executeSql("INSERT INTO `users`(`salonid`, `email`, `password`, `role`, `isactive`) VALUES (" + data.insertId + ",'" + req.body.adminemail + "','" + encPassword + "','" + req.body.adminrole + "',true);", function (data1, err) {
         if (err) {
