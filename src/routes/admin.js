@@ -829,31 +829,7 @@ function handleMembershipService(body, appointmentId, index, callback) {
     }
   });
 }
-function handlePointAndHistory(body, appointmentId) {
-  if (body.tCustPoint == 0) {
-    db.executeSql("INSERT INTO `point`( `custid`, `totalcustpoint`)VALUES(" + body.custid + "," + body.totalpoint + ");", function (pointdata, err) {
-      if (err) {
-        console.log(err);
-      } else {
-      }
-    });
-  } else {
-    if (body.lessPoints != null) {
-      db.executeSql("UPDATE `point` SET totalcustpoint=" + body.lessPoints + " WHERE custid=" + body.custid + ";", function (updatepointdata, err) {
-        if (err) {
-          console.log(err);
-        } else {
-          db.executeSql("INSERT INTO `pointhistory`(`custid`, `appointmentid`, `redeempoint`, `totalpoint`, `redeemdate`) VALUES(" + body.custid + "," + appointmentId + "," + body.redeempoints + "," + body.tCustPoint + ",CURRENT_TIMESTAMP);", function (historydata, err) {
-            if (err) {
-              console.log(err);
-            } else {
-            }
-          });
-        }
-      });
-    }
-  }
-}
+
 
 router.post("/UpdateAppointementEmployeeDetails", midway.checkToken, (req, res, next) => {
   db.executeSql("UPDATE `custservices` SET `employeename`='" + req.body.employeeName + "',`empid`=" + req.body.empId + " WHERE id=" + req.body.CSId + ";", function (data, err) {
@@ -1469,15 +1445,135 @@ router.get("/GetAllCompletedServices", midway.checkToken, (req, res, next) => {
 });
 
 router.post("/SaveModeOfPayment", midway.checkToken, (req, res, next) => {
-  db.executeSql(
-    "INSERT INTO `payment`(`cid`, `appointmentid`, `cname`, `modeofpayment`, `tprice`, `tpoint`, `pdate`,`createddate`) VALUES (" + req.body.cid + "," + req.body.appointmentid + ",'" + req.body.cname + "','" + req.body.modeofpayment + "'," + req.body.tprice + "," + req.body.tpoint + ",CURRENT_TIMESTAMP,CURRENT_TIMESTAMP);", function (data, err) {
+  // Check if redeempoints are greater than 0
+  if (req.body.redeempoints > 0) {
+    // Deduct redeemed points from totalcustpoint
+    db.executeSql("UPDATE `point` SET totalcustpoint = totalcustpoint - " + req.body.redeempoints + " WHERE custid=" + req.body.custid + ";", function (data, err) {
       if (err) {
-        res.json("error");
+        console.log(err);
+        return res.status(500).json({ error: "Error deducting redeem points" });
       } else {
-        return res.json("success");
+        // Insert into pointhistory
+        db.executeSql("INSERT INTO `pointhistory`(`custid`, `appointmentid`, `redeempoint`, `totalpoint`, `redeemdate`) VALUES(" + req.body.custid + "," + req.body.id + "," + req.body.redeempoints + "," + req.body.tCustPoint + ",CURRENT_TIMESTAMP);", function (data1, err) {
+          if (err) {
+            console.log(err);
+            return res.status(500).json({ error: "Error inserting redeem points history" });
+          } else {
+            // Continue with other operations
+            db.executeSql("UPDATE `point` SET totalcustpoint = totalcustpoint + " + req.body.totalpoint + " WHERE custid=" + req.body.custid + ";", function (data, err) {
+              if (err) {
+                console.log(err);
+                return res.status(500).json({ error: "Error deducting redeem points" });
+              } else {
+                processPayment(req, res);
+              }
+            });
+          }
+        });
+      }
+    });
+  } else {
+    if (req.body.redeempoints == 0) {
+      if (req.body.tCustPoint == 0) {
+        db.executeSql("INSERT INTO `point`( `custid`, `totalcustpoint`)VALUES(" + req.body.custid + ",'" + req.body.totalpoint + "');", function (pointdata, err) {
+          if (err) {
+            console.log(err);
+            return res.status(500).json({ error: "Error inserting points" });
+          } else {
+            // Continue with other operations
+            processPayment(req, res);
+          }
+        });
+      } else {
+        db.executeSql("UPDATE `point` SET totalcustpoint=totalcustpoint + " + req.body.totalpoint + " WHERE custid=" + req.body.custid + ";", function (updatepointdata, err) {
+          if (err) {
+            console.log(err);
+            return res.status(500).json({ error: "Error updating points" });
+          } else {
+            // Continue with other operations
+            processPayment(req, res);
+          }
+        });
       }
     }
-  );
+  }
+});
+
+function processPayment(req, res) {
+  // Handle payment insertion
+  db.executeSql("INSERT INTO `payment`(`cid`, `appointmentid`, `modeofpayment`, `tprice`, `tpoint`, `redeempoint`, `redeemamount`, `vipdiscount`, `vipamount`, `maxdiscount`, `maxamount`, `cash`, `online`, `pending`, `pendingstatus`, `pdate`, `createddate`) VALUES (" + req.body.cId + "," + req.body.id + ",'" + req.body.modeofpayment + "'," + req.body.totalprice + "," + req.body.totalpoint + "," + req.body.redeempoints + "," + req.body.redeempointprice + "," + req.body.vipdiscount + "," + req.body.vipdiscountprice + "," + req.body.maxdiscount + "," + req.body.maxdiscountprice + "," + req.body.cashamount + "," + req.body.onlineamount + "," + req.body.pendingamount + "," + req.body.pendingstatus + ",CURRENT_TIMESTAMP,CURRENT_TIMESTAMP);", function (data1, err) {
+    if (err) {
+      console.log(err);
+      return res.status(500).json({ error: "Error inserting payment data" });
+    } else {
+      // Insert emppoints data
+      insertEmpPoints(req, res);
+    }
+  });
+}
+
+function insertEmpPoints(req, res) {
+  // Loop through emppoint array and insert data
+  for (let i = 0; i < req.body.emppoint.length; i++) {
+    db.executeSql("INSERT INTO `emppoints`(`userid`, `appointmentid`, `empid`, `spoint`, `status`, `createddate`) VALUES (" + req.body.custid + "," + req.body.id + "," + req.body.emppoint[i].empid + ",'" + req.body.emppoint[i].point + "',true,CURRENT_TIMESTAMP);", function (data2, err) {
+      if (err) {
+        console.log(err);
+        return res.status(500).json({ error: "Error inserting employee points data" });
+      }
+      else {
+        if (req.body.emppoint[i].empTotalPoint > 0) {
+          console.log('UPDATE =', i, ':', req.body.emppoint[i].empTotalPoint, req.body.emppoint[i].empid)
+          db.executeSql("UPDATE `emptotalpoint` SET `empid`=" + req.body.emppoint[i].empid + ",`totalpoint`= totalpoint + '" + req.body.emppoint[i].point + "' WHERE empid=" + req.body.emppoint[i].empid + ";", function (data2, err) {
+            if (err) {
+              console.log(err);
+              return res.status(500).json({ error: "Error inserting employee points data" });
+            } else {
+              if (i == req.body.emppoint.length - 1) {
+                // Return success response after all emppoints are inserted
+                paymentStatus(req, res);
+              }
+            }
+          });
+        }
+        if (req.body.emppoint[i].empTotalPoint == 0) {
+          console.log('Insert =', i, ':', req.body.emppoint[i].empTotalPoint, req.body.emppoint[i].empid)
+          db.executeSql("INSERT INTO `emptotalpoint`(`empid`, `totalpoint`) VALUES (" + req.body.emppoint[i].empid + ",'" + req.body.emppoint[i].point + "');", function (data2, err) {
+            if (err) {
+              console.log(err);
+              return res.status(500).json({ error: "Error inserting employee points data" });
+            } else {
+              if (i == req.body.emppoint.length - 1) {
+                // Return success response after all emppoints are inserted
+                paymentStatus(req, res);
+              }
+            }
+          });
+        }
+      }
+    });
+  }
+}
+
+function paymentStatus(req, res) {
+  // Handle payment insertion
+  db.executeSql("UPDATE `appointment` SET `ispayment`=true WHERE id=" + req.body.id + " ;", function (data1, err) {
+    if (err) {
+      console.log(err);
+      return res.status(500).json({ error: "Error inserting payment data" });
+    } else {
+      return res.json("success");
+    }
+  });
+}
+
+router.get("/GetAllEmpPointList", midway.checkToken, (req, res, next) => {
+  db.executeSql("SELECT * FROM `emptotalpoint`;", function (data, err) {
+    if (err) {
+      console.log("Error in store.js", err);
+    } else {
+      return res.json(data);
+    }
+  });
 });
 
 router.get("/GetAllModeOfPayment", midway.checkToken, (req, res, next) => {
