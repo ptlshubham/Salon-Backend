@@ -202,7 +202,7 @@ router.post("/GetAllSalaryList", midway.checkToken, (req, res, next) => {
 });
 router.get("/GetAllOrderList", midway.checkToken, (req, res, next) => {
   db.executeSql(
-    "select o.id,o.userid,o.totalprice,o.isactive,o.orderdate,c.fname,c.lname,c.email,c.contact,c.whatsapp,c.gender,c.address,c.landmark,c.state,c.city,c.pincode,c.uid,c.vip,c.ismembership from orderlist o join customer c on o.userid=c.uid",
+    "select o.id,o.userid,o.totalprice,o.isactive,o.orderdate,c.fname,c.lname,c.email,c.contact,c.whatsapp,c.gender,c.address,c.landmark,c.state,c.city,c.pincode,c.uid,c.vip,c.ismembership,c.notes,c.vouchernotes,c.amountpending from orderlist o join customer c on o.userid=c.uid",
     function (data, err) {
       if (err) {
         console.log(err);
@@ -1005,7 +1005,7 @@ router.post("/saveOfferPurchase", midway.checkToken, (req, res, next) => {
 });
 
 router.get("/GetAllAppointment", midway.checkToken, (req, res, next) => {
-  db.executeSql("select a.id,a.custid,a.bookingdate,a.bookingtime,a.totalprice,a.totalpoint,a.totaltime,a.raitings,a.ispayment,a.isstatus,a.isactive,a.createddate,a.updateddate,c.id as cId,c.fname,c.lname,c.email,c.contact,c.whatsapp,c.gender,c.vip,c.isMembership,c.notes,c.vouchernotes from appointment a join customer c on a.custid=c.id where isactive=true ORDER BY a.bookingdate", function (data, err) {
+  db.executeSql("select a.id,a.custid,a.bookingdate,a.bookingtime,a.totalprice,a.totalpoint,a.totaltime,a.raitings,a.ispayment,a.isstatus,a.isactive,a.createddate,a.updateddate,c.id as cId,c.fname,c.lname,c.email,c.contact,c.whatsapp,c.gender,c.vip,c.isMembership,c.notes,c.vouchernotes,c.amountpending from appointment a join customer c on a.custid=c.id where isactive=true ORDER BY a.bookingdate", function (data, err) {
     if (err) {
       console.log(err);
     } else {
@@ -1435,7 +1435,7 @@ today = yyyy + "-" + mm + "-" + dd;
 
 router.get("/GetAllCompletedServices", midway.checkToken, (req, res, next) => {
   console.log(today, 'date')
-  db.executeSql("select a.id,a.custid,a.bookingdate,a.bookingtime,a.totalprice,a.totalpoint,a.totaltime,a.raitings,a.ispayment,a.isstatus,a.isactive,a.createddate,a.updateddate,c.id as cId,c.fname,c.lname,c.email,c.contact,c.whatsapp,c.gender,c.uid,c.vip,c.isMembership,c.notes from appointment a join customer c on a.custid=c.id where a.isactive=false and a.createddate='" + today + "'", function (data, err) {
+  db.executeSql("select a.id,a.custid,a.bookingdate,a.bookingtime,a.totalprice,a.totalpoint,a.totaltime,a.raitings,a.ispayment,a.isstatus,a.isactive,a.createddate,a.updateddate,c.id as cId,c.fname,c.lname,c.email,c.contact,c.whatsapp,c.gender,c.uid,c.vip,c.isMembership,c.notes,c.vouchernotes, c.amountpending FROM from appointment a join customer c on a.custid=c.id where a.isactive=false and a.createddate='" + today + "'", function (data, err) {
     if (err) {
       console.log(err);
     } else {
@@ -1501,12 +1501,21 @@ router.post("/SaveModeOfPayment", midway.checkToken, (req, res, next) => {
 
 function processPayment(req, res) {
   // Handle payment insertion
-  db.executeSql("INSERT INTO `payment`(`cid`, `appointmentid`, `modeofpayment`, `tprice`, `tpoint`, `redeempoint`, `redeemamount`, `vipdiscount`, `vipamount`, `maxdiscount`, `maxamount`, `cash`, `online`, `pending`, `pendingstatus`, `pdate`, `createddate`) VALUES (" + req.body.cId + "," + req.body.id + ",'" + req.body.modeofpayment + "'," + req.body.totalprice + "," + req.body.totalpoint + "," + req.body.redeempoints + "," + req.body.redeempointprice + "," + req.body.vipdiscount + "," + req.body.vipdiscountprice + "," + req.body.maxdiscount + "," + req.body.maxdiscountprice + "," + req.body.cashamount + "," + req.body.onlineamount + "," + req.body.pendingamount + "," + req.body.pendingstatus + ",CURRENT_TIMESTAMP,CURRENT_TIMESTAMP);", function (data1, err) {
+  db.executeSql("INSERT INTO `payment`(`cid`, `appointmentid`, `modeofpayment`, `tprice`, `tpoint`, `paidprice`, `redeempoint`, `redeemamount`, `vipdiscount`, `vipamount`, `maxdiscount`, `maxamount`, `cash`, `online`, `pending`, `pendingstatus`, `appointmentdate`, `pdate`, `lastpdate`, `createddate`) VALUES (" + req.body.cId + "," + req.body.id + ",'" + req.body.modeofpayment + "'," + req.body.totalprice + "," + req.body.totalpoint + "," + req.body.subtotal + "," + req.body.redeempoints + "," + req.body.redeempointprice + "," + req.body.vipdiscount + "," + req.body.vipdiscountprice + "," + req.body.maxdiscount + "," + req.body.maxdiscountprice + "," + req.body.cashamount + "," + req.body.onlineamount + "," + req.body.pendingamount + "," + req.body.pendingstatus + ",'" + req.body.bookingdate + "','" + req.body.pdate + "','" + req.body.lastpdate + "',CURRENT_TIMESTAMP);", function (data1, err) {
     if (err) {
       console.log(err);
       return res.status(500).json({ error: "Error inserting payment data" });
     } else {
       // Insert emppoints data
+      if (req.body.pendingamount > 0) {
+        db.executeSql("UPDATE `customer` SET `amountpending`=true WHERE id=" + req.body.cId + " ;", function (data1, err) {
+          if (err) {
+            console.log(err);
+            return res.status(500).json({ error: "Error inserting payment data" });
+          } else {
+          }
+        });
+      }
       insertEmpPoints(req, res);
     }
   });
@@ -1576,18 +1585,37 @@ router.get("/GetAllEmpPointList", midway.checkToken, (req, res, next) => {
   });
 });
 
-router.get("/GetAllModeOfPayment", midway.checkToken, (req, res, next) => {
-  db.executeSql(
-    "select * from payment where pdate ='" + today + "' ",
-    function (data, err) {
-      if (err) {
-        console.log("Error in store.js", err);
-      } else {
-        return res.json(data);
-      }
+router.get("/GetAllPendingPaymentTotal", midway.checkToken, (req, res, next) => {
+  db.executeSql("SELECT cid,SUM(CASE WHEN pendingstatus = true THEN pending ELSE 0 END) AS totalpending FROM payment GROUP BY cid;", function (data, err) {
+    if (err) {
+      console.log("Error in store.js", err);
+    } else {
+      return res.json(data);
     }
+  });
+});
+
+router.get("/GetAllPaymentList", midway.checkToken, (req, res, next) => {
+  db.executeSql("SELECT c.id, c.fname, c.lname, c.email, c.contact,c.whatsapp, c.gender,c.address, c.landmark, c.state, c.city, c.pincode,c.uid, c.vip, c.isMembership, c.notes, c.vouchernotes,c.amountpending, p.id as pid,p.cid, p.appointmentid, p.modeofpayment, p.tprice,p.tpoint,p.paidprice, p.redeempoint, p.redeemamount, p.vipdiscount,p.vipamount, p.maxdiscount, p.maxamount, p.cash,p.online, p.pending, p.pendingstatus,p.appointmentdate, p.pdate,p.lastpdate, p.createddate FROM customer c INNER JOIN payment p ON c.id = p.cid;", function (data, err) {
+    if (err) {
+      console.log("Error in store.js", err);
+    } else {
+      return res.json(data);
+    }
+  }
   );
 });
+
+// router.get("/GetTodayPendingPaymentList", midway.checkToken, (req, res, next) => {
+//   db.executeSql("SELECT c.id, c.fname, c.lname, c.email, c.contact,c.whatsapp, c.gender,c.address, c.landmark, c.state, c.city, c.pincode,c.uid, c.vip, c.isMembership, c.notes, c.vouchernotes,c.amountpending, p.id as pid,p.cid, p.appointmentid, p.modeofpayment, p.tprice,p.tpoint, p.redeempoint, p.redeemamount, p.vipdiscount,p.vipamount, p.maxdiscount, p.maxamount, p.cash,p.online, p.pending, p.pendingstatus, p.pdate, p.createddate FROM customer c INNER JOIN payment p ON c.id = p.cid where p.pdate ='" + today + "' ", function (data, err) {
+//     if (err) {
+//       console.log("Error in store.js", err);
+//     } else {
+//       return res.json(data);
+//     }
+//   }
+//   );
+// });
 
 router.get("/GetMonthlyPayment", midway.checkToken, (req, res, next) => {
   db.executeSql("select * from payment ", function (data, err) {
