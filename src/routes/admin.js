@@ -2727,6 +2727,23 @@ router.get("/GetCustomerServices", midway.checkToken, (req, res, next) => {
   });
 });
 
+router.post("/SaveBulkServiceDetails", (req, res, next) => {
+  for (let i = 0; i < req.body.length; i++) {
+      db.executeSql("INSERT INTO `serviceslist`(`name`,`price`, `totalcost`, `time`, `point`, `isactive`,`createdate`,`epoint`) VALUES ('" + req.body[i].name + "','" + req.body[i].price + "','" + req.body[i].totalcost + "','" + req.body[i].time + "','" + req.body[i].point + "',true,CURRENT_TIMESTAMP,'" + req.body[i].epoint + "')", function (data, err) {
+          if (err) {
+              res.json("error");
+              console.log(err)
+          } else {
+             if (i == req.body.length - 1) {
+              return res.json('success');
+
+                      }
+          }
+      });
+  }
+  // console.log(data);
+});
+
 function generateUUID() {
   var d = new Date().getTime();
   var uuid = "xxxxxxxx-xxxx-4xxx-yxxx".replace(/[xy]/g, function (c) {
