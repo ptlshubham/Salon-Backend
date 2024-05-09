@@ -2465,23 +2465,30 @@ router.get("/GetWebActiveBanner", midway.checkToken, (req, res, next) => {
 });
 
 router.post("/SaveRegistrationList", (req, res, next) => {
-  console.log(req.body, "companys");
-  db.executeSql("INSERT INTO `companys`(`fname`, `lname`, `uemail`, `cname`, `cphone`, `caddress`, `cpincode`, `isactive`, `createddate`) VALUES ('" + req.body.fname + "','" + req.body.lname + "','" + req.body.email + "','" + req.body.cname + "','" + req.body.phoneno + "','" + req.body.addres + "','" + req.body.pincode + "',true,CURRENT_TIMESTAMP);", function (data, err) {
+  console.log(req.body, "companies");
+  db.executeSql("INSERT INTO `companies`(`fname`, `lname`, `uemail`, `cname`, `uphone`, `isactive`, `createddate`) VALUES ('" + req.body.fname + "','" + req.body.lname + "','" + req.body.email + "','" + req.body.cname + "','" + req.body.phoneno + "',true,CURRENT_TIMESTAMP);", function (data, err) {
     if (err) {
       res.json("error");
     } else {
       var salt = "7fa73b47df808d36c5fe328546ddef8b9011b2c6";
       var repass = salt + "" + req.body.adminpassword;
       var encPassword = crypto.createHash("sha1").update(repass).digest("hex");
-      db.executeSql("INSERT INTO `users`(`salonid`, `email`, `password`, `role`, `isactive`) VALUES (" + data.insertId + ",'" + req.body.adminemail + "','" + encPassword + "','" + req.body.adminrole + "',true);", function (data1, err) {
+      db.executeSql("INSERT INTO `users`(`salonid`, `email`, `password`, `role`, `isactive`) VALUES (" + data.insertId + ",'" + req.body.email + "','" + encPassword + "','" + req.body.adminrole + "',true);", function (data1, err) {
         if (err) {
           res.json("error");
         } else {
-          db.executeSql("INSERT INTO `admin`(`salonid`, `firstname`, `lastname`, `email`, `password`, `isactive`, `role`, `uid`) VALUES (" + data.insertId + ",'" + req.body.adminfname + "','" + req.body.adminlname + "','" + req.body.adminemail + "','" + encPassword + "','" + req.body.adminrole + "',true,'" + data1.insertId + "');", function (data2, err) {
+          db.executeSql("INSERT INTO `admin`(`salonid`, `firstname`, `lastname`, `email`, `password`, `isactive`, `role`, `uid`) VALUES (" + data.insertId + ",'" + req.body.fname + "','" + req.body.lname + "','" + req.body.email + "','" + encPassword + "',true,'" + req.body.adminrole + "','" + data1.insertId + "');", function (data2, err) {
             if (err) {
               res.json("error");
             } else {
-              return res.json(data);
+              db.executeSql("INSERT INTO `general`(`salonid`,`vipdiscount`, `maxdiscount`, `emppointsconvert`, `custpointsconvert`,`currency` ,`createddate`)VALUES (" + data.insertId + ",0,0,0,0,₹,CURRENT_TIMESTAMP);", function (data3, err) {
+                if (err) {
+                  console.log(err)
+                  res.json("error");
+                } else {
+                  return res.json('success');
+                }
+              });
             }
           });
         }
@@ -2490,8 +2497,8 @@ router.post("/SaveRegistrationList", (req, res, next) => {
   });
 });
 
-router.get("/GetAllRegistration", midway.checkToken, (req, res, next) => {
-  db.executeSql("select * from saloonlist", function (data, err) {
+router.get("/GetAllRegistrationList/:id", midway.checkToken, (req, res, next) => {
+  db.executeSql("select * from companies where id=" + req.params.id, function (data, err) {
     if (err) {
       console.log(err);
     } else {
@@ -2500,9 +2507,19 @@ router.get("/GetAllRegistration", midway.checkToken, (req, res, next) => {
   });
 });
 
-router.post("/UpdateRegistrationList", midway.checkToken, (req, res, next) => {
+router.post("/UpdateUserDetails", midway.checkToken, (req, res, next) => {
   console.log(req.body)
-  db.executeSql("UPDATE `saloonlist` SET sname='" + req.body.sname + "',scontact='" + req.body.scontact + "',semail='" + req.body.semail + "',gst='" + req.body.gst + "',address='" + req.body.address + "',`landmark`='" + req.body.landmark + "',`state`='" + req.body.selectState + "',`city`='" + req.body.city + "',`pincode`='" + req.body.pincode + "',oname='" + req.body.oname + "',ocontact='" + req.body.ocontact + "',oemail='" + req.body.oemail + "',`gender`='" + req.body.selectGender + "',websitelink='" + req.body.websitelink + "',subscription='" + req.body.selectSupscription + "',updateddate=CURRENT_TIMESTAMP WHERE id=" + req.body.id + ";", function (data, err) {
+  db.executeSql("UPDATE `companies` SET fname='" + req.body.fname + "',lname='" + req.body.lname + "',uphone='" + req.body.uphone + "',uwhatsapp='" + req.body.uwhatsapp + "',uaddress='" + req.body.uaddress + "',ustate='" + req.body.ustate + "',`ulandmark`='" + req.body.ulandmark + "',`ucity`='" + req.body.ucity + "',`ugender`='" + req.body.selectGender + "',`upincode`='" + req.body.upincode + "',updateddate=CURRENT_TIMESTAMP WHERE id=" + req.body.id + ";", function (data, err) {
+    if (err) {
+      console.log("Error in store.js", err);
+    } else {
+      return res.json(data);
+    }
+  });
+});
+router.post("/UpdateCompaniesDetails", midway.checkToken, (req, res, next) => {
+  // console.log(req.body)
+  db.executeSql("UPDATE `companies` SET cname='" + req.body.cname + "',cphone='" + req.body.cphone + "',cwhatsapp='" + req.body.cwhatsapp + "',uwhatsapp='" + req.body.uwhatsapp + "',cemail='" + req.body.cemail + "',cgst='" + req.body.cgst + "',caddress='" + req.body.caddress + "',cstate='" + req.body.cstate + "',`clandmark`='" + req.body.clandmark + "',`ccity`='" + req.body.ccity + "',`cpincode`='" + req.body.cpincode + "',updateddate=CURRENT_TIMESTAMP WHERE id=" + req.body.id + ";", function (data, err) {
     if (err) {
       console.log("Error in store.js", err);
     } else {
@@ -2511,7 +2528,16 @@ router.post("/UpdateRegistrationList", midway.checkToken, (req, res, next) => {
   });
 });
 
-
+router.post("/SaveCompaniesLogo", midway.checkToken, (req, res, next) => {
+  console.log(req.body, "compny logo")
+  db.executeSql("UPDATE `companies` SET clogo='" + req.body.clogo + "',updateddate=CURRENT_TIMESTAMP WHERE id=" + req.body.id + ";", function (data, err) {
+    if (err) {
+      console.log("Error in store.js", err);
+    } else {
+      return res.json(data);
+    }
+  });
+});
 
 router.get("/RemoveRegistrationDetails/:id", midway.checkToken, (req, res, next) => {
   db.executeSql("Delete from saloonlist where id=" + req.params.id, function (data, err) {
@@ -2525,9 +2551,125 @@ router.get("/RemoveRegistrationDetails/:id", midway.checkToken, (req, res, next)
 }
 );
 
+router.post("/SaveSocialLinks", midway.checkToken, (req, res, next) => {
+  console.log(req.body)
+  db.executeSql("select * from sociallinks where salonid=" + req.body.salonid + "", function (data, err) {
+    if (err) {
+      console.log(err);
+    } else {
+      console.log(data);
+      if (data.length == 0) {
+        db.executeSql("INSERT INTO `sociallinks`(`salonid`, `facebook`,`instagram`, `twitter`, `linkedin`, `youtube`,`createddate`)VALUES(" + req.body.salonid + ",'" + req.body.facebook + "','" + req.body.instagram + "','" + req.body.twitter + "','" + req.body.linkedin + "','" + req.body.youtube + "',CURRENT_TIMESTAMP);", function (data1, err) {
+          if (err) {
+            console.log(err)
+            res.json("error");
+          } else {
+            return res.json(data1);
+          }
+        });
+      }
+      else {
+        db.executeSql("UPDATE `sociallinks` SET facebook='" + req.body.facebook + "',instagram='" + req.body.instagram + "',twitter='" + req.body.twitter + "',linkedin='" + req.body.linkedin + "',youtube='" + req.body.youtube + "',updateddate=CURRENT_TIMESTAMP WHERE id=" + req.body.id + ";", function (data2, err) {
+          if (err) {
+            console.log(err);
+            res.json("error");
+          } else {
+            return res.json(data2);
+          }
+        });
+      }
+    }
+  });
+});
+router.get("/GetSocialLinks/:salonid", midway.checkToken, (req, res, next) => {
+  db.executeSql("select * from sociallinks where salonid=" + req.params.salonid, function (data, err) {
+    if (err) {
+      console.log(err);
+    } else {
+      console.log(data);
+      return res.json(data);
+    }
+  });
+});
+
+router.post("/SaveCredentials", midway.checkToken, (req, res, next) => {
+  db.executeSql("select * from credentials where salonid=" + req.body.salonid + " && accounttype='" + req.body.accounttype + "'", function (data, err) {
+    if (err) {
+      console.log(err);
+    } else {
+      console.log(data);
+      if (data.length == 0) {
+        console.log('', data)
+        db.executeSql("INSERT INTO `credentials`(`salonid`, `username`, `accounttype`, `password`, `createddate`) VALUES(" + req.body.salonid + ",'" + req.body.username + "','" + req.body.accounttype + "','" + req.body.password + "',CURRENT_TIMESTAMP);", function (data1, err) {
+          if (err) {
+            console.log(err)
+          } else {
+            return res.json(data1);
+          }
+        });
+      }
+      else {
+        console.log('fhugfvhjvghgvhyivyhgvyh')
+        console.log(req.body)
+        db.executeSql("UPDATE `credentials` SET username='" + req.body.username + "',password='" + req.body.password + "',updateddate=CURRENT_TIMESTAMP WHERE id=" + req.body.id + ";", function (data2, err) {
+          if (err) {
+            console.log(err);
+            res.json("error");
+          } else {
+            return res.json(data2);
+          }
+        });
+      }
+    }
+  });
+});
+
+router.get("/getSocialCredentials/:salonid", midway.checkToken, (req, res, next) => {
+  db.executeSql("select * from credentials where salonid=" + req.params.salonid, function (data, err) {
+    if (err) {
+      console.log(err);
+    } else {
+      console.log(data);
+      return res.json(data);
+    }
+  });
+});
+
+
+router.post("/UploadLogoImage", midway.checkToken, (req, res, next) => {
+  var imgname = generateUUID();
+  const storage = multer.diskStorage({
+    destination: function (req, file, cb) {
+      cb(null, "images/logo");
+    },
+    // By default, multer removes file extensions so let's add them back
+    filename: function (req, file, cb) {
+      cb(null, imgname + path.extname(file.originalname));
+    },
+  });
+  let upload = multer({ storage: storage }).single("file");
+  upload(req, res, function (err) {
+    console.log("path=", config.url + "images/logo/" + req.file.filename);
+
+    if (req.fileValidationError) {
+      console.log("err1", req.fileValidationError);
+      return res.json("err1", req.fileValidationError);
+    } else if (!req.file) {
+      console.log("Please select an image to upload");
+      return res.json("Please select an image to upload");
+    } else if (err instanceof multer.MulterError) {
+      console.log("err3");
+      return res.json("err3", err);
+    } else if (err) {
+      console.log("err4");
+      return res.json("err4", err);
+    }
+    return res.json("/images/logo/" + req.file.filename);
+  });
+});
 //----------
 
-router.post("/saveVendororderList", midway.checkToken, (req, res, next) => {
+router.post("/SaveVendororderList", midway.checkToken, (req, res, next) => {
   console.log(req.body, "dfggf");
   db.executeSql("INSERT INTO `vendororder`(`vid`, `totalorderprice`, `totalquantity`, `orderdate`) VALUES (" + req.body.vid + "," + req.body.finalprice + "," + req.body.totalQuantity + ", CURRENT_TIMESTAMP);", function (data, err) {
     if (err) {
@@ -2560,7 +2702,7 @@ router.get("/GetVendorOrderList/:id", midway.checkToken, (req, res, next) => {
   });
 });
 
-router.get("/removeorderDetails/:id", midway.checkToken, (req, res, next) => {
+router.get("/RemoveorderDetails/:id", midway.checkToken, (req, res, next) => {
   db.executeSql("Delete from vendororder where id=" + req.params.id, function (data, err) {
     if (err) {
       console.log(err);
@@ -2662,9 +2804,10 @@ router.post("/UpdateLogoutDetails", (req, res, next) => {
 });
 
 router.post("/SaveGeneralSalonDetails", midway.checkToken, (req, res, next) => {
-  console.log(req.body, "General Details");
-  db.executeSql("INSERT INTO `general`(`salonid`, `vipdiscount`, `maxdiscount`, `emppointsconvert`, `custpointsconvert`, `createddate`) VALUES (" + req.body.salonid + "," + req.body.vipdiscount + "," + req.body.maxdiscount + "," + req.body.emppointsconvert + "," + req.body.custpointsconvert + ",CURRENT_TIMESTAMP);", function (data, err) {
+  console.log(req.body, "genral details")
+  db.executeSql("UPDATE `general` SET vipdiscount=" + req.body.vipdiscount + ",maxdiscount=" + req.body.maxdiscount + ",emppointsconvert=" + req.body.emppointsconvert + ",custpointsconvert=" + req.body.custpointsconvert + ",currency='" + req.body.currency + "',updateddate=CURRENT_TIMESTAMP WHERE id=" + req.body.id + ";", function (data, err) {
     if (err) {
+      console.log(err);
       res.json("error");
     } else {
       return res.json(data);
