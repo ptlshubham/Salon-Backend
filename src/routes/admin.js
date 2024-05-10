@@ -2575,6 +2575,46 @@ router.get("/RemoveRegistrationDetails/:id", midway.checkToken, (req, res, next)
 }
 );
 
+router.post("/SaveSeoDetails", midway.checkToken, (req, res, next) => {
+  console.log(req.body)
+  db.executeSql("select * from seo where salonid=" + req.body.salonid + " && type='" + req.body.type + "'", function (data, err) {
+    if (err) {
+      console.log(err);
+    } else {
+      console.log(data);
+      if (data.length == 0) {
+        db.executeSql("INSERT INTO `seo`(`salonid`, `type`,`code`, `isactive`,`createddate`)VALUES(" + req.body.salonid + ",'" + req.body.type + "','" + req.body.code + "'," + req.body.isactive + ",CURRENT_TIMESTAMP);", function (data1, err) {
+          if (err) {
+            console.log(err)
+            res.json("error");
+          } else {
+            return res.json(data1);
+          }
+        });
+      }
+      else {
+        db.executeSql("UPDATE `seo` SET type='" + req.body.type + "',code='" + req.body.code + "', isactive=" + req.body.isactive + ",updateddate=CURRENT_TIMESTAMP WHERE id=" + req.body.id + ";", function (data2, err) {
+          if (err) {
+            console.log(err);
+            res.json("error");
+          } else {
+            return res.json(data2);
+          }
+        });
+      }
+    }
+  });
+});
+router.get("/GetSeoDetails/:salonid", midway.checkToken, (req, res, next) => {
+  db.executeSql("select * from seo where salonid=" + req.params.salonid, function (data, err) {
+    if (err) {
+      console.log(err);
+    } else {
+      console.log(data);
+      return res.json(data);
+    }
+  });
+});
 router.post("/SaveSocialLinks", midway.checkToken, (req, res, next) => {
   console.log(req.body)
   db.executeSql("select * from sociallinks where salonid=" + req.body.salonid + "", function (data, err) {
