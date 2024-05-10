@@ -2410,6 +2410,16 @@ router.get("/GetWebBanners", midway.checkToken, (req, res, next) => {
   });
 });
 
+router.get("/GetImageCategoryGroupBy", (req, res, next) => {
+  db.executeSql("SELECT category,COUNT(*) FROM webbanners GROUP BY category;", function (data, err) {
+      if (err) {
+          console.log(err);
+      } else {
+          return res.json(data);
+      }
+  })
+})
+
 router.post("/RemoveWebBanners", midway.checkToken, (req, res, next) => {
   console.log(req.id);
   db.executeSql(
