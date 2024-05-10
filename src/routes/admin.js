@@ -2272,29 +2272,13 @@ router.post("/SaveUserCustomerList", (req, res, next) => {
 
 router.post("/SaveVendorList", midway.checkToken, (req, res, next) => {
   console.log(req.body);
-  db.executeSql(
-    "INSERT INTO `vendor`( `fname`, `gst`, `contact`, `whatsapp`, `address`, `city`, `pincode`, `isactive`, `createdate`, `updatedate`) VALUES ('" +
-    req.body.fname +
-    "','" +
-    req.body.gst +
-    "','" +
-    req.body.contact +
-    "','" +
-    req.body.whatsapp +
-    "','" +
-    req.body.address +
-    "','" +
-    req.body.city +
-    "'," +
-    req.body.pincode +
-    ",true,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP);",
-    function (data, err) {
-      if (err) {
-        console.log(err);
-      } else {
-        return res.json("success");
-      }
+  db.executeSql("INSERT INTO `vendor`( `fname`, `gst`, `contact`, `whatsapp`, `address`, `state`, `city`, `pincode`, `isactive`, `createdate`, `updatedate`) VALUES ('" + req.body.fname + "','" + req.body.gst + "','" + req.body.contact + "','" + req.body.whatsapp + "','" + req.body.address + "','" + req.body.state + "','" + req.body.city + "'," + req.body.pincode + ",true,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP);", function (data, err) {
+    if (err) {
+      console.log(err);
+    } else {
+      return res.json("success");
     }
+  }
   );
 });
 router.get("/GetAllVendor", midway.checkToken, (req, res, next) => {
@@ -2323,15 +2307,7 @@ router.post("/RemoveVendorList", midway.checkToken, (req, res, next) => {
 
 router.post("/UpdateVendorList", midway.checkToken, (req, res, next) => {
   db.executeSql(
-    "UPDATE `vendor` SET fname='" + req.body.fname + "',gst='" + req.body.gst + "',contact='" + req.body.contact + "',whatsapp='" + req.body.whatsapp +
-    "',address='" +
-    req.body.address +
-    "',city='" +
-    req.body.city +
-    "',updatedate=CURRENT_TIMESTAMP WHERE id=" +
-    req.body.id +
-    ";",
-    function (data, err) {
+    "UPDATE `vendor` SET fname='" + req.body.fname + "',gst='" + req.body.gst + "',contact='" + req.body.contact + "',whatsapp='" + req.body.whatsapp + "',address='" + req.body.address + "',state='" + req.body.state + "',city='" + req.body.city + "',updatedate=CURRENT_TIMESTAMP WHERE id=" + req.body.id + ";", function (data, err) {
       if (err) {
         console.log("Error in store.js", err);
       } else {
@@ -2413,7 +2389,7 @@ router.post("/UploadBannersImage", midway.checkToken, (req, res, next) => {
 
 router.post("/SaveWebBanners", midway.checkToken, (req, res, next) => {
   console.log(req.body);
-  db.executeSql("INSERT INTO `webbanners`(`name`,`bannersimage`,`status`)VALUES('" + req.body.purpose + "','" + req.body.image + "'," + req.body.status + ");",
+  db.executeSql("INSERT INTO `webbanners`(`name`, `category`,`bannersimage`,`status`)VALUES('" + req.body.purpose + "','" + req.body.category + "','" + req.body.image + "'," + req.body.status + ");",
     function (data, err) {
       if (err) {
         res.json("error");
