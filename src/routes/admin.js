@@ -310,8 +310,8 @@ router.get("/GetAllCustomer", midway.checkToken, (req, res, next) => {
   });
 });
 
-router.get("/GetAllOffer", midway.checkToken, (req, res, next) => {
-  db.executeSql("select * from offer", function (data, err) {
+router.get("/GetAllOffer/:id", midway.checkToken, (req, res, next) => {
+  db.executeSql("select * from offer where salonid=" + req.params.id + "", function (data, err) {
     if (err) {
       console.log(err);
     } else {
@@ -329,7 +329,7 @@ router.post("/SaveOfferList", midway.checkToken, (req, res, next) => {
           if (err) {
             console.log(err);
           } else {
-            db.executeSql("INSERT INTO `offer`(`offername`,`totalprice`,`offerprice`,`percentage`,`status`)VALUES('" + req.body.offername + "'," + req.body.totalprice + "," + req.body.offerprice + "," + req.body.percentage + ",true);", function (data, err) {
+            db.executeSql("INSERT INTO `offer`(`salonid`,`offername`,`totalprice`,`offerprice`,`percentage`,`status`)VALUES(" + req.body.salonid + ",'" + req.body.offername + "'," + req.body.totalprice + "," + req.body.offerprice + "," + req.body.percentage + ",true);", function (data, err) {
               if (err) {
                 console.log(err);
               } else {
@@ -351,7 +351,7 @@ router.post("/SaveOfferList", midway.checkToken, (req, res, next) => {
       }
     });
   } else {
-    db.executeSql("INSERT INTO `offer`(`offername`,`totalprice`,`offerprice`,`percentage`,`status`)VALUES('" + req.body.offername + "'," + req.body.totalprice + "," + req.body.offerprice + "," + req.body.percentage + ",true);", function (data, err) {
+    db.executeSql("INSERT INTO `offer`(`salonid`,`offername`,`totalprice`,`offerprice`,`percentage`,`status`)VALUES(" + req.body.salonid + ",'" + req.body.offername + "'," + req.body.totalprice + "," + req.body.offerprice + "," + req.body.percentage + ",true);", function (data, err) {
       if (err) {
         console.log(err);
       } else {
@@ -392,29 +392,27 @@ router.post("/SaveAcceptUserOrder", midway.checkToken, (req, res, next) => {
   });
 });
 router.get("/removeOfferDetails/:id", midway.checkToken, (req, res, next) => {
-  db.executeSql(
-    "Delete from offer where id=" + req.params.id,
-    function (data, err) {
-      if (err) {
-        console.log(err);
-      } else {
-        db.executeSql(
-          "Delete from offerservices where offerid=" + req.params.id,
-          function (data1, err) {
-            if (err) {
-              console.log(err);
-            } else {
-              return res.json(data1);
-            }
+  db.executeSql("Delete from offer where id=" + req.params.id, function (data, err) {
+    if (err) {
+      console.log(err);
+    } else {
+      db.executeSql(
+        "Delete from offerservices where offerid=" + req.params.id,
+        function (data1, err) {
+          if (err) {
+            console.log(err);
+          } else {
+            return res.json(data1);
           }
-        );
-      }
+        }
+      );
     }
+  }
   );
 });
 
-router.get("/GetActiveOffer", midway.checkToken, (req, res, next) => {
-  db.executeSql("select * from offer where status=true", function (data, err) {
+router.get("/GetActiveOffer/:id", midway.checkToken, (req, res, next) => {
+  db.executeSql("select * from offer where status=true AND salonid=" + req.params.id + ",", function (data, err) {
     if (err) {
       console.log(err);
     } else {
@@ -446,7 +444,7 @@ router.post("/SaveMembershipList", midway.checkToken, (req, res, next) => {
           if (err) {
             console.log(err);
           } else {
-            db.executeSql("INSERT INTO `membership`(`membershipname`, `membershipdiscount`, `totalprice`, `membershipprice`, `status`, `validity`, `validitydays`) VALUES('" + req.body.membershipname + "'," + req.body.membershipdiscount + "," + req.body.totalprice + "," + req.body.membershipprice + ",true,'" + req.body.validity + "','" + req.body.validitydays + "');", function (data3, err) {
+            db.executeSql("INSERT INTO `membership`(`salonid`,`membershipname`, `membershipdiscount`, `totalprice`, `membershipprice`, `status`, `validity`, `validitydays`) VALUES(" + req.body.salonid + ",'" + req.body.membershipname + "'," + req.body.membershipdiscount + "," + req.body.totalprice + "," + req.body.membershipprice + ",true,'" + req.body.validity + "','" + req.body.validitydays + "');", function (data3, err) {
               if (err) {
                 console.log(err);
               } else {
@@ -470,7 +468,7 @@ router.post("/SaveMembershipList", midway.checkToken, (req, res, next) => {
     });
   }
   else {
-    db.executeSql("INSERT INTO `membership`(`membershipname`,`membershipdiscount`,`totalprice`,`membershipprice`,`status`, `validity`, `validitydays`)VALUES('" + req.body.membershipname + "'," + req.body.membershipdiscount + "," + req.body.totalprice + "," + req.body.membershipprice + ",true,'" + req.body.validity + "','" + req.body.validitydays + "');", function (data, err) {
+    db.executeSql("INSERT INTO `membership`(`salonid`,`membershipname`,`membershipdiscount`,`totalprice`,`membershipprice`,`status`, `validity`, `validitydays`)VALUES(" + req.body.salonid + ",'" + req.body.membershipname + "'," + req.body.membershipdiscount + "," + req.body.totalprice + "," + req.body.membershipprice + ",true,'" + req.body.validity + "','" + req.body.validitydays + "');", function (data, err) {
       if (err) {
         console.log(err);
       } else {
@@ -502,24 +500,19 @@ router.post("/GetUsedServicesByMembership", midway.checkToken, (req, res, next) 
   );
 }
 );
-router.get(
-  "/removeMembershipDetails/:id",
-  midway.checkToken,
-  (req, res, next) => {
-    db.executeSql(
-      "Delete from membership where id=" + req.params.id,
-      function (data, err) {
-        if (err) {
-          console.log(err);
-        } else {
-          return res.json(data);
-        }
-      }
-    );
+router.get("/removeMembershipDetails/:id", midway.checkToken, (req, res, next) => {
+  db.executeSql("Delete from membership where id=" + req.params.id, function (data, err) {
+    if (err) {
+      console.log(err);
+    } else {
+      return res.json(data);
+    }
   }
+  );
+}
 );
-router.get("/GetAllMembership", midway.checkToken, (req, res, next) => {
-  db.executeSql("select * from membership", function (data, err) {
+router.get("/GetAllMembership/:id", midway.checkToken, (req, res, next) => {
+  db.executeSql("select * from membership where salonid=" + req.params.id + "", function (data, err) {
     if (err) {
       console.log(err);
     } else {
@@ -527,8 +520,8 @@ router.get("/GetAllMembership", midway.checkToken, (req, res, next) => {
     }
   });
 });
-router.get("/GetAllActiveMembership", midway.checkToken, (req, res, next) => {
-  db.executeSql("select * from membership where status=true", function (data, err) {
+router.get("/GetAllActiveMembership/:id", midway.checkToken, (req, res, next) => {
+  db.executeSql("select * from membership where status=true AND salonid=" + req.params.id + "", function (data, err) {
     if (err) {
       console.log(err);
     } else {
