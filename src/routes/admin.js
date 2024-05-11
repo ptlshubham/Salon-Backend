@@ -2389,7 +2389,7 @@ router.post("/UploadBannersImage", midway.checkToken, (req, res, next) => {
 
 router.post("/SaveWebBanners", midway.checkToken, (req, res, next) => {
   console.log(req.body);
-  db.executeSql("INSERT INTO `webbanners`(`name`, `category`,`bannersimage`,`status`)VALUES('" + req.body.purpose + "','" + req.body.category + "','" + req.body.image + "'," + req.body.status + ");",
+  db.executeSql("INSERT INTO `webbanners`(`salonid`, `name`, `category`,`bannersimage`,`status`)VALUES('" + req.body.salonid + "','" + req.body.purpose + "','" + req.body.category + "','" + req.body.image + "'," + req.body.status + ");",
     function (data, err) {
       if (err) {
         res.json("error");
@@ -2400,8 +2400,9 @@ router.post("/SaveWebBanners", midway.checkToken, (req, res, next) => {
   );
 });
 
-router.get("/GetWebBanners", midway.checkToken, (req, res, next) => {
-  db.executeSql("select * from webbanners", function (data, err) {
+
+router.get("/GetWebBanners/:id", midway.checkToken, (req, res, next) => {
+  db.executeSql("select * from webbanners where salonid=" + req.params.id, function (data, err) {
     if (err) {
       console.log("Error in store.js", err);
     } else {
@@ -2409,16 +2410,6 @@ router.get("/GetWebBanners", midway.checkToken, (req, res, next) => {
     }
   });
 });
-
-router.get("/GetImageCategoryGroupBy", (req, res, next) => {
-  db.executeSql("SELECT category,COUNT(*) FROM webbanners GROUP BY category;", function (data, err) {
-      if (err) {
-          console.log(err);
-      } else {
-          return res.json(data);
-      }
-  })
-})
 
 router.post("/RemoveWebBanners", midway.checkToken, (req, res, next) => {
   console.log(req.id);
@@ -2548,6 +2539,20 @@ router.post("/SaveCompaniesLogo", midway.checkToken, (req, res, next) => {
     }
   });
 });
+router.post("/RemoveCompaniesLogo", midway.checkToken, (req, res, next) => {
+  console.log(req.id);
+  db.executeSql(
+    "Delete from companies where id=" + req.body.id,
+    function (data, err) {
+      if (err) {
+        console.log("Error in store.js", err);
+      } else {
+        return res.json(data);
+      }
+    }
+  );
+});
+
 
 router.get("/RemoveRegistrationDetails/:id", midway.checkToken, (req, res, next) => {
   db.executeSql("Delete from saloonlist where id=" + req.params.id, function (data, err) {
