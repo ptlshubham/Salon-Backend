@@ -5,6 +5,7 @@ var con = mysql.createConnection({
     host: "localhost",
     user: "root",
     password: "",
+    // database: "salon-portal"
     database: "angrez"
 });
 exports.executeSql = function (sql, callback) {
