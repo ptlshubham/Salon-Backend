@@ -1629,31 +1629,18 @@ router.get("/GetMonthlyPayment", midway.checkToken, (req, res, next) => {
 
 router.post("/SaveExpensesList", midway.checkToken, (req, res, next) => {
   console.log(req.body);
-  db.executeSql(
-    "INSERT INTO expenses (expensesdate, expensesname, expensesprices, employeename, paymenttype) VALUES ('" +
-    req.body.expensesdate +
-    "','" +
-    req.body.expensesname +
-    "','" +
-    req.body.expensesprices +
-    "','" +
-    req.body.employeename +
-    "','" +
-    req.body.paymenttype +
-    "');",
-    function (data, err) {
-      console.log(req.body.expensesdate, " , ", req.body.expensesdate);
-      if (err) {
-        res.json("error");
-      } else {
-        return res.json(data);
-      }
+  db.executeSql("INSERT INTO expenses (salonid, expensesdate, expensesname, expensesprices, employeename, paymenttype) VALUES ('" + req.body.salonid + "','" + req.body.expensesdate + "','" + req.body.expensesname + "','" + req.body.expensesprices + "','" + req.body.employeename + "','" + req.body.paymenttype + "');", function (data, err) {
+    console.log(req.body.expensesdate, " , ", req.body.expensesdate);
+    if (err) {
+      res.json("error");
+    } else {
+      return res.json(data);
     }
+  }
   );
 });
-
-router.get("/GetAllExpenses", midway.checkToken, (req, res, next) => {
-  db.executeSql("select * from expenses", function (data, err) {
+router.get("/GetAllExpenses/:id", midway.checkToken, (req, res, next) => {
+  db.executeSql("select * from expenses where salonid=" + req.params.id, function (data, err) {
     if (err) {
       console.log(err);
     } else {
@@ -2272,7 +2259,7 @@ router.post("/SaveUserCustomerList", (req, res, next) => {
 
 router.post("/SaveVendorList", midway.checkToken, (req, res, next) => {
   console.log(req.body);
-  db.executeSql("INSERT INTO `vendor`( `fname`, `gst`, `contact`, `whatsapp`, `address`, `state`, `city`, `pincode`, `isactive`, `createdate`, `updatedate`) VALUES ('" + req.body.fname + "','" + req.body.gst + "','" + req.body.contact + "','" + req.body.whatsapp + "','" + req.body.address + "','" + req.body.state + "','" + req.body.city + "'," + req.body.pincode + ",true,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP);", function (data, err) {
+  db.executeSql("INSERT INTO `vendor`(`salonid`, `fname`, `gst`, `contact`, `whatsapp`, `address`, `state`, `city`, `pincode`, `isactive`, `createdate`, `updatedate`) VALUES ('" + req.body.salonid + "','" + req.body.fname + "','" + req.body.gst + "','" + req.body.contact + "','" + req.body.whatsapp + "','" + req.body.address + "','" + req.body.state + "','" + req.body.city + "'," + req.body.pincode + ",true,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP);", function (data, err) {
     if (err) {
       console.log(err);
     } else {
@@ -2281,8 +2268,8 @@ router.post("/SaveVendorList", midway.checkToken, (req, res, next) => {
   }
   );
 });
-router.get("/GetAllVendor", midway.checkToken, (req, res, next) => {
-  db.executeSql("select * from vendor", function (data, err) {
+router.get("/GetAllVendor/:id", midway.checkToken, (req, res, next) => {
+  db.executeSql("select * from vendor  where salonid=" + req.params.id, function (data, err) {
     if (err) {
       console.log(err);
     } else {
