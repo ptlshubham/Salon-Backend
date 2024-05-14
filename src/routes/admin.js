@@ -2670,6 +2670,95 @@ router.post("/UploadLogoImage", midway.checkToken, (req, res, next) => {
 });
 //----------
 
+router.post("/UploadRefrenceImage", midway.checkToken, (req, res, next) => {
+  var imgname = generateUUID();
+  const storage = multer.diskStorage({
+    destination: function (req, file, cb) {
+      cb(null, "images/refrenceimage");
+    },
+    // By default, multer removes file extensions so let's add them back
+    filename: function (req, file, cb) {
+      cb(null, imgname + path.extname(file.originalname));
+    },
+  });
+  let upload = multer({ storage: storage }).single("file");
+  upload(req, res, function (err) {
+    console.log("path=", config.url + "images/refrenceimage/" + req.file.filename);
+
+    if (req.fileValidationError) {
+      console.log("err1", req.fileValidationError);
+      return res.json("err1", req.fileValidationError);
+    } else if (!req.file) {
+      console.log("Please select an image to upload");
+      return res.json("Please select an image to upload");
+    } else if (err instanceof multer.MulterError) {
+      console.log("err3");
+      return res.json("err3", err);
+    } else if (err) {
+      console.log("err4");
+      return res.json("err4", err);
+    }
+
+    return res.json("/images/refrenceimage/" + req.file.filename);
+  });
+});
+// router.post("/UploadMultiRefrence", midway.checkToken, (req, res, next) => {
+//   var imgname = generateUUID();
+//   const storage = multer.diskStorage({
+//     destination: function (req, file, cb) {
+//       cb(null, 'images/refrencemulti');
+//     },
+//     // By default, multer removes file extensions so let's add them back
+//     filename: function (req, file, cb) {
+//       cb(null, imgname + path.extname(file.originalname));
+//     }
+//   });
+//   let upload = multer({ storage: storage }).single('file');
+//   upload(req, res, function (err) {
+//     console.log("path=", config.url + 'images/refrencemulti/' + req.file.filename);
+
+//     if (req.fileValidationError) {
+//       console.log("err1", req.fileValidationError);
+//       return res.json("err1", req.fileValidationError);
+//     } else if (!req.file) {
+//       console.log('Please select an image to upload');
+//       return res.json('Please select an image to upload');
+//     } else if (err instanceof multer.MulterError) {
+//       console.log("err3");
+//       return res.json("err3", err);
+//     } else if (err) {
+//       console.log("err4");
+//       return res.json("err4", err);
+//     }
+//     return res.json('/images/refrencemulti/' + req.file.filename);
+//   });
+// });
+router.post("/SavePromotiondetails", midway.checkToken, (req, res, next) => {
+  console.log(req.body);
+  db.executeSql("INSERT INTO `promotions`(`salonid`, `tokenid`, `purpose`, `sizes` , `title`, `description`, `url`, `url1`, `url2`, `image`, `isactive`,`createddate`)VALUES('" + req.body.salonid + "','" + req.body.tokenid + "','" + req.body.purpose + "','" + req.body.sizes + "','" + req.body.title + "','" + req.body.description + "','" + req.body.url + "','" + req.body.url1 + "','" + req.body.url2 + "','" + req.body.image + "',true,CURRENT_TIMESTAMP);", function (data, err) {
+    if (err) {
+      res.json("error");
+    } else {
+      res.json("success");
+    }
+  }
+  );
+});
+
+router.post("/RemoveRefrenceImage", midway.checkToken, (req, res, next) => {
+  console.log(req.id);
+  db.executeSql(
+    "Delete from promotions where id=" + req.body.id,
+    function (data, err) {
+      if (err) {
+        console.log("Error in store.js", err);
+      } else {
+        return res.json(data);
+      }
+    }
+  );
+});
+
 router.post("/SaveVendororderList", midway.checkToken, (req, res, next) => {
   console.log(req.body, "dfggf");
   db.executeSql("INSERT INTO `vendororder`(`vid`, `totalorderprice`, `totalquantity`, `orderdate`) VALUES (" + req.body.vid + "," + req.body.finalprice + "," + req.body.totalQuantity + ", CURRENT_TIMESTAMP);", function (data, err) {
@@ -2804,6 +2893,7 @@ router.post("/UpdateLogoutDetails", (req, res, next) => {
   );
 });
 
+// ---------
 router.post("/SaveGeneralSalonDetails", midway.checkToken, (req, res, next) => {
   console.log(req.body, "genral details")
   db.executeSql("UPDATE `general` SET vipdiscount=" + req.body.vipdiscount + ",maxdiscount=" + req.body.maxdiscount + ",emppointsconvert=" + req.body.emppointsconvert + ",custpointsconvert=" + req.body.custpointsconvert + ",currency='" + req.body.currency + "',updateddate=CURRENT_TIMESTAMP WHERE id=" + req.body.id + ";", function (data, err) {
